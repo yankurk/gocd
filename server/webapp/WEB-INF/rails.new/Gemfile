@@ -20,4 +20,5 @@ gem 'webpacker'
 
 group :development, :test do
   gem 'rspec-rails', '2.99'
+  gem 'capybara'
 end
