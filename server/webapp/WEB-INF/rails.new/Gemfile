@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.0.4'
+gem 'rails', '4.2.9'
 
 gem 'validatable', '>=1.6.0'
 
@@ -17,11 +17,11 @@ gem 'js-routes'
 gem 'oauth2_provider', '1.0.3', path: 'vendor/engines/oauth2_provider'
 gem 'versionist'
 gem 'roar'
-gem 'rack-throttle', '~> 0.4.2'
+gem 'rack-throttle'
 gem 'webpack-rails'
 
 group :development, :test do
-  gem 'rails-dev-tweaks', '~> 1.1'
+  gem 'rails-dev-tweaks'
   gem 'minitest'
   gem "jasmine"
   gem "jasmine-rails"
@@ -29,10 +29,10 @@ group :development, :test do
   gem 'jasmine-jquery-rails'
   gem 'jasmine-junitreporter'
 
-  gem 'rspec-rails', '2.14.2'
+  gem 'rspec-rails', '2.99'
   gem 'rspec-extra-formatters'
 
-  gem 'capybara', '2.2.1'
+  gem 'capybara'
   gem 'ruby-debug-base'
   gem 'ruby-debug-ide'
 end
