@@ -205,7 +205,7 @@ def findGemsToNotPack = {
     gems = ruby.evalScriptlet(
       """
           Dir.chdir('${project.railsRoot}') do
-            \$LOAD_PATH.unshift("vendor/bundle/jruby/2.3.0/gems/bundler-${versions.gems.bundler}/lib")
+            \$LOAD_PATH.unshift("${project.railsRoot}/vendor/bundle/jruby/2.3.0/gems/bundler-${versions.gems.bundler}/lib")
             require 'bundler'
             require 'json'
             definition = ::Bundler.definition
@@ -483,9 +483,9 @@ task war(type: Jar) {
     exclude("**/rails.new/app/views/**/*.*")
     exclude("**/rails.new/webpack/")
     findGemsToNotPack().each { gem ->
-      theSpec.exclude("**/rails.new/vendor/bundle/jruby/1.9/gems/${gem}")
-      theSpec.exclude("**/rails.new/vendor/bundle/jruby/1.9/specifications/${gem}.gemspec")
-      theSpec.exclude("**/rails.new/vendor/bundle/jruby/1.9/build_info/${gem}.info")
+      theSpec.exclude("**/rails.new/vendor/bundle/jruby/2.3.0/gems/${gem}")
+      theSpec.exclude("**/rails.new/vendor/bundle/jruby/2.3.0/specifications/${gem}.gemspec")
+      theSpec.exclude("**/rails.new/vendor/bundle/jruby/2.3.0/build_info/${gem}.info")
     }
   }
 
