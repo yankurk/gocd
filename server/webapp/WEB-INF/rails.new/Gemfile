@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.9'
 gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
-gem 'jquery-rails'
+gem 'js-routes'
 
 # TODO: UPGRADE: remove this and upgrade - https://github.com/ruby/rake/issues/116#issuecomment-195164635
 gem 'rake', '11.1.0'
@@ -15,7 +15,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'roar', '1.0.1'
 gem 'representable', '2.1.7'
 gem 'versionist'
-
 
 group :development, :test do
   gem 'rspec-rails', '2.99'
