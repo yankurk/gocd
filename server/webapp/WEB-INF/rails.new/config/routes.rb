@@ -1,21 +1,5 @@
-##########################GO-LICENSE-START################################
-# Copyright 2017 ThoughtWorks, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-##########################GO-LICENSE-END##################################
-
-Go::Application.routes.draw do
-  mount JasmineRails::Engine => '/jasmine-specs', as: :jasmine_old if defined?(JasmineRails)
+Rails.application.routes.draw do
+  # mount JasmineRails::Engine => '/jasmine-specs', as: :jasmine_old if defined?(JasmineRails)
 
   unless defined?(CONSTANTS)
     CONFIG_REPO_ID_FORMAT = ROLE_NAME_FORMAT = ELASTIC_AGENT_PROFILE_ID_FORMAT = USER_NAME_FORMAT = GROUP_NAME_FORMAT = TEMPLATE_NAME_FORMAT = PIPELINE_NAME_FORMAT = STAGE_NAME_FORMAT = ENVIRONMENT_NAME_FORMAT = /[\w\-][\w\-.]*/
@@ -31,7 +15,7 @@ Go::Application.routes.draw do
     CONSTANTS = true
   end
 
-  mount Oauth2Provider::Engine => '/oauth', :as => :oauth_engine
+  # mount Oauth2Provider::Engine => '/oauth', :as => :oauth_engine
 
   root 'welcome#index' # put to get root_path. '/' is handled by java.
 
@@ -472,4 +456,5 @@ Go::Application.routes.draw do
 
   # dummy mappings. for specs to pass
   get 'test' => 'test/test#index', as: :oauth_clients
+
 end

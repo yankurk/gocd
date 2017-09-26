@@ -14,6 +14,8 @@
 # limitations under the License.
 ##########################################################################
 
+$rack_default_headers = Rack::MockRequest::DEFAULT_ENV.dup
+
 module ApiHeaderSetupTeardown
 
   def setup_header

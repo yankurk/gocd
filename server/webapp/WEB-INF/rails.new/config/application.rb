@@ -1,10 +1,20 @@
 require File.expand_path('../boot', __FILE__)
 
-require 'action_controller/railtie'
-require 'action_view/railtie'
-require 'sprockets/railtie'
-require 'rails/test_unit/railtie'
+%w(
+  action_controller
+  action_view
+  rails/test_unit
+  sprockets
+).each do |framework|
+  begin
+    require "#{framework}/railtie"
+  rescue LoadError
+  end
+end
 
+
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 module Go
@@ -15,48 +25,20 @@ module Go
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = 'UTC'
+    # config.time_zone = 'Central Time (US & Canada)'
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    # Rails4 does not load lib/* by default. Forcing it to do so.
+    # Do not swallow errors in after_commit/after_rollback callbacks.
+    # config.active_record.raise_in_transactional_callbacks = true
+
+
     config.autoload_paths += Dir[
-        Rails.root.join('lib', '**/'),
-        Rails.root.join('app', 'models', '**/'),
-        Rails.root.join('app', 'presenters')
+      Rails.root.join('lib'),
+      Rails.root.join('app', 'presenters')
     ]
-
-    # Replacement for "helper :all", used to make all helper methods available to controllers.
-    config.action_controller.include_all_helpers = true
-
-    #Set up rate limiting
-    require "encryption_api_rate_limiter"
-    config.middleware.use EncryptionApiRateLimiter, {max_per_minute: com.thoughtworks.go.util.SystemEnvironment.new.getMaxEncryptionAPIRequestsPerMinute()}
-
-    # Add catch-all route, after all Rails routes and Engine routes are initialized.
-    initializer :add_catch_all_route, :after => :add_routing_paths do |app|
-      app.routes.append do
-        match '*url', via: :all, to: 'application#unresolved'
-      end
-    end
-
-    initializer "weak etag" do |app|
-      app.middleware.use JettyWeakEtagMiddleware
-    end
-    initializer "catch json parser" do |app|
-      app.middleware.insert_before ActionDispatch::ParamsParser, CatchJsonParseErrors
-    end
-
-    config.assets.enabled = true
-
-    require Rails.root.join("lib", "log4j_logger.rb")
-    config.logger = Log4jLogger::Logger.new('com.thoughtworks.go.server.Rails')
-
-    config.generators do |g|
-      g.test_framework        :rspec, :fixture_replacement => nil
-    end
 
   end
 end

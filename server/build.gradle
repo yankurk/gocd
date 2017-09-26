@@ -80,6 +80,7 @@ sourceSets {
     resources {
       srcDirs += ['properties/test', 'webapp', 'test/data']
       exclude "WEB-INF/rails.new/"
+      exclude "WEB-INF/rails.old/"
     }
   }
 }
@@ -482,9 +483,9 @@ task war(type: Jar) {
     exclude("**/rails.new/app/views/**/*.*")
     exclude("**/rails.new/webpack/")
     findGemsToNotPack().each { gem ->
-      theSpec.exclude("**/rails.new/vendor/bundle/jruby/1.9/gems/${gem}")
-      theSpec.exclude("**/rails.new/vendor/bundle/jruby/1.9/specifications/${gem}.gemspec")
-      theSpec.exclude("**/rails.new/vendor/bundle/jruby/1.9/build_info/${gem}.info")
+      theSpec.exclude("**/rails.new/vendor/bundle/jruby/2.3.0/gems/${gem}")
+      theSpec.exclude("**/rails.new/vendor/bundle/jruby/2.3.0/specifications/${gem}.gemspec")
+      theSpec.exclude("**/rails.new/vendor/bundle/jruby/2.3.0/build_info/${gem}.info")
     }
   }
 

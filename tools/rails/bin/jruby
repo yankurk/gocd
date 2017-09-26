@@ -5,7 +5,7 @@ JRUBY_BASE="$GO_ROOT/tools/jruby"
 SERVER_ROOT="${GO_ROOT}/server"
 RAILS_ROOT="${SERVER_ROOT}/webapp/WEB-INF/rails.new"
 
-export GEM_HOME="$RAILS_ROOT/vendor/bundle/jruby/1.9"
+export GEM_HOME="$RAILS_ROOT/vendor/bundle/jruby/2.3.0"
 export GEM_PATH="$JRUBY_BASE/lib/ruby/gems/shared:${GEM_HOME}"
 export PATH=$JRUBY_BASE/bin:$PATH
 

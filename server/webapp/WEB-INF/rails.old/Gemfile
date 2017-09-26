@@ -1,0 +1,38 @@
+source 'https://rubygems.org'
+
+gem 'rails', '4.2.9'
+
+gem 'validatable', '>=1.6.0'
+
+gem 'dynamic_form'
+
+gem 'sprockets-rails'
+gem 'sass-rails'
+gem 'uglifier'
+gem 'foundation-rails'
+gem 'bourbon'
+gem 'font-awesome-sass'
+gem 'js-routes'
+
+gem 'oauth2_provider', '1.0.3', path: 'vendor/engines/oauth2_provider'
+gem 'versionist'
+gem 'roar'
+gem 'rack-throttle'
+gem 'webpack-rails'
+
+group :development, :test do
+  gem 'rails-dev-tweaks'
+  gem 'minitest'
+  gem "jasmine"
+  gem "jasmine-rails"
+  gem 'selenium-webdriver'
+  gem 'jasmine-jquery-rails'
+  gem 'jasmine-junitreporter'
+
+  gem 'rspec-rails', '2.99'
+  gem 'rspec-extra-formatters'
+
+  gem 'capybara'
+  gem 'ruby-debug-base'
+  gem 'ruby-debug-ide'
+end

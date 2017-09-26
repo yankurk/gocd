@@ -1,112 +1,61 @@
-##########################GO-LICENSE-START################################
-# Copyright 2014 ThoughtWorks, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-##########################GO-LICENSE-END##################################
-
+# This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require 'rspec/autorun'
-require 'capybara/rspec'
-require 'rspec-extra-formatters'
 
-# Requires supporting ruby files with custom matchers and macros, etc,
-# in spec/support/ and its subdirectories.
+# Requires supporting ruby files with custom matchers and macros, etc, in
+# spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
+# run as spec files by default. This means that files in spec/support that end
+# in _spec.rb will both be required and run as specs, causing the specs to be
+# run twice. It is recommended that you do not name files matching this glob to
+# end with _spec.rb. You can configure this pattern with with the --pattern
+# option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
-Dir["#{File.dirname(__FILE__)}/util/*.rb"].each { |f| load f }
-
-# make sure that we capture the default headers before any tests mess it up.
-$rack_default_headers = Rack::MockRequest::DEFAULT_ENV.dup
+# Checks for pending migrations before tests are run.
+# If you are not using ActiveRecord, you can remove this line.
+# ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
-  # Use color not only in STDOUT but also in pagers and files
-  config.tty   = true
-  config.color = true
+  # ## Mock Framework
+  #
+  # If you prefer to use mocha, flexmock or RR, uncomment the appropriate line:
+  #
+  # config.mock_with :mocha
+  # config.mock_with :flexmock
+  # config.mock_with :rr
 
-  # config.add_formatter :documentation
-  config.add_formatter :documentation
-  # config.add_formatter 'TapFormatter',   File.join(ENV['REPORTS_DIR'] || Rails.root.join('tmp/reports'), 'spec_full_report')
-  config.add_formatter 'JUnitFormatter', File.join(ENV['REPORTS_DIR'] || Rails.root.join('tmp/reports'), 'spec_full_report.xml')
+  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
+  # config.fixture_path = "#{::Rails.root}/spec/fixtures"
+
+  # If you're not using ActiveRecord, or you'd prefer not to run each of your
+  # examples within a transaction, remove the following line or assign false
+  # instead of true.
+  # config.use_transactional_fixtures = true
 
   # If true, the base class of anonymous controllers will be inferred
   # automatically. This will be the default behavior in future versions of
   # rspec-rails.
   config.infer_base_class_for_anonymous_controllers = false
 
-  # config.backtrace_exclusion_patterns = []
-
-  config.include ApiSpecHelper
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
 
-  # clear flash messages for every spec
-  config.before(:each) do
-    com.thoughtworks.go.server.web.FlashMessageService.useFlash(com.thoughtworks.go.server.web.FlashMessageService::Flash.new)
-    setup_base_urls
-  end
-
-  config.after(:each) do
-    ServiceCacheStrategy.instance.clear_services
-  end
+  # RSpec Rails can automatically mix in different behaviours to your tests
+  # based on their file location, for example enabling you to call `get` and
+  # `post` in specs under `spec/controllers`.
+  #
+  # You can disable this behaviour by removing the line below, and instead
+  # explictly tag your specs with their type, e.g.:
+  #
+  #     describe UsersController, :type => :controller do
+  #       # ...
+  #     end
+  #
+  # The different available types are documented in the features, such as in
+  # https://relishapp.com/rspec/rspec-rails/v/3-0/docs
+  config.infer_spec_type_from_file_location!
 end
-
-ApplicationController.class_eval do
-  def should_receive_render_with(*expected)
-    self.should_receive(:render).with(*expected) do |*actual|
-      actual.should == expected
-      @performed_render = true
-    end
-  end
-
-  def should_receive_redirect_to(expected_url)
-    self.should_receive(:redirect_to).with(expected_url) do |actual_url|
-      actual_url.should =~ expected_url
-      @performed_redirect = true
-    end
-  end
-end
-
-def stub_localized_result
-  result = com.thoughtworks.go.server.service.result.HttpLocalizedOperationResult.new
-  com.thoughtworks.go.server.service.result.HttpLocalizedOperationResult.stub(:new).and_return(result)
-  result
-end
-
-def uuid_pattern
-  hex = "[a-f0-9]"
-  "#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}"
-end
-
-def with_caching(perform_caching)
-  old_perform_caching = ActionController::Base.perform_caching
-  begin
-    ActionController::Base.perform_caching = perform_caching
-    yield
-  ensure
-    ActionController::Base.perform_caching = old_perform_caching
-  end
-end
-
-
-include JavaImports
-include JavaSpecImports
-include CacheStoreForTest
-include FixtureTestHelpers
-include ExtraSpecAssertions
-include CacheTestHelpers
-include MiscSpecExtensions
