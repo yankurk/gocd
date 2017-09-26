@@ -44,15 +44,6 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = "random"
 
-  # clear flash messages for every spec
-  config.before(:each) do
-    com.thoughtworks.go.server.web.FlashMessageService.useFlash(com.thoughtworks.go.server.web.FlashMessageService::Flash.new)
-    setup_base_urls
-  end
-
-  config.after(:each) do
-    ServiceCacheStrategy.instance.clear_services
-  end
 end
 
 ApplicationController.class_eval do

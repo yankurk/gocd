@@ -39,10 +39,3 @@ module ApiHeaderSetupTeardown
     end
   end
 end
-
-# before :each do
-#   Rack::MockRequest::DEFAULT_ENV["HTTP_ACCEPT"] = "application/vnd.go.cd.v2+json"
-# end
-# after :each do
-#   Rack::MockRequest::DEFAULT_ENV = {}
-# end

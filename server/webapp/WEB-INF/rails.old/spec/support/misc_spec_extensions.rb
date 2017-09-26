@@ -43,4 +43,35 @@ module MiscSpecExtensions
     com.thoughtworks.go.server.service.result.HttpLocalizedOperationResult.stub(:new).and_return(result)
     result
   end
+
+  def uuid_pattern
+    hex = "[a-f0-9]"
+    "#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}"
+  end
+
+  def with_caching(perform_caching)
+    old_perform_caching = ActionController::Base.perform_caching
+    begin
+      ActionController::Base.perform_caching = perform_caching
+      yield
+    ensure
+      ActionController::Base.perform_caching = old_perform_caching
+    end
+  end
+end
+
+ApplicationController.class_eval do
+  def should_receive_render_with(*expected)
+    self.should_receive(:render).with(*expected) do |*actual|
+      actual.should == expected
+      @performed_render = true
+    end
+  end
+
+  def should_receive_redirect_to(expected_url)
+    self.should_receive(:redirect_to).with(expected_url) do |actual_url|
+      actual_url.should =~ expected_url
+      @performed_redirect = true
+    end
+  end
 end
