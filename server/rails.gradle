@@ -99,6 +99,7 @@ task compileAssetsDev(type: YarnRunTask) {
 
   yarnCommand = ['webpack-dev', '--', "--env.outputDir", destinationDir.toPath().toString()]
 
+  source(project.file("${project.railsRoot}/.babelrc"))
   source(project.file("${project.railsRoot}/webpack"))
   source(project.file("${project.railsRoot}/vendor/assets"))
   source(project.file("${project.railsRoot}/config"))
@@ -110,6 +111,7 @@ task compileAssetsWebpackProd(type: YarnRunTask) {
 
   onlyIf { !project.hasProperty('fastBuild') }
 
+  source(project.file("${project.railsRoot}/.babelrc"))
   source(project.file("${project.railsRoot}/webpack"))
   source(project.file("${project.railsRoot}/vendor/assets"))
   source(project.file("${project.railsRoot}/config"))
