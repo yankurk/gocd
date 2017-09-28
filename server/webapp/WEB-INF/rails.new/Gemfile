@@ -7,13 +7,9 @@ end
 
 gem 'rails', '~> 5.1.4'
 gem 'sass-rails', '~> 5.0'
+gem 'webpacker'
 gem 'uglifier'
 gem 'js-routes'
-gem 'webpacker'
-
-# TODO: UPGRADE: remove this and upgrade - https://github.com/ruby/rake/issues/116#issuecomment-195164635
-gem 'rake', '11.1.0'
-
 gem 'roar', '1.0.1'
 gem 'representable', '2.1.7'
 gem 'versionist'
@@ -21,7 +17,22 @@ gem 'versionist'
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
+# TODO: UPGRADE: remove this and upgrade - https://github.com/ruby/rake/issues/116#issuecomment-195164635
+gem 'rake', '11.1.0'
+
 group :development, :test do
-  gem 'rspec-rails', '2.99'
+  gem 'rspec-rails'
   gem 'capybara'
+  gem 'listen'
+
+  # to enable debugging, turn on debug flag:
+  # -Djruby.debug.fullTrace=true
+
+  gem 'rails-controller-testing', require: false
+
+  gem 'pry'
+  git 'https://github.com/ketan/pry-debugger-jruby' do
+    gem 'pry-debugger-jruby'
+  end
+  gem 'pry-state'
 end

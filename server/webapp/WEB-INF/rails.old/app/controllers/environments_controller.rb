@@ -21,7 +21,7 @@ class EnvironmentsController < ApplicationController
   before_filter :load_pipelines_and_agents, :only => [:new, :edit, :create, :update, :edit_pipelines, :edit_agents]
 
   prepend_before_filter :default_as_empty_list, :only => [:update]
-  skip_before_filter :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
 
   layout "application", :except => [:edit_pipelines, :edit_agents, :edit_variables]
   prepend_before_filter :set_tab_name

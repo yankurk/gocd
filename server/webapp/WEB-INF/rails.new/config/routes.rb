@@ -15,7 +15,7 @@
 ##########################GO-LICENSE-END##################################
 
 Go::Application.routes.draw do
-  mount JasmineRails::Engine => '/jasmine-specs', as: :jasmine_old if defined?(JasmineRails)
+  #mount JasmineRails::Engine => '/jasmine-specs', as: :jasmine_old if defined?(JasmineRails)
 
   unless defined?(CONSTANTS)
     CONFIG_REPO_ID_FORMAT = ROLE_NAME_FORMAT = ELASTIC_AGENT_PROFILE_ID_FORMAT = USER_NAME_FORMAT = GROUP_NAME_FORMAT = TEMPLATE_NAME_FORMAT = PIPELINE_NAME_FORMAT = STAGE_NAME_FORMAT = ENVIRONMENT_NAME_FORMAT = /[\w\-][\w\-.]*/
@@ -31,7 +31,7 @@ Go::Application.routes.draw do
     CONSTANTS = true
   end
 
-  mount Oauth2Provider::Engine => '/oauth', :as => :oauth_engine
+  # mount Oauth2Provider::Engine => '/oauth', :as => :oauth_engine
 
   root 'welcome#index' # put to get root_path. '/' is handled by java.
 
@@ -282,10 +282,9 @@ Go::Application.routes.draw do
     api_version(:module => 'ApiV2', header: {name: 'Accept', value: 'application/vnd.go.cd.v2+json'}) do
       namespace :admin do
         resources :plugin_info, controller: 'plugin_infos', param: :id, only: [:index, :show], constraints: {id: PLUGIN_ID_FORMAT}
-        resources :environments, param: :name, only: [:show, :destroy, :create, :index], constraints: {:name => ENVIRONMENT_NAME_FORMAT} do
-          patch on: :member, action: :patch
-          put on: :member, action: :put
-        end
+        resources :environments, param: :name, only: [:show, :destroy, :create, :index], constraints: {:name => ENVIRONMENT_NAME_FORMAT}
+        patch 'environments/:name', to: 'environments#patch', constraints: {:name => ENVIRONMENT_NAME_FORMAT}
+        put 'environments/:name', to: 'environments#put', constraints: {:name => ENVIRONMENT_NAME_FORMAT}
       end
 
       match '*url', via: :all, to: 'errors#not_found'

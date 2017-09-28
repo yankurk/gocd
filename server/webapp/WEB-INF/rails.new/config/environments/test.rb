@@ -13,7 +13,7 @@ Rails.application.configure do
   config.eager_load = false
 
   # Configure static asset server for tests with Cache-Control for performance.
-  config.serve_static_assets  = true
+  config.serve_static_assets = true
   config.static_cache_control = "public, max-age=3600"
 
   config.assets.compile = true
@@ -22,7 +22,7 @@ Rails.application.configure do
   config.assets.digest = false
 
   # Show full error reports and disable caching.
-  config.consider_all_requests_local       = true
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
 
   # Raise exceptions instead of rendering exception templates.
@@ -42,12 +42,15 @@ Rails.application.configure do
   # config.active_support.deprecation = :stderr
 
   config.logger = nil
+  config.java_services_cache = :TestServiceCache
 end
 
 # Override load_context of Spring for rspec.
-import org.springframework.context.support.ClassPathXmlApplicationContext
+# Raises error for missing translations
+# config.action_view.raise_on_missing_translations = true
+
 
 def Spring.load_context
-  ctx_files = Dir[File.expand_path(File.join(Rails.root, "..", "applicationContext*.xml"))].map { |path| "WEB-INF/#{File.basename(path)}"}
-  ClassPathXmlApplicationContext.new(ctx_files.to_java(:string))
+  ctx_files = Dir[File.expand_path(File.join(Rails.root, "..", "applicationContext*.xml"))].map {|path| "WEB-INF/#{File.basename(path)}"}
+  org.springframework.context.support.ClassPathXmlApplicationContext.new(ctx_files.to_java(:string))
 end
