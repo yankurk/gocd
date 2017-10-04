@@ -22,6 +22,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.UpgradeRequest;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -36,23 +37,25 @@ import java.util.function.Predicate;
 @WebSocket
 public class ConsoleLogSocket implements SocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleLogSocket.class);
-    private static final byte[] PING = "meh".getBytes();
 
     private final JobIdentifier jobIdentifier;
     private final ConsoleLogSender handler;
     private Session session;
     private String sessionId;
     private String key;
+    private SocketHealthService socketHealthService;
 
-    ConsoleLogSocket(ConsoleLogSender handler, JobIdentifier jobIdentifier) {
+    ConsoleLogSocket(ConsoleLogSender handler, JobIdentifier jobIdentifier, SocketHealthService socketHealthService) {
         this.handler = handler;
         this.jobIdentifier = jobIdentifier;
         this.key = String.format("%s:%d", jobIdentifier, hashCode());
+        this.socketHealthService = socketHealthService;
     }
 
     @OnWebSocketConnect
     public void onConnect(Session session) throws Exception {
         this.session = session;
+        socketHealthService.register(this);
         LOGGER.debug("{} connected", sessionName());
 
 
@@ -74,7 +77,16 @@ public class ConsoleLogSocket implements SocketEndpoint {
     @OnWebSocketError
     public void onError(Throwable error) {
         LOGGER.error("{} closing session because an error was thrown", sessionName(), error);
-        close(StatusCode.SERVER_ERROR, error.getMessage());
+        try {
+            close(StatusCode.SERVER_ERROR, error.getMessage());
+        } finally {
+            socketHealthService.deregister(this);
+        }
+    }
+
+    @OnWebSocketClose
+    public void onClose(int status, String reason) {
+        socketHealthService.deregister(this);
     }
 
     @Override
@@ -84,7 +96,7 @@ public class ConsoleLogSocket implements SocketEndpoint {
 
     @Override
     public void ping() throws IOException {
-        session.getRemote().sendPing(ByteBuffer.wrap(PING));
+        session.getRemote().sendString(WebsocketMessages.PING);
     }
 
     @Override

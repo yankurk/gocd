@@ -217,6 +217,10 @@ module ApplicationHelper
     security_service.isUserAdmin(current_user)
   end
 
+  def is_user_admin_of_group? group_name
+    security_service.isUserAdminOfGroup(current_user, group_name)
+  end
+
   def has_admin_permissions_for_pipeline? pipeline_name
     security_service.hasAdminPermissionsForPipeline(current_user, pipeline_name)
   end
@@ -258,6 +262,10 @@ module ApplicationHelper
 
   def version
     @@version ||= com.thoughtworks.go.CurrentGoCDVersion.getInstance().formatted()
+  end
+
+  def unformatted_version
+    @@unformatted_version ||= com.thoughtworks.go.CurrentGoCDVersion.getInstance().goVersion()
   end
 
   def copyright_year
@@ -457,8 +465,30 @@ module ApplicationHelper
     form_remote_tag(options)
   end
 
+  def is_quick_edit_page_default?
+    Toggles.isToggleOn(Toggles.QUICK_EDIT_PAGE_DEFAULT)
+  end
+
   def is_pipeline_config_spa_enabled?
     Toggles.isToggleOn(Toggles.PIPELINE_CONFIG_SINGLE_PAGE_APP)
+  end
+
+  def is_plugin_spa_toggle_enabled?
+    Toggles.isToggleOn(Toggles.PLUGIN_SPA_TOGGLE_KEY)
+  end
+
+  def plugin_listing_path
+    if is_plugin_spa_toggle_enabled?
+      return admin_plugins_path
+    end
+    plugins_listing_path
+  end
+
+  def edit_path_for_pipeline(pipeline_name)
+    if is_pipeline_config_spa_enabled? && is_quick_edit_page_default?
+      return edit_admin_pipeline_config_path(:pipeline_name => pipeline_name)
+    end
+    pipeline_edit_path(:pipeline_name => pipeline_name, :current_tab => 'general')
   end
 
   def plugin_supports_status_report?(plugin_id)

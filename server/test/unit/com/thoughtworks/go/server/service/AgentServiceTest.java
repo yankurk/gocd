@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 ThoughtWorks, Inc.
+ * Copyright 2017 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package com.thoughtworks.go.server.service;
 
+import ch.qos.logback.classic.Level;
 import com.thoughtworks.go.config.AgentConfig;
-import com.thoughtworks.go.config.Agents;
 import com.thoughtworks.go.config.CaseInsensitiveString;
 import com.thoughtworks.go.domain.AgentInstance;
 import com.thoughtworks.go.domain.AgentRuntimeStatus;
 import com.thoughtworks.go.remote.AgentIdentifier;
-import com.thoughtworks.go.server.domain.Agent;
 import com.thoughtworks.go.server.domain.AgentInstances;
 import com.thoughtworks.go.server.domain.Username;
 import com.thoughtworks.go.server.persistence.AgentDao;
@@ -36,20 +35,20 @@ import com.thoughtworks.go.serverhealth.ServerHealthService;
 import com.thoughtworks.go.serverhealth.ServerHealthState;
 import com.thoughtworks.go.util.LogFixture;
 import com.thoughtworks.go.util.SystemEnvironment;
+import com.thoughtworks.go.util.TimeProvider;
 import com.thoughtworks.go.utils.Timeout;
-import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Arrays;
 
 import static com.thoughtworks.go.util.LogFixture.logFixtureFor;
 import static com.thoughtworks.go.util.SystemUtil.currentWorkingDirectory;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -64,9 +63,11 @@ public class AgentServiceTest {
     private ServerHealthService serverHealthService;
     private AgentConfigService agentConfigService;
     AgentConfig agentConfig;
+    private TimeProvider timeProvider;
 
     @Before
     public void setUp() {
+        timeProvider = mock(TimeProvider.class);
         agentInstances = mock(AgentInstances.class);
         agentConfig = new AgentConfig("uuid", "host", "192.168.1.1");
         when(agentInstances.findAgentAndRefreshStatus("uuid")).thenReturn(AgentInstance.createFromConfig(agentConfig, new SystemEnvironment()));
@@ -81,7 +82,7 @@ public class AgentServiceTest {
 
     @Test
     public void shouldUpdateStatus() throws Exception {
-        AgentRuntimeInfo runtimeInfo = new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), "pavanIsGreat", false);
+        AgentRuntimeInfo runtimeInfo = new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), "pavanIsGreat", false, timeProvider);
         when(agentDao.cookieFor(runtimeInfo.getIdentifier())).thenReturn("pavanIsGreat");
         agentService.updateRuntimeInfo(runtimeInfo);
         verify(agentInstances).updateAgentRuntimeInfo(runtimeInfo);
@@ -89,7 +90,7 @@ public class AgentServiceTest {
 
     @Test
     public void shouldThrowExceptionWhenAgentWithNoCookieTriesToUpdateStatus() throws Exception {
-        AgentRuntimeInfo runtimeInfo = new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), null, false);
+        AgentRuntimeInfo runtimeInfo = new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), null, false, timeProvider);
 
         try (LogFixture logFixture = logFixtureFor(AgentService.class, Level.DEBUG)) {
             try {
@@ -98,7 +99,7 @@ public class AgentServiceTest {
             } catch (Exception e) {
                 assertThat(e, instanceOf(AgentNoCookieSetException.class));
                 assertThat(e.getMessage(), is(format("Agent [%s] has no cookie set", runtimeInfo.agentInfoDebugString())));
-                assertThat(Arrays.asList(logFixture.getMessages()), hasItem(format("Agent [%s] has no cookie set", runtimeInfo.agentInfoDebugString())));
+                assertThat(logFixture.getRawMessages(), hasItem(format("Agent [%s] has no cookie set", runtimeInfo.agentInfoDebugString())));
             }
         }
 
@@ -106,9 +107,9 @@ public class AgentServiceTest {
 
     @Test
     public void shouldThrowExceptionWhenADuplicateAgentTriesToUpdateStatus() throws Exception {
-        AgentRuntimeInfo runtimeInfo = new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), null, false);
+        AgentRuntimeInfo runtimeInfo = new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), null, false, timeProvider);
         runtimeInfo.setCookie("invalid_cookie");
-        AgentInstance original = AgentInstance.createFromLiveAgent(new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), null, false), new SystemEnvironment());
+        AgentInstance original = AgentInstance.createFromLiveAgent(new AgentRuntimeInfo(agentIdentifier, AgentRuntimeStatus.Idle, currentWorkingDirectory(), null, false, timeProvider), new SystemEnvironment());
 
         try (LogFixture logFixture = logFixtureFor(AgentService.class, Level.DEBUG)) {
             try {
@@ -117,7 +118,7 @@ public class AgentServiceTest {
                 fail("should throw exception when cookie mismatched");
             } catch (Exception e) {
                 assertThat(e.getMessage(), is(format("Agent [%s] has invalid cookie", runtimeInfo.agentInfoDebugString())));
-                assertThat(Arrays.asList(logFixture.getMessages()), hasItem(format("Found agent [%s] with duplicate uuid. Please check the agent installation.", runtimeInfo.agentInfoDebugString())));
+                assertThat(logFixture.getRawMessages(), hasItem(format("Found agent [%s] with duplicate uuid. Please check the agent installation.", runtimeInfo.agentInfoDebugString())));
                 verify(serverHealthService).update(ServerHealthState.warning(format("[%s] has duplicate unique identifier which conflicts with [%s]", runtimeInfo.agentInfoForDisplay(), original.agentInfoForDisplay()),
                         "Please check the agent installation. Click <a href='https://docs.gocd.org/current/faq/agent_guid_issue.html' target='_blank'>here</a> for more info.",
                         HealthStateType.duplicateAgent(HealthStateScope.forAgent(runtimeInfo.getCookie())), Timeout.THIRTY_SECONDS));
@@ -137,8 +138,8 @@ public class AgentServiceTest {
 
     @Test
     public void shouldUnderstandFilteringAgentListBasedOnUuid() {
-        AgentInstance instance1 = AgentInstance.createFromLiveAgent(AgentRuntimeInfo.fromServer(new AgentConfig("uuid-1", "host-1", "192.168.1.2"), true, "/foo/bar", 100l, "linux", false), new SystemEnvironment());
-        AgentInstance instance3 = AgentInstance.createFromLiveAgent(AgentRuntimeInfo.fromServer(new AgentConfig("uuid-3", "host-3", "192.168.1.4"), true, "/baz/quux", 300l, "linux", false), new SystemEnvironment());
+        AgentInstance instance1 = AgentInstance.createFromLiveAgent(AgentRuntimeInfo.fromServer(new AgentConfig("uuid-1", "host-1", "192.168.1.2"), true, "/foo/bar", 100l, "linux", false, timeProvider), new SystemEnvironment());
+        AgentInstance instance3 = AgentInstance.createFromLiveAgent(AgentRuntimeInfo.fromServer(new AgentConfig("uuid-3", "host-3", "192.168.1.4"), true, "/baz/quux", 300l, "linux", false, timeProvider), new SystemEnvironment());
         when(agentInstances.filter(Arrays.asList("uuid-1", "uuid-3"))).thenReturn(Arrays.asList(instance1, instance3));
         AgentsViewModel agents = agentService.filter(Arrays.asList("uuid-1", "uuid-3"));
         AgentViewModel view1 = new AgentViewModel(instance1);

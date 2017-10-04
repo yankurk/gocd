@@ -28,7 +28,6 @@ import com.thoughtworks.go.server.security.userdetail.GoUserPrinciple;
 import com.thoughtworks.go.server.service.GoConfigService;
 import com.thoughtworks.go.server.service.PluginRoleService;
 import com.thoughtworks.go.server.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
 import org.springframework.security.BadCredentialsException;
@@ -38,6 +37,7 @@ import org.springframework.security.userdetails.UserDetails;
 import java.util.Collections;
 import java.util.List;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 public class PreAuthenticatedAuthenticationProvider implements AuthenticationProvider {
@@ -47,7 +47,6 @@ public class PreAuthenticatedAuthenticationProvider implements AuthenticationPro
     private final AuthorityGranter authorityGranter;
     private GoConfigService configService;
 
-    @Autowired
     public PreAuthenticatedAuthenticationProvider(AuthorizationExtension authorizationExtension, PluginRoleService pluginRoleService,
                                                   UserService userService, AuthorityGranter authorityGranter, GoConfigService configService) {
         this.authorizationExtension = authorizationExtension;
@@ -81,11 +80,13 @@ public class PreAuthenticatedAuthenticationProvider implements AuthenticationPro
             return null;
         }
 
+        validateUser(response.getUser());
+
+        assignRoles(pluginId, response.getUser().getUsername(), response.getRoles());
+
         UserDetails userDetails = getUserDetails(response.getUser());
 
         userService.addUserIfDoesNotExist(toDomainUser(response.getUser()));
-
-        assignRoles(pluginId, userDetails.getUsername(), response.getRoles());
 
         PreAuthenticatedAuthenticationToken result =
                 new PreAuthenticatedAuthenticationToken(userDetails, preAuthToken.getCredentials(), pluginId, userDetails.getAuthorities());
@@ -97,11 +98,11 @@ public class PreAuthenticatedAuthenticationProvider implements AuthenticationPro
 
     private AuthenticationResponse authenticateUser(PreAuthenticatedAuthenticationToken preAuthToken) {
         AuthenticationResponse response = null;
-        for(SecurityAuthConfig authConfig : authConfigs(preAuthToken.getPluginId())) {
+        for (SecurityAuthConfig authConfig : authConfigs(preAuthToken.getPluginId())) {
             response = authorizationExtension.authenticateUser(preAuthToken.getPluginId(), preAuthToken.getCredentials(),
                     Collections.singletonList(authConfig), pluginRoleConfigsForAuthConfig(authConfig.getId()));
 
-            if(isAuthenticated(response)) {
+            if (isAuthenticated(response)) {
                 break;
             }
         }
@@ -115,6 +116,18 @@ public class PreAuthenticatedAuthenticationProvider implements AuthenticationPro
 
     private boolean isAuthenticated(AuthenticationResponse response) {
         return (response != null && response.getUser() != null);
+    }
+
+    private void validateUser(User user) {
+        if (isBlank(user.getUsername())) {
+            throw new InvalidAuthenticationResponse("Plugin sent invalid response: username must not be blank.");
+        }
+    }
+
+    class InvalidAuthenticationResponse extends AuthenticationException {
+        public InvalidAuthenticationResponse(String msg) {
+            super(msg);
+        }
     }
 
     private List<PluginRoleConfig> pluginRoleConfigsForAuthConfig(String authConfigId) {
@@ -140,10 +153,6 @@ public class PreAuthenticatedAuthenticationProvider implements AuthenticationPro
     }
 
     private User ensureDisplayNamePresent(User user) {
-        if (user == null) {
-            return null;
-        }
-
         if (isNotBlank(user.getDisplayName())) {
             return user;
         }

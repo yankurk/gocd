@@ -16,16 +16,15 @@
 
 package com.thoughtworks.go.agent;
 
+import ch.qos.logback.classic.Level;
 import com.googlecode.junit.ext.checkers.OSChecker;
 import com.thoughtworks.go.agent.common.AgentBootstrapperArgs;
 import com.thoughtworks.go.agent.common.util.Downloader;
-import com.thoughtworks.go.agent.common.util.LoggingHelper;
 import com.thoughtworks.go.agent.testhelper.FakeGoServer;
 import com.thoughtworks.go.mothers.ServerUrlGeneratorMother;
 import com.thoughtworks.go.util.LogFixture;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Level;
 import org.junit.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -51,12 +50,11 @@ public class AgentProcessParentImplTest {
     public FakeGoServer server = new FakeGoServer();
 
     private static final OSChecker OS_CHECKER = new OSChecker(OSChecker.WINDOWS);
-    private final File stderrLog = new File(AgentProcessParentImpl.GO_AGENT_STDERR_LOG);
-    private final File stdoutLog = new File(AgentProcessParentImpl.GO_AGENT_STDOUT_LOG);
+    private final File stderrLog = new File("logs", AgentProcessParentImpl.GO_AGENT_STDERR_LOG);
+    private final File stdoutLog = new File("logs", AgentProcessParentImpl.GO_AGENT_STDOUT_LOG);
 
     @BeforeClass
     public static void setup() {
-        System.setProperty(LoggingHelper.LOG_DIR, ".");
         System.setProperty("sleep.for.download", "10");
     }
 

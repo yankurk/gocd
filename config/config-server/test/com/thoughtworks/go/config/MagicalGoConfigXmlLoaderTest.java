@@ -21,6 +21,7 @@ import com.googlecode.junit.ext.RunIf;
 import com.thoughtworks.go.config.elastic.ElasticProfile;
 import com.thoughtworks.go.config.exceptions.GoConfigInvalidException;
 import com.thoughtworks.go.config.materials.*;
+import com.thoughtworks.go.config.materials.Filter;
 import com.thoughtworks.go.config.materials.git.GitMaterialConfig;
 import com.thoughtworks.go.config.materials.mercurial.HgMaterialConfig;
 import com.thoughtworks.go.config.materials.perforce.P4MaterialConfig;
@@ -30,10 +31,7 @@ import com.thoughtworks.go.config.merge.MergeConfigOrigin;
 import com.thoughtworks.go.config.pluggabletask.PluggableTask;
 import com.thoughtworks.go.config.preprocessor.ConfigParamPreprocessor;
 import com.thoughtworks.go.config.preprocessor.ConfigRepoPartialPreprocessor;
-import com.thoughtworks.go.config.remote.ConfigOrigin;
-import com.thoughtworks.go.config.remote.ConfigRepoConfig;
-import com.thoughtworks.go.config.remote.FileConfigOrigin;
-import com.thoughtworks.go.config.remote.PartialConfig;
+import com.thoughtworks.go.config.remote.*;
 import com.thoughtworks.go.config.validation.*;
 import com.thoughtworks.go.domain.*;
 import com.thoughtworks.go.domain.config.Admin;
@@ -44,9 +42,7 @@ import com.thoughtworks.go.domain.label.PipelineLabel;
 import com.thoughtworks.go.domain.materials.MaterialConfig;
 import com.thoughtworks.go.domain.packagerepository.PackageDefinition;
 import com.thoughtworks.go.domain.packagerepository.PackageRepository;
-import com.thoughtworks.go.helper.ConfigFileFixture;
-import com.thoughtworks.go.helper.MaterialConfigsMother;
-import com.thoughtworks.go.helper.StageConfigMother;
+import com.thoughtworks.go.helper.*;
 import com.thoughtworks.go.junitext.EnhancedOSChecker;
 import com.thoughtworks.go.plugin.access.packagematerial.PackageConfiguration;
 import com.thoughtworks.go.plugin.access.packagematerial.PackageConfigurations;
@@ -62,10 +58,7 @@ import com.thoughtworks.go.plugin.api.task.TaskConfig;
 import com.thoughtworks.go.plugin.api.task.TaskExecutor;
 import com.thoughtworks.go.plugin.api.task.TaskView;
 import com.thoughtworks.go.security.GoCipher;
-import com.thoughtworks.go.util.ConfigElementImplementationRegistryMother;
-import com.thoughtworks.go.util.FileUtil;
-import com.thoughtworks.go.util.ReflectionUtil;
-import com.thoughtworks.go.util.XsdValidationException;
+import com.thoughtworks.go.util.*;
 import com.thoughtworks.go.util.command.HgUrlArgument;
 import com.thoughtworks.go.util.command.UrlArgument;
 import org.apache.commons.collections.CollectionUtils;
@@ -173,7 +166,7 @@ public class MagicalGoConfigXmlLoaderTest {
     public void shouldLoadConfigWithConfigRepoAndPluginName() throws Exception {
         CruiseConfig cruiseConfig = xmlLoader.loadConfigHolder(ConfigFileFixture.configWithConfigRepos(
                 "  <config-repos>\n"
-                        + "    <config-repo plugin=\"myplugin\" id=\"repo-id\">\n"
+                        + "    <config-repo pluginId=\"myplugin\" id=\"repo-id\">\n"
                         + "      <git url=\"https://github.com/tomzo/gocd-indep-config-part.git\" />\n"
                         + "    </config-repo >\n"
                         + "  </config-repos>\n"
@@ -187,10 +180,10 @@ public class MagicalGoConfigXmlLoaderTest {
     public void shouldLoadConfigWith2ConfigRepos() throws Exception {
         CruiseConfig cruiseConfig = xmlLoader.loadConfigHolder(ConfigFileFixture.configWithConfigRepos(
                 "  <config-repos>\n"
-                        + "    <config-repo plugin=\"myplugin\" id=\"repo-id1\">\n"
+                        + "    <config-repo pluginId=\"myplugin\" id=\"repo-id1\">\n"
                         + "      <git url=\"https://github.com/tomzo/gocd-indep-config-part.git\" />\n"
                         + "    </config-repo >\n"
-                        + "    <config-repo plugin=\"myplugin\" id=\"repo-id2\">\n"
+                        + "    <config-repo pluginId=\"myplugin\" id=\"repo-id2\">\n"
                         + "      <git url=\"https://github.com/tomzo/gocd-refmain-config-part.git\" />\n"
                         + "    </config-repo >\n"
                         + "  </config-repos>\n"
@@ -228,7 +221,7 @@ public class MagicalGoConfigXmlLoaderTest {
     public void shouldThrowXsdValidationException_WhenNoRepository() throws Exception {
         CruiseConfig cruiseConfig = xmlLoader.loadConfigHolder(ConfigFileFixture.configWithConfigRepos(
                 "  <config-repos>\n"
-                        + "    <config-repo plugin=\"myplugin\">\n"
+                        + "    <config-repo pluginId=\"myplugin\">\n"
                         + "    </config-repo >\n"
                         + "  </config-repos>\n"
         )).config;
@@ -238,7 +231,7 @@ public class MagicalGoConfigXmlLoaderTest {
     public void shouldThrowXsdValidationException_When2RepositoriesInSameConfigElement() throws Exception {
         CruiseConfig cruiseConfig = xmlLoader.loadConfigHolder(ConfigFileFixture.configWithConfigRepos(
                 "  <config-repos>\n"
-                        + "    <config-repo plugin=\"myplugin\">\n"
+                        + "    <config-repo pluginId=\"myplugin\">\n"
                         + "      <git url=\"https://github.com/tomzo/gocd-indep-config-part.git\" />\n"
                         + "      <git url=\"https://github.com/tomzo/gocd-refmain-config-part.git\" />\n"
                         + "    </config-repo >\n"
@@ -250,10 +243,10 @@ public class MagicalGoConfigXmlLoaderTest {
     public void shouldFailValidation_WhenSameMaterialUsedBy2ConfigRepos() throws Exception {
         CruiseConfig cruiseConfig = xmlLoader.loadConfigHolder(ConfigFileFixture.configWithConfigRepos(
                 "  <config-repos>\n"
-                        + "    <config-repo plugin=\"myplugin\" id=\"id1\">\n"
+                        + "    <config-repo pluginId=\"myplugin\" id=\"id1\">\n"
                         + "      <git url=\"https://github.com/tomzo/gocd-indep-config-part.git\" />\n"
                         + "    </config-repo >\n"
-                        + "    <config-repo plugin=\"myotherplugin\" id=\"id2\">\n"
+                        + "    <config-repo pluginId=\"myotherplugin\" id=\"id2\">\n"
                         + "      <git url=\"https://github.com/tomzo/gocd-indep-config-part.git\" />\n"
                         + "    </config-repo >\n"
                         + "  </config-repos>\n"
@@ -498,30 +491,6 @@ public class MagicalGoConfigXmlLoaderTest {
         MaterialConfig materialConfig = xmlLoader.fromXmlPartial(toInputStream(buildXmlPartial), SvnMaterialConfig.class);
         MaterialConfig svnMaterial = MaterialConfigsMother.svnMaterialConfig("http://foo.bar", null, "cruise", "password", false, null);
         assertThat(materialConfig, is(svnMaterial));
-    }
-
-    @Test
-    public void shouldAcceptLdapConfiguration_withNoManagerDn() throws Exception {
-        String ldapCfg = "<ldap uri=\"foo\" searchFilter=\"filter\" >"
-                + "<bases><base>base1</base></bases>"
-                + "</ldap>";
-
-        LdapConfig ldapConfig = xmlLoader.fromXmlPartial(toInputStream(ldapCfg), LdapConfig.class);
-
-        assertThat(ldapConfig.managerDn(), is(""));
-        assertThat(ldapConfig.managerPassword(), is(""));
-    }
-
-
-    @Test
-    public void shouldAcceptLdapConfiguration_withoutSearchFilter() throws Exception {
-        String ldapCfg = "<ldap uri=\"foo\" managerDn=\"foo\" managerPassword=\"bar\">"
-                + "<bases><base>base1</base></bases>"
-                + "</ldap>";
-
-        LdapConfig ldapConfig = xmlLoader.fromXmlPartial(toInputStream(ldapCfg), LdapConfig.class);
-
-        assertThat(ldapConfig.searchFilter(), is(""));
     }
 
     @Test
@@ -1906,7 +1875,7 @@ public class MagicalGoConfigXmlLoaderTest {
             ConfigMigrator.loadWithMigration(content);
             fail("Should not support 2 environments with the same same");
         } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("Duplicate unique value [uat] declared for identity constraint \"uniqueEnvironmentName\" of element \"environments\""));
+            assertThat(e.getMessage(), containsString("Duplicate unique value [uat] declared for identity constraint of element \"environments\""));
         }
     }
 
@@ -1997,7 +1966,7 @@ public class MagicalGoConfigXmlLoaderTest {
             fail("XSD should not allow duplicate agent uuid in environment");
         } catch (Exception e) {
             assertThat(e.getMessage(), containsString(
-                    "Duplicate unique value [1] declared for identity constraint \"uniqueEnvironmentAgentsUuid\" of element \"agents\"."));
+                    "Duplicate unique value [1] declared for identity constraint of element \"agents\"."));
         }
     }
 
@@ -2954,25 +2923,6 @@ public class MagicalGoConfigXmlLoaderTest {
     }
 
     @Test
-    public void shouldLoadAfterMigration62() {
-        final String content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                + "<cruise schemaVersion='62'>\n"
-                + "    <server artifactsdir=\"artifacts\">\n"
-                + "      <security>"
-                + "        <ldap uri='some_url' managerDn='some_manager_dn' managerPassword='foo' searchFilter='(sAMAccountName={0})'>"
-                + "             <bases>"
-                + "                 <base value='ou=Enterprise,ou=Principal,dc=corporate,dc=thoughtworks,dc=com'/>"
-                + "             </bases>"
-                + "        </ldap>"
-                + "      </security>"
-                + "    </server>"
-                + " </cruise>";
-        GoConfigHolder goConfigHolder = ConfigMigrator.loadWithMigration(content);
-        assertThat(goConfigHolder.config.server().security().ldapConfig().isEnabled(), is(false));
-        assertThat(goConfigHolder.config.server().security().securityAuthConfigs().get(0).getProperty("SearchBases").getValue(), is("ou=Enterprise,ou=Principal,dc=corporate,dc=thoughtworks,dc=com"));
-    }
-
-    @Test
     public void shouldResolvePackageReferenceElementForAMaterialInConfig() throws Exception {
         String xml = "<cruise schemaVersion='" + CONFIG_SCHEMA_VERSION + "'>\n"
                 + "<repositories>\n"
@@ -3230,7 +3180,7 @@ public class MagicalGoConfigXmlLoaderTest {
             xmlLoader.loadConfigHolder(xml);
             fail("should have thrown XsdValidationException");
         } catch (XsdValidationException e) {
-            assertThat(e.getMessage(), is("Duplicate unique value [repo-id] declared for identity constraint \"uniqueRepositoryId\" of element \"repositories\"."));
+            assertThat(e.getMessage(), is("Duplicate unique value [repo-id] declared for identity constraint of element \"repositories\"."));
         }
     }
 
@@ -3241,7 +3191,7 @@ public class MagicalGoConfigXmlLoaderTest {
             xmlLoader.loadConfigHolder(xml);
             fail("should have thrown XsdValidationException");
         } catch (XsdValidationException e) {
-            assertThat(e.getMessage(), is("Duplicate unique value [repo] declared for identity constraint \"uniqueRepositoryName\" of element \"repositories\"."));
+            assertThat(e.getMessage(), is("Duplicate unique value [repo] declared for identity constraint of element \"repositories\"."));
         }
     }
 
@@ -3253,7 +3203,7 @@ public class MagicalGoConfigXmlLoaderTest {
             xmlLoader.loadConfigHolder(xml);
             fail("should have thrown XsdValidationException");
         } catch (XsdValidationException e) {
-            assertThat(e.getMessage(), is("Duplicate unique value [package-id] declared for identity constraint \"uniquePackageId\" of element \"cruise\"."));
+            assertThat(e.getMessage(), is("Duplicate unique value [package-id] declared for identity constraint of element \"cruise\"."));
         }
     }
 
@@ -3955,7 +3905,7 @@ public class MagicalGoConfigXmlLoaderTest {
             xmlLoader.loadConfigHolder(ConfigFileFixture.JOBS_WITH_SAME_NAME);
         } catch (Exception e) {
             assertTrue(e instanceof XsdValidationException);
-            assertThat(e.getMessage(), is("Duplicate unique value [unit] declared for identity constraint \"uniqueJob\" of element \"jobs\"."));
+            assertThat(e.getMessage(), is("Duplicate unique value [unit] declared for identity constraint of element \"jobs\"."));
         }
     }
 

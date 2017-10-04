@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 ThoughtWorks, Inc.
+ * Copyright 2017 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package com.thoughtworks.go.config;
 
 import com.thoughtworks.go.domain.ConfigErrors;
 import com.thoughtworks.go.domain.config.Admin;
-import com.thoughtworks.go.security.GoCipher;
-import com.thoughtworks.go.util.ObjectUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +25,11 @@ import java.util.List;
 @ConfigTag("security")
 public class SecurityConfig implements Validatable {
     @ConfigSubtag(optional = true)
-    private LdapConfig ldapConfig = new LdapConfig(new GoCipher());
-    @ConfigSubtag(optional = true)
-    private PasswordFileConfig passwordFileConfig = new PasswordFileConfig();
-    @ConfigSubtag(optional = true)
     private SecurityAuthConfigs securityAuthConfigs = new SecurityAuthConfigs();
     @ConfigSubtag(optional = true)
     private RolesConfig rolesConfig = new RolesConfig();
     @ConfigSubtag(optional = true)
     private AdminsConfig adminsConfig = new AdminsConfig();
-    @ConfigAttribute(value = "anonymous")
-    private boolean anonymous = true;
     @ConfigAttribute(value = "allowOnlyKnownUsersToLogin")
     private boolean allowOnlyKnownUsersToLogin = false;
     private ConfigErrors errors = new ConfigErrors();
@@ -46,48 +38,25 @@ public class SecurityConfig implements Validatable {
     }
 
     /*Dont chain constructors*/
-    public SecurityConfig(LdapConfig ldapConfig, PasswordFileConfig passwordFileConfig, boolean allowOnlyKnownUsersToLogin) {
-        this.ldapConfig = ldapConfig;
-        this.passwordFileConfig = passwordFileConfig;
+    public SecurityConfig(boolean allowOnlyKnownUsersToLogin) {
         this.allowOnlyKnownUsersToLogin = allowOnlyKnownUsersToLogin;
     }
 
-    public SecurityConfig(LdapConfig ldap, PasswordFileConfig pwordFile, boolean anonymous, AdminsConfig admins) {
-        this.ldapConfig = ldap;
-        this.passwordFileConfig = pwordFile;
-        this.anonymous = anonymous;
+    public SecurityConfig(AdminsConfig admins) {
         this.adminsConfig = admins;
     }
 
-    public SecurityConfig(LdapConfig ldapConfig, PasswordFileConfig passwordFileConfig, boolean anonymous, AdminsConfig adminsConfig, boolean allowOnlyKnownUsersToLogin) {
-        this.ldapConfig = ldapConfig;
-        this.anonymous = anonymous;
+    public SecurityConfig(AdminsConfig adminsConfig, boolean allowOnlyKnownUsersToLogin) {
         this.adminsConfig = adminsConfig;
-        this.passwordFileConfig = passwordFileConfig;
         this.allowOnlyKnownUsersToLogin = allowOnlyKnownUsersToLogin;
     }
 
-    public LdapConfig ldapConfig() {
-        return ldapConfig;
-    }
-
     public boolean isSecurityEnabled() {
-        boolean ldapEnabled = ldapConfig != null && ldapConfig.isEnabled();
-        boolean passwordFileEnabled = passwordFileConfig != null && passwordFileConfig.isEnabled();
-        boolean isPluginAuthEnabled = securityAuthConfigs != null && !securityAuthConfigs.isEmpty();
-        return ldapEnabled || passwordFileEnabled || isPluginAuthEnabled;
-    }
-
-    public boolean anonymousAccess() {
-        return anonymous;
+        return securityAuthConfigs != null && !securityAuthConfigs.isEmpty();
     }
 
     public AdminsConfig adminsConfig() {
         return adminsConfig;
-    }
-
-    public PasswordFileConfig passwordFileConfig() {
-        return passwordFileConfig;
     }
 
     public RolesConfig getRoles() {
@@ -122,15 +91,6 @@ public class SecurityConfig implements Validatable {
         return adminsConfig == null || adminsConfig.isEmpty();
     }
 
-    public boolean hasSecurityMethodChanged(SecurityConfig newSecurity) {
-        if (newSecurity == null) {
-            return true;
-        }
-        boolean ldapChanged = !ObjectUtil.equal(ldapConfig, newSecurity.ldapConfig());
-        boolean passwordFileChanged = !ObjectUtil.equal(passwordFileConfig, newSecurity.passwordFileConfig());
-        return ldapChanged || passwordFileChanged;
-    }
-
     public boolean isUserMemberOfRole(final CaseInsensitiveString userName, final CaseInsensitiveString roleName) {
         return rolesConfig.isUserMemberOfRole(userName, roleName);
     }
@@ -153,14 +113,6 @@ public class SecurityConfig implements Validatable {
         return this.allowOnlyKnownUsersToLogin;
     }
 
-    public void modifyLdap(LdapConfig ldapConfig) {
-        this.ldapConfig.updateWithNew(ldapConfig);
-    }
-
-    public void modifyPasswordFile(PasswordFileConfig passwordConfig) {
-        this.passwordFileConfig = passwordConfig;
-    }
-
     public void modifyAllowOnlyKnownUsers(boolean shouldAllow) {
         this.allowOnlyKnownUsersToLogin = shouldAllow;
     }
@@ -172,33 +124,27 @@ public class SecurityConfig implements Validatable {
 
         SecurityConfig that = (SecurityConfig) o;
 
-        if (anonymous != that.anonymous) return false;
         if (allowOnlyKnownUsersToLogin != that.allowOnlyKnownUsersToLogin) return false;
-        if (ldapConfig != null ? !ldapConfig.equals(that.ldapConfig) : that.ldapConfig != null) return false;
-        if (passwordFileConfig != null ? !passwordFileConfig.equals(that.passwordFileConfig) : that.passwordFileConfig != null)
-            return false;
         if (securityAuthConfigs != null ? !securityAuthConfigs.equals(that.securityAuthConfigs) : that.securityAuthConfigs != null)
             return false;
         if (rolesConfig != null ? !rolesConfig.equals(that.rolesConfig) : that.rolesConfig != null) return false;
-        return adminsConfig != null ? adminsConfig.equals(that.adminsConfig) : that.adminsConfig == null;
+        if (adminsConfig != null ? !adminsConfig.equals(that.adminsConfig) : that.adminsConfig != null) return false;
+        return errors != null ? errors.equals(that.errors) : that.errors == null;
     }
 
     @Override
     public int hashCode() {
-        int result = ldapConfig != null ? ldapConfig.hashCode() : 0;
-        result = 31 * result + (passwordFileConfig != null ? passwordFileConfig.hashCode() : 0);
-        result = 31 * result + (securityAuthConfigs != null ? securityAuthConfigs.hashCode() : 0);
+        int result = securityAuthConfigs != null ? securityAuthConfigs.hashCode() : 0;
         result = 31 * result + (rolesConfig != null ? rolesConfig.hashCode() : 0);
         result = 31 * result + (adminsConfig != null ? adminsConfig.hashCode() : 0);
-        result = 31 * result + (anonymous ? 1 : 0);
         result = 31 * result + (allowOnlyKnownUsersToLogin ? 1 : 0);
+        result = 31 * result + (errors != null ? errors.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return String.format("SecurityConfig{ldapConfig=%s, passwordFileConfig=%s, rolesConfig=%s, adminsConfig=%s, anonymous=%s, allowOnlyKnownUsersToLogin=%s}", ldapConfig, passwordFileConfig,
-                rolesConfig, adminsConfig, anonymous, allowOnlyKnownUsersToLogin);
+        return String.format("SecurityConfig{securityAuthConfigs=%s, rolesConfig=%s, adminsConfig=%s, allowOnlyKnownUsersToLogin=%s}", securityAuthConfigs, rolesConfig, adminsConfig, allowOnlyKnownUsersToLogin);
     }
 
     public void validate(ValidationContext validationContext) {

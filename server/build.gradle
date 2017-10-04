@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 import com.thoughtworks.go.build.VerifyJarTask
 import org.jruby.CompatVersion
 import org.jruby.Ruby
@@ -46,6 +47,10 @@ configurations {
 
   compile.exclude(group: 'org.springframework', module: 'spring-support')
   runtime.exclude(group: 'org.springframework', module: 'spring-support')
+
+  // this dependency is a "provided" dependency
+  compile.exclude(group: 'ch.qos.logback', module: 'logback-classic')
+  runtime.exclude(group: 'ch.qos.logback', module: 'logback-classic')
 }
 
 project.ext.railsRoot = file("${project.projectDir}/webapp/WEB-INF/rails.new")
@@ -88,19 +93,12 @@ dependencies {
   compile project(':common')
   compile project(':rack_hack')
 
-  compile(group: 'commons-beanutils', name: 'commons-beanutils-core', version: '1.7.0') {
-    exclude(module: 'commons-logging')
-    exclude(module: 'commons-collections')
-  }
-
   copyOnly project(path: ':tfs-impl-14', configuration: 'fatJarConfig')
   copyOnly project(path: ':agent', configuration: 'fatJarConfig')
   copyOnly project(path: ':agent-launcher', configuration: 'fatJarConfig')
   copyOnlyTestData project(':test-agent')
 
-  compile group: 'oro', name: 'oro', version: '2.0.8'
   compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
-  compile group: 'commons-pool', name: 'commons-pool', version: '1.5.6'
   compile group: 'com.h2database', name: 'h2', version: '1.3.168'
   compile group: 'net.sf', name: 'dbdeploy', version: '2.11.1'
   compile(group: 'org.hibernate', name: 'hibernate-ehcache', version: '3.3.2.GA') {
@@ -113,41 +111,32 @@ dependencies {
   compile(group: 'org.hibernate', name: 'hibernate-annotations', version: '3.4.0.GA') {
     exclude(module: 'slf4j-api')
   }
+
+  // optional dependency from hibernate
   compile group: 'javassist', name: 'javassist', version: '3.9.0.GA'
   compile group: 'org.apache.ibatis', name: 'ibatis-sqlmap', version: '2.3.4.726'
   compile group: 'net.sf.ehcache', name: 'ehcache-core', version: '2.0.0'
   compile(group: 'opensymphony', name: 'oscache', version: '2.4.1') {
-    exclude(module: 'commons-logging')
     exclude(module: 'jms')
     exclude(module: 'servlet-api')
   }
   compile(group: 'org.apache.activemq', name: 'activemq-core', version: '5.5.0') {
     exclude(module: 'spring-context')
     exclude(module: 'org.osgi.core')
-    exclude(module: 'commons-logging')
   }
   compile group: 'org.jruby', name: 'jruby-complete', version: '1.7.26'
-  compile group: 'org.jruby.rack', name: 'jruby-rack', version: '1.1.14'
+  compile group: 'org.jruby.rack', name: 'jruby-rack', version: versions.rack
   compile group: 'org.openrdf', name: 'sesame-onejar', version: '2.3.1'
-  compile group: 'org.springframework', name: 'spring-web', version: '3.1.3.RELEASE'
-  compile group: 'org.springframework', name: 'web.servlet', version: '3.1.3.RELEASE'
-  compile(group: 'org.springframework.security', name: 'spring-security-acl', version: '2.0.3') {
-    exclude(module: 'spring-support')
-    exclude(module: 'spring-jdbc')
+  compile group: 'org.springframework', name: 'spring-orm', version: project.versions.spring
+  compile group: 'org.springframework', name: 'spring-web', version: project.versions.spring
+  compile group: 'org.springframework', name: 'web.servlet', version: project.versions.spring
+  compile(group: 'org.springframework.security', name: 'spring-security-core', version: '2.0.3') {
     exclude(module: 'spring-core')
-    exclude(module: 'spring-beans')
     exclude(module: 'spring-context')
     exclude(module: 'spring-aop')
+
     exclude(module: 'commons-codec')
-    exclude(module: 'commons-logging')
     exclude(module: 'commons-collections')
-  }
-  compile group: 'org.springframework.security', name: 'spring-security-core-tiger', version: '2.0.3'
-  compile(group: 'org.springframework.ldap', name: 'spring-ldap', version: '1.2.1') {
-    exclude(module: 'spring-core')
-    exclude(module: 'spring-beans')
-    exclude(module: 'commons-lang')
-    exclude(module: 'commons-logging')
   }
   compile group: 'com.apple', name: 'AppleJavaExtensions', version: '1.4'
   compile group: 'org.aspectj', name: 'aspectjrt', version: '1.5.4'
@@ -162,7 +151,9 @@ dependencies {
   compile group: 'com.sun.mail', name: 'mailapi', version: '1.5.6'
   compile group: 'com.sun.mail', name: 'smtp', version: '1.5.6'
   compile group: 'org.objenesis', name: 'objenesis', version: '1.2'
-  compile(group: 'jaxen', name: 'jaxen', version: '1.1') {
+
+  // needed by jdom2 for some XPATH stuff
+  compile(group: 'jaxen', name: 'jaxen', version: '1.1.6') {
     exclude(module: 'xml-apis')
     exclude(module: 'xom')
     exclude(module: 'xercesImpl')
@@ -170,15 +161,16 @@ dependencies {
   }
   // this is just an override to force a transitive dep to the version we want.
   compile group: 'xml-apis', name: 'xml-apis', version: '1.3.04'
-  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
-  compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.21'
-  compile group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
+  compile group: 'org.slf4j', name: 'slf4j-api', version: project.versions.slf4j
   compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '4.7.0.201704051617-r'
+  compile group: 'cglib', name: 'cglib-nodep', version: '2.2'
   compileOnly project(':app-server')
   compileOnly group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.47'
   compileOnly group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: versions.jetty
 
-  testCompile group: 'com.unboundid', name: 'unboundid-ldapsdk', version: '2.3.6'
+  testCompile group: 'org.dbunit', name: 'dbunit', version: '2.5.1'
+  testCompile group: 'org.mozilla', name: 'rhino', version: '1.7.7'
+  testCompile group: 'jmock', name: 'jmock-cglib', version: '1.1.0'
   testCompile project(path: ':common', configuration: 'testOutput')
   testCompile project(path: ':config-server', configuration: 'testOutput')
   testCompile project(path: ':config-api', configuration: 'testOutput')
@@ -187,14 +179,13 @@ dependencies {
   testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.4.0'
   testCompile group: 'org.jsoup', name: 'jsoup', version: '1.8.1'
   testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '1.7.0'
-  testCompile group: 'org.xmlunit', name: 'xmlunit-core', version: '2.2.1'
   testCompile group: 'org.xmlunit', name: 'xmlunit-matchers', version: '2.2.1'
 }
 
 jar {
   classifier = 'classes'
-  exclude '**/*/log4j.properties'
-  exclude 'log4j.properties'
+  exclude '**/*/logback.xml'
+  exclude 'logback.xml'
 }
 
 def findGemsToNotPack = {
@@ -262,6 +253,58 @@ task copyH2Deltas(type: Copy, dependsOn: [':server:cleanDb']) {
   into('db/h2deltas')
 }
 
+task cleanTestRepo(type: Delete) {
+  delete 'test-repo'
+}
+
+clean.dependsOn cleanTestRepo
+
+task prepareTestGitRepo {
+  def repoDir = project.file('test-repo')
+  outputs.dir repoDir
+
+  doFirst {
+    project.delete(repoDir)
+    repoDir.mkdirs()
+
+    project.file("${repoDir}/README.md").withPrintWriter { out ->
+      out.println("# This is a test repo")
+    }
+
+    project.exec {
+      commandLine = ['git', "init"]
+      workingDir = repoDir
+
+      standardOutput = System.out
+      errorOutput = System.err
+    }
+
+    project.exec {
+      commandLine = ['git', "config", "commit.gpgSign", "false"]
+      workingDir = repoDir
+
+      standardOutput = System.out
+      errorOutput = System.err
+    }
+
+    project.exec {
+      commandLine = ['git', 'add', '.']
+      workingDir = repoDir
+
+      standardOutput = System.out
+      errorOutput = System.err
+    }
+
+    project.exec {
+      commandLine = ['git', 'commit', '-m', "Initial commit"]
+      workingDir = repoDir
+
+      standardOutput = System.out
+      errorOutput = System.err
+    }
+  }
+}
+
 task prepareDb {
   dependsOn copyH2Db, copyH2Deltas
 }
@@ -285,7 +328,7 @@ task prepareNoRails {
 }
 
 task prepare {
-  dependsOn = [prepareNoRails, ':server:dependencyClassPath', ':server:compileAssetsDev']
+  dependsOn = [prepareNoRails, prepareTestGitRepo, ':server:dependencyClassPath', ':server:compileAssetsDev']
 }
 
 test {
@@ -334,7 +377,6 @@ clean {
   delete 'artifactsDir'
   delete 'data'
   delete 'felix-cache'
-  delete 'logs'
   delete 'pipelines'
   delete 'plugins'
   delete 'tfs-impl-14.jar'
@@ -359,6 +401,7 @@ task inlinePartials {
 
   outputs.dir(inlinedPartialsDir)
   inputs.dir(viewsDir)
+  outputs.cacheIf {true}
 
   doFirst {
     delete inlinedPartialsDir
@@ -397,8 +440,8 @@ task war(type: Jar) {
   extension 'war'
 
   // do this lazily because finding gems is expensive during the configure cycle causing gradle to boot really slow
-  exclude '**/*/log4j.properties'
-  exclude 'log4j.properties'
+  exclude '**/*/logback.xml'
+  exclude 'logback.xml'
 
   // exclude app-server because it causes class cast exceptions (loaded by different classloaders)
 
@@ -480,7 +523,6 @@ task verifyWar(type: VerifyJarTask) {
       "commons-fileupload-1.3.2.jar",
       "commons-io-2.5.jar",
       "commons-lang-2.6.jar",
-      "commons-logging-1.2.jar",
       "commons-net-2.0.jar",
       "commons-pool-1.5.6.jar",
       "config-api-${project.version}.jar",
@@ -511,63 +553,50 @@ task verifyWar(type: VerifyJarTask) {
       "httpcore-4.4.4.jar",
       "httpmime-4.5.2.jar",
       "ibatis-sqlmap-2.3.4.726.jar",
-      "jackson-annotations-2.5.0.jar",
-      "jackson-core-2.5.0.jar",
-      "jackson-databind-2.5.0.jar",
       "jasypt-1.7.jar",
       "JavaEWAH-1.1.6.jar",
       "javassist-3.9.0.GA.jar",
       "javasysmon-0.3.6.jar",
-      "javax.inject-1.jar",
       "javax.servlet-api-3.1.0.jar",
-      "jaxen-1.1.jar",
+      "jaxen-1.1.6.jar",
+      "jcl-over-slf4j-${project.versions.slf4j}.jar",
       "jdom-2.0.2.jar",
       "joda-time-2.3.jar",
-      "jolt-core-0.0.20.jar",
       "jruby-complete-1.7.26.jar",
-      "jruby-rack-1.1.14.jar",
+      "jruby-rack-${versions.rack}.jar",
       "jsch-0.1.54.jar",
-      "json-utils-0.0.20.jar",
       "jta-1.1.jar",
-      "jul-to-slf4j-1.7.21.jar",
       "kahadb-5.5.0.jar",
-      "log4j-1.2.17.jar",
       "mailapi-1.5.6.jar",
       "objenesis-1.2.jar",
-      "org.apache.felix.framework-4.2.1.jar",
+      "org.apache.felix.framework-${project.versions.felix}.jar",
       "org.eclipse.jgit-4.7.0.201704051617-r.jar",
       "org.eclipse.jgit.http.server-4.7.0.201704051617-r.jar",
-      "oro-2.0.8.jar",
       "oscache-2.4.1.jar",
       "plugin-metadata-store-${project.version}.jar",
       "quartz-1.6.5.jar",
       "rack_hack-${project.version}.jar",
       "sesame-onejar-2.3.1.jar",
-      "slf4j-api-1.7.21.jar",
-      "slf4j-log4j12-1.7.21.jar",
+      "slf4j-api-${project.versions.slf4j}.jar",
       "smtp-1.5.6.jar",
-      "spring-aop-3.1.3.RELEASE.jar",
-      "spring-asm-3.1.3.RELEASE.jar",
-      "spring-beans-3.1.3.RELEASE.jar",
-      "spring-context-3.1.3.RELEASE.jar",
-      "spring-context-support-3.1.3.RELEASE.jar",
-      "spring-core-3.1.3.RELEASE.jar",
-      "spring-expression-3.1.3.RELEASE.jar",
-      "spring-jdbc-3.1.3.RELEASE.jar",
-      "spring-ldap-1.2.1.jar",
-      "spring-orm-3.1.3.RELEASE.jar",
-      "spring-security-acl-2.0.3.jar",
+      "spring-aop-${project.versions.spring}.jar",
+      "spring-asm-${project.versions.spring}.jar",
+      "spring-beans-${project.versions.spring}.jar",
+      "spring-context-${project.versions.spring}.jar",
+      "spring-context-support-${project.versions.spring}.jar",
+      "spring-core-${project.versions.spring}.jar",
+      "spring-expression-${project.versions.spring}.jar",
+      "spring-jdbc-${project.versions.spring}.jar",
+      "spring-orm-${project.versions.spring}.jar",
       "spring-security-core-2.0.3.jar",
-      "spring-security-core-tiger-2.0.3.jar",
-      "spring-tx-3.1.3.RELEASE.jar",
-      "spring-web-3.1.3.RELEASE.jar",
-      "spring-webmvc-3.1.3.RELEASE.jar",
+      "spring-tx-${project.versions.spring}.jar",
+      "spring-web-${project.versions.spring}.jar",
+      "spring-webmvc-${project.versions.spring}.jar",
       "urlrewritefilter-3.2.0.jar",
       "util-${project.version}.jar",
       "velocity-1.7.jar",
       "velocity-tools-view-1.2.jar",
-      "web.servlet-3.1.3.RELEASE.jar",
-      "xercesImpl-2.9.1.jar",
+      "web.servlet-${project.versions.spring}.jar",
       "xml-apis-1.3.04.jar",
     ]
   ]

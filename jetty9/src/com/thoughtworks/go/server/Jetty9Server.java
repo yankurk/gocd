@@ -23,11 +23,11 @@ import com.thoughtworks.go.util.FileUtil;
 import com.thoughtworks.go.util.GoConstants;
 import com.thoughtworks.go.util.SystemEnvironment;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -36,6 +36,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 import org.eclipse.jetty.xml.XmlConfiguration;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
@@ -106,10 +107,12 @@ public class Jetty9Server extends AppServer {
     }
 
     @Override
-    public void setCookieExpirePeriod(int cookieExpirePeriod) {
+    public void setSessionAndCookieExpiryTimeout(int sessionAndCookieExpiryTimeout) {
         SessionCookieConfig cookieConfig = webAppContext.getSessionHandler().getSessionManager().getSessionCookieConfig();
         cookieConfig.setHttpOnly(true);
-        cookieConfig.setMaxAge(cookieExpirePeriod);
+        cookieConfig.setMaxAge(sessionAndCookieExpiryTimeout);
+        SessionManager sessionManager = webAppContext.getSessionHandler().getSessionManager();
+        sessionManager.setMaxInactiveInterval(sessionAndCookieExpiryTimeout);
     }
 
     @Override
@@ -230,6 +233,12 @@ public class Jetty9Server extends AppServer {
                 JettyWebXmlConfiguration.class.getCanonicalName()
         });
         webAppContext.setContextPath(systemEnvironment.getWebappContextPath());
+
+        // delegate all logging to parent classloader to avoid initialization of loggers in multiple classloaders
+        webAppContext.addSystemClass("org.apache.log4j.");
+        webAppContext.addSystemClass("org.slf4j.");
+        webAppContext.addSystemClass("org.apache.commons.logging.");
+
         webAppContext.setWar(getWarFile());
         webAppContext.setParentLoaderPriority(systemEnvironment.getParentLoaderPriority());
         return webAppContext;

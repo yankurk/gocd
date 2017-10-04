@@ -25,9 +25,8 @@ import com.thoughtworks.go.config.materials.PluggableSCMMaterialConfig;
 import com.thoughtworks.go.config.materials.dependency.DependencyMaterialConfig;
 import com.thoughtworks.go.config.materials.svn.SvnMaterialConfig;
 import com.thoughtworks.go.config.registry.ConfigElementImplementationRegistry;
+import com.thoughtworks.go.config.remote.FileConfigOrigin;
 import com.thoughtworks.go.config.remote.RepoConfigOrigin;
-import com.thoughtworks.go.config.server.security.ldap.BaseConfig;
-import com.thoughtworks.go.config.server.security.ldap.BasesConfig;
 import com.thoughtworks.go.config.update.ConfigUpdateResponse;
 import com.thoughtworks.go.config.update.FullConfigUpdateCommand;
 import com.thoughtworks.go.config.update.UiBasedConfigUpdateCommand;
@@ -79,8 +78,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -288,14 +286,6 @@ public class GoConfigServiceTest {
         pipelineConfig.lockExplicitly();
         expectLoad(new BasicCruiseConfig(group));
         assertThat(goConfigService.isLockable("pipeline"), is(true));
-    }
-
-    @Test
-    public void shouldUnderstandIfLdapIsConfigured() throws Exception {
-        CruiseConfig config = new BasicCruiseConfig();
-        config.setServerConfig(new ServerConfig(null, new SecurityConfig(new LdapConfig("test", "test", "test", null, true, new BasesConfig(new BaseConfig("test")), "test"), null, true, null)));
-        expectLoad(config);
-        assertThat("Ldap is configured", goConfigService.isLdapConfigured(), is(true));
     }
 
     @Test
@@ -592,7 +582,7 @@ public class GoConfigServiceTest {
         PipelineConfig down2 = GoConfigMother.createPipelineConfigWithMaterialConfig("down2", new DependencyMaterialConfig(new CaseInsensitiveString("blahPipeline"), new CaseInsensitiveString("blahStage")));
         when(goConfigDao.load()).thenReturn(configWith(
                 up, down1, down2, GoConfigMother.createPipelineConfigWithMaterialConfig("otherPipeline", new DependencyMaterialConfig(new CaseInsensitiveString("someotherpipeline"),
-                new CaseInsensitiveString("blahStage")))
+                        new CaseInsensitiveString("blahStage")))
         ));
 
         assertThat(goConfigService.downstreamPipelinesOf("blahPipeline"), is(Arrays.asList(down1, down2)));
@@ -877,7 +867,7 @@ public class GoConfigServiceTest {
     public void shouldThrowExceptionIfGroupDoesNotExist_WhenUserIsAdmin() {
         CaseInsensitiveString adminName = new CaseInsensitiveString("admin");
         GoConfigMother mother = new GoConfigMother();
-        mother.enableSecurityWithPasswordFile(cruiseConfig);
+        mother.enableSecurityWithPasswordFilePlugin(cruiseConfig);
         cruiseConfig.server().security().adminsConfig().add(new AdminUser(adminName));
         String groupName = String.format("group_%s", UUID.randomUUID());
         try {
@@ -893,7 +883,7 @@ public class GoConfigServiceTest {
         CaseInsensitiveString adminName = new CaseInsensitiveString("admin");
         String groupName = String.format("group_%s", UUID.randomUUID());
         GoConfigMother mother = new GoConfigMother();
-        mother.enableSecurityWithPasswordFile(cruiseConfig);
+        mother.enableSecurityWithPasswordFilePlugin(cruiseConfig);
         cruiseConfig.server().security().adminsConfig().add(new AdminUser(adminName));
         try {
             goConfigService.isUserAdminOfGroup(new CaseInsensitiveString("foo"), groupName);
@@ -908,7 +898,7 @@ public class GoConfigServiceTest {
         CaseInsensitiveString adminName = new CaseInsensitiveString("admin");
         String groupName = String.format("group_%s", UUID.randomUUID());
         GoConfigMother mother = new GoConfigMother();
-        mother.enableSecurityWithPasswordFile(cruiseConfig);
+        mother.enableSecurityWithPasswordFilePlugin(cruiseConfig);
         cruiseConfig.server().security().adminsConfig().add(new AdminUser(adminName));
         mother.addPipelineWithGroup(cruiseConfig, groupName, "pipeline", "stage");
         mother.addAdminUserForPipelineGroup(cruiseConfig, "user", groupName);
@@ -1070,7 +1060,7 @@ public class GoConfigServiceTest {
     }
 
     @Test
-    public void badConfigShouldContainOldMD5_WhenConfigUpdateFailed(){
+    public void badConfigShouldContainOldMD5_WhenConfigUpdateFailed() {
         when(goConfigDao.updateConfig(org.mockito.Matchers.<UpdateConfigCommand>any())).thenThrow(new RuntimeException(getGoConfigInvalidException()));
         ConfigUpdateResponse configUpdateResponse = goConfigService.updateConfigFromUI(mock(UpdateConfigFromUI.class), "old-md5", new Username(new CaseInsensitiveString("user")),
                 new HttpLocalizedOperationResult());
@@ -1079,7 +1069,7 @@ public class GoConfigServiceTest {
     }
 
     @Test
-    public void configShouldContainOldMD5_WhenConfigMergeFailed(){
+    public void configShouldContainOldMD5_WhenConfigMergeFailed() {
         when(goConfigDao.loadForEditing()).thenReturn(new BasicCruiseConfig());
         when(goConfigDao.updateConfig(org.mockito.Matchers.<UpdateConfigCommand>any())).thenThrow(new ConfigFileHasChangedException());
         ConfigUpdateResponse configUpdateResponse = goConfigService.updateConfigFromUI(mock(UpdateConfigFromUI.class), "old-md5", new Username(new CaseInsensitiveString("user")),
@@ -1093,18 +1083,18 @@ public class GoConfigServiceTest {
     public void shouldReturnConfigStateFromDaoLayer_WhenUpdatingServerConfig() {
         ConfigSaveState expectedSaveState = ConfigSaveState.MERGED;
         when(goConfigDao.updateConfig(org.mockito.Matchers.<UpdateConfigCommand>any())).thenReturn(expectedSaveState);
-        ConfigSaveState configSaveState = goConfigService.updateServerConfig(new MailHost(new GoCipher()), null, null, true, "md5", null, null, null, null, "http://site",
+        ConfigSaveState configSaveState = goConfigService.updateServerConfig(new MailHost(new GoCipher()), true, "md5", null, null, null, null, "http://site",
                 "https://site", "location");
         assertThat(configSaveState, is(expectedSaveState));
     }
 
-	@Test
-	public void shouldDelegateToConfig_getAllPipelinesInGroup() throws Exception {
-		CruiseConfig cruiseConfig = mock(BasicCruiseConfig.class);
-		expectLoad(cruiseConfig);
-		goConfigService.getAllPipelinesInGroup("group");
-		verify(cruiseConfig).pipelines("group");
-	}
+    @Test
+    public void shouldDelegateToConfig_getAllPipelinesInGroup() throws Exception {
+        CruiseConfig cruiseConfig = mock(BasicCruiseConfig.class);
+        expectLoad(cruiseConfig);
+        goConfigService.getAllPipelinesInGroup("group");
+        verify(cruiseConfig).pipelines("group");
+    }
 
     @Test
     public void shouldNotUpdatePipelineSelectionsWhenTheUserIsAnonymousAndHasNeverSelectedPipelines() {
@@ -1159,8 +1149,7 @@ public class GoConfigServiceTest {
 
 
     @Test
-    public void pipelineEditableViaUI_shouldReturnFalseWhenPipelineIsRemote() throws Exception
-    {
+    public void pipelineEditableViaUI_shouldReturnFalseWhenPipelineIsRemote() throws Exception {
         PipelineConfigs group = new BasicPipelineConfigs();
         PipelineConfig pipelineConfig = createPipelineConfig("pipeline", "name", "plan");
         pipelineConfig.setOrigin(new RepoConfigOrigin());
@@ -1168,9 +1157,9 @@ public class GoConfigServiceTest {
         expectLoad(new BasicCruiseConfig(group));
         assertThat(goConfigService.isPipelineEditableViaUI("pipeline"), is(false));
     }
+
     @Test
-    public void pipelineEditableViaUI_shouldReturnTrueWhenPipelineIsLocal() throws Exception
-    {
+    public void pipelineEditableViaUI_shouldReturnTrueWhenPipelineIsLocal() throws Exception {
         PipelineConfigs group = new BasicPipelineConfigs();
         PipelineConfig pipelineConfig = createPipelineConfig("pipeline", "name", "plan");
         group.add(pipelineConfig);
@@ -1221,6 +1210,64 @@ public class GoConfigServiceTest {
         assertTrue(schedulableDependencyMaterials.contains(pluggableSCMMaterialConfig));
     }
 
+    @Test
+    public void shouldBeAbleToEditAExistentPipelineWithAdminPrivileges() throws Exception {
+        CruiseConfig cruiseConfig = mock(CruiseConfig.class);
+
+        when(goConfigDao.load()).thenReturn(cruiseConfig);
+        PipelineConfig pipeline = new PipelineConfig();
+        pipeline.setOrigin(new FileConfigOrigin());
+        pipeline.setName("pipeline1");
+        when(cruiseConfig.pipelineConfigByName(new CaseInsensitiveString("pipeline1"))).thenReturn(pipeline);
+        when(cruiseConfig.getGroups()).thenReturn(new GoConfigMother().cruiseConfigWithOnePipelineGroup().getGroups());
+        when(cruiseConfig.isAdministrator("admin_user")).thenReturn(true);
+
+        assertTrue(goConfigService.canEditPipeline("pipeline1", new Username("admin_user")));
+    }
+
+    @Test
+    public void shouldNotBeAbleToEditANonExistentPipeline() throws Exception {
+        CruiseConfig cruiseConfig = mock(CruiseConfig.class);
+
+        when(goConfigDao.load()).thenReturn(cruiseConfig);
+        when(cruiseConfig.pipelineConfigByName(new CaseInsensitiveString("non_existing_pipeline"))).thenThrow(new PipelineNotFoundException("Not found."));
+
+        assertFalse(goConfigService.canEditPipeline("non_existing_pipeline", null));
+    }
+
+    @Test
+    public void shouldNotBeAbleToEditPipelineIfUserDoesNotHaveSufficientPermissions() throws Exception {
+        CruiseConfig cruiseConfig = mock(CruiseConfig.class);
+
+        when(goConfigDao.load()).thenReturn(cruiseConfig);
+        PipelineConfig pipeline = new PipelineConfig();
+        pipeline.setOrigin(new FileConfigOrigin());
+        pipeline.setName("pipeline1");
+        when(cruiseConfig.pipelineConfigByName(new CaseInsensitiveString("pipeline1"))).thenReturn(pipeline);
+        BasicCruiseConfig basicCruiseConfig = new GoConfigMother().cruiseConfigWithOnePipelineGroup();
+        when(cruiseConfig.getGroups()).thenReturn(basicCruiseConfig.getGroups());
+        when(cruiseConfig.findGroup("group1")).thenReturn(mock(PipelineConfigs.class));
+        when(cruiseConfig.isAdministrator("view_user")).thenReturn(false);
+        when(cruiseConfig.server()).thenReturn(new ServerConfig());
+
+        assertFalse(goConfigService.canEditPipeline("pipeline1", new Username("view_user")));
+    }
+
+    @Test
+    public void shouldNotAllowEditOfConfigRepoPipelines() throws Exception {
+        CruiseConfig cruiseConfig = mock(CruiseConfig.class);
+
+        when(goConfigDao.load()).thenReturn(cruiseConfig);
+        PipelineConfig pipeline = new PipelineConfig();
+        pipeline.setName("pipeline1");
+        pipeline.setOrigin(new RepoConfigOrigin());
+        when(cruiseConfig.pipelineConfigByName(new CaseInsensitiveString("pipeline1"))).thenReturn(pipeline);
+        when(cruiseConfig.getGroups()).thenReturn(new GoConfigMother().cruiseConfigWithOnePipelineGroup().getGroups());
+        when(cruiseConfig.isAdministrator("admin_user")).thenReturn(true);
+
+        assertFalse(goConfigService.canEditPipeline("pipeline1", new Username("admin_user")));
+    }
+
     private PipelineConfig createPipelineConfig(String pipelineName, String stageName, String... buildNames) {
         PipelineConfig pipeline = new PipelineConfig(new CaseInsensitiveString(pipelineName), new MaterialConfigs());
         pipeline.add(new StageConfig(new CaseInsensitiveString(stageName), jobConfigs(buildNames)));
@@ -1253,7 +1300,9 @@ public class GoConfigServiceTest {
 
     private CruiseConfig mockConfigWithSecurity() {
         CruiseConfig config = mockConfig();
-        config.server().useSecurity(new SecurityConfig(null, new PasswordFileConfig("path"), true));
+        final SecurityConfig securityConfig = new SecurityConfig(true);
+        securityConfig.securityAuthConfigs().add(new SecurityAuthConfig("file", "cd.go.authentication.passwordfile"));
+        config.server().useSecurity(securityConfig);
         return config;
     }
 

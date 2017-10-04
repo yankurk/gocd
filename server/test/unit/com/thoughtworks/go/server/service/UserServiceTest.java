@@ -28,6 +28,7 @@ import com.thoughtworks.go.server.domain.Username;
 import com.thoughtworks.go.server.exceptions.UserEnabledException;
 import com.thoughtworks.go.server.exceptions.UserNotFoundException;
 import com.thoughtworks.go.server.persistence.OauthRepository;
+import com.thoughtworks.go.server.service.result.BulkDeletionFailureResult;
 import com.thoughtworks.go.server.service.result.HttpLocalizedOperationResult;
 import com.thoughtworks.go.server.transaction.TestTransactionSynchronizationManager;
 import com.thoughtworks.go.server.transaction.TestTransactionTemplate;
@@ -36,16 +37,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.thoughtworks.go.helper.SecurityConfigMother.securityConfigWithRole;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
@@ -221,7 +219,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldCreateNewUsers() throws Exception {
-        UserSearchModel foo = new UserSearchModel(new User("fooUser", "Mr Foo", "foo@cruise.com"), UserSourceType.LDAP);
+        UserSearchModel foo = new UserSearchModel(new User("fooUser", "Mr Foo", "foo@cruise.com"), UserSourceType.PLUGIN);
 
         doNothing().when(userDao).saveOrUpdate(foo.getUser());
         when(userDao.findUser("fooUser")).thenReturn(new NullUser());
@@ -233,25 +231,11 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldAllowCreateNewUsersFromPasswordFileWithoutEmailAddress() throws Exception {
-        UserSearchModel passwordUser = new UserSearchModel(new User("passwordUser"), UserSourceType.PASSWORD_FILE);
-
-        doNothing().when(userDao).saveOrUpdate(passwordUser.getUser());
-        when(userDao.findUser("passwordUser")).thenReturn(new NullUser());
-        when(userDao.enabledUserCount()).thenReturn(10);
-
-        HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
-        userService.create(Arrays.asList(passwordUser), result);
-        assertThat(result.isSuccessful(), is(true));
-
-    }
-
-    @Test
     public void shouldReturnConflictWhenUserAlreadyExists() {
         HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
 
         User existsingUser = new User("existingUser", "Existing User", "existing@user.com");
-        UserSearchModel searchModel = new UserSearchModel(existsingUser, UserSourceType.LDAP);
+        UserSearchModel searchModel = new UserSearchModel(existsingUser, UserSourceType.PLUGIN);
         when(userDao.findUser("existingUser")).thenReturn(existsingUser);
         userService.create(Arrays.asList(searchModel), result);
 
@@ -259,13 +243,12 @@ public class UserServiceTest {
         assertThat(result.httpCode(), is(HttpServletResponse.SC_CONFLICT));
     }
 
-
     @Test
     public void shouldReturnErrorMessageWhenUserValidationsFail() throws Exception {
         HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
 
         User invalidUser = new User("fooUser", "Foo User", "invalidEmail");
-        UserSearchModel searchModel = new UserSearchModel(invalidUser, UserSourceType.LDAP);
+        UserSearchModel searchModel = new UserSearchModel(invalidUser, UserSourceType.PLUGIN);
         when(userDao.findUser("fooUser")).thenReturn(new NullUser());
         when(userDao.enabledUserCount()).thenReturn(1);
 
@@ -319,7 +302,8 @@ public class UserServiceTest {
     @Test
     public void shouldReturnUsersInSortedOrderFromPipelineGroupWhoHaveOperatePermissions() {
         CruiseConfig config = new BasicCruiseConfig();
-        SecurityConfig securityConfig = new SecurityConfig(null, new PasswordFileConfig("path"), true, null);
+        SecurityConfig securityConfig = new SecurityConfig(null);
+        securityConfig.securityAuthConfigs().add(new SecurityAuthConfig("file", "cd.go.authentication.passwordfile"));
         securityConfig.addRole(new RoleConfig(new CaseInsensitiveString("role1"), new RoleUser(new CaseInsensitiveString("user1")), new RoleUser(new CaseInsensitiveString("user2")),
                 new RoleUser(new CaseInsensitiveString("user3"))));
         securityConfig.addRole(new RoleConfig(new CaseInsensitiveString("role2"), new RoleUser(new CaseInsensitiveString("user4")), new RoleUser(new CaseInsensitiveString("user5")),
@@ -479,6 +463,90 @@ public class UserServiceTest {
         userService.deleteUser(username, result);
         assertThat(result.isSuccessful(), is(false));
         assertThat(result.hasMessage(), is(true));
+    }
+
+    @Test
+    public void shouldDeleteAllSpecifiedUsersSuccessfully() {
+        List<String> usernames = Arrays.asList("john", "joan");
+
+        User john = new User("john");
+        john.disable();
+        User joan = new User("joan");
+        joan.disable();
+        HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
+
+        when(userDao.findUser("john")).thenReturn(john);
+        when(userDao.findUser("joan")).thenReturn(joan);
+        userService.deleteUsers(usernames, result);
+
+        verify(userDao).deleteUsers(usernames);
+        assertThat(result.isSuccessful(), is(true));
+        assertThat(result.toString(), containsString("RESOURCES_DELETE_SUCCESSFUL"));
+        assertThat(result.toString(), containsString("[john, joan]"));
+    }
+
+    @Test
+    public void shouldFailWithErrorEvenIfOneUserDoesNotExistDuringBulkDelete() {
+        List<String> usernames = Arrays.asList("john", "joan");
+        User john = new User("John");
+        john.disable();
+        HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
+
+        BulkDeletionFailureResult expectedBulkDeletionFailureResult = new BulkDeletionFailureResult();
+        expectedBulkDeletionFailureResult.addNonExistentUserName("joan");
+
+        when(userDao.findUser("joan")).thenReturn(new NullUser());
+        when(userDao.findUser("john")).thenReturn(john);
+
+        BulkDeletionFailureResult bulkDeletionFailureResult = userService.deleteUsers(usernames, result);
+
+        assertThat(result.isSuccessful(), is(false));
+        assertThat(result.toString(), containsString("USER_ENABLED_OR_NOT_FOUND"));
+        assertThat(bulkDeletionFailureResult.getNonExistentUsers(), is(expectedBulkDeletionFailureResult.getNonExistentUsers()));
+        assertThat(bulkDeletionFailureResult.getEnabledUsers(), is(expectedBulkDeletionFailureResult.getEnabledUsers()));
+    }
+
+    @Test
+    public void shouldFailWithErrorEvenIfOneUserIsEnabledDuringBulkDelete() {
+        List<String> usernames =Arrays.asList("john", "joan");
+        User john = new User("john");
+        User joan = new User("joan");
+        HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
+        BulkDeletionFailureResult expectedBulkDeletionFailureResult = new BulkDeletionFailureResult();
+        expectedBulkDeletionFailureResult.addEnabledUserName("john");
+        expectedBulkDeletionFailureResult.addEnabledUserName("joan");
+
+        when(userDao.findUser("joan")).thenReturn(john);
+        when(userDao.findUser("john")).thenReturn(joan);
+
+        BulkDeletionFailureResult bulkDeletionFailureResult = userService.deleteUsers(usernames, result);
+
+        assertThat(result.isSuccessful(), is(false));
+        assertThat(result.toString(), containsString("USER_ENABLED_OR_NOT_FOUND"));
+        assertThat(bulkDeletionFailureResult.getNonExistentUsers(), is(expectedBulkDeletionFailureResult.getNonExistentUsers()));
+        assertThat(bulkDeletionFailureResult.getEnabledUsers(), is(expectedBulkDeletionFailureResult.getEnabledUsers()));
+    }
+
+    @Test
+    public void shouldFailWithErrorIfNoUsersAreProvidedDuringBulkDelete() {
+        List<String> usernames = null;
+
+        HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
+        userService.deleteUsers(usernames, result);
+
+        assertThat(result.isSuccessful(), is(false));
+        assertThat(result.toString(), containsString("NO_USERS_SELECTED"));
+    }
+
+    @Test
+    public void shouldFailWithErrorIfEmptyUsersAreProvidedDuringBulkDelete() {
+        List<String> usernames = new ArrayList<>();
+
+        HttpLocalizedOperationResult result = new HttpLocalizedOperationResult();
+        userService.deleteUsers(usernames, result);
+
+        assertThat(result.isSuccessful(), is(false));
+        assertThat(result.toString(), containsString("NO_USERS_SELECTED"));
     }
 
     @Test

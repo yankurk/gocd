@@ -16,10 +16,10 @@
 
 package com.thoughtworks.go.domain;
 
+import ch.qos.logback.classic.Level;
 import com.thoughtworks.go.util.HttpService;
 import com.thoughtworks.go.util.LogFixture;
 import com.thoughtworks.go.util.TestingClock;
-import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -122,7 +122,6 @@ public class DownloadActionTest {
         private int timesCalled = 0;
 
         MockCachingFetchZipHttpService(int count) {
-            super(null);
             this.count = count;
         }
 
@@ -137,8 +136,12 @@ public class DownloadActionTest {
     }
 
     private void shouldHaveLogged(LogFixture logging, Level level, String message) {
+        String result;
+        synchronized (logging) {
+            result = logging.getLog();
+        }
         Assert.assertTrue(
-                "Expected log to contain " + message + " but got:\n" + logging.allLogs(),
+                "Expected log to contain " + message + " but got:\n" + result,
                 logging.contains(level, message));
     }
 
@@ -152,7 +155,6 @@ public class DownloadActionTest {
         private int timesCalled = 0;
 
         public FailSometimesHttpService(int count) {
-            super(null);
             this.count = count;
         }
 

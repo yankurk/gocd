@@ -167,38 +167,12 @@ describe "admin/server/index.html.erb" do
     end
   end
 
-  describe "user management" do
-    before(:each) do
-      assign(:inbuilt_ldap_password_auth_enabled, true)
-    end
-
-    it "should have a text area for search bases" do
-      server_config_form = ServerConfigurationForm.new({:ldap_search_base => "foo\\nbar\\nbaz,goo"})
-      assign(:server_configuration_form, server_config_form)
-
+  describe "inbuiltLdapPasswordAuth removed" do
+    it "should display built in ldap and password file support has been removed and migrated to respective plugins" do
       render
 
       Capybara.string(response.body).find('#user_management').tap do |div|
-        expect(div).to have_selector("label[for='server_configuration_form_ldap_search_base']", :text => "Search Base*")
-        expect(div).not_to have_selector("input[name='server_configuration_form[ldap_search_base]']")
-        expect(div).to have_selector("textarea[name='server_configuration_form[ldap_search_base]'][class='large']", :text => "foo\\nbar\\nbaz,goo")
-        expect(div).to have_selector(".contextual_help")
-      end
-    end
-  end
-
-  describe "inbuiltLdapPasswordAuth disabled" do
-    before(:each) do
-      assign(:inbuilt_ldap_password_auth_enabled, false)
-    end
-
-    it "should not display ldap and passwordfile settings when inbuilt_ldap_password_auth_enabled is turned off" do
-      render
-
-      Capybara.string(response.body).find('#user_management').tap do |div|
-        expect(div).not_to have_selector(".ldap_settings")
-        expect(div).not_to have_selector(".password_file_settings")
-        expect(div).to have_selector("div[class='information']", :text => "Support for LDAP and Password file authentication in GoCD core has been disabled in favour of the bundled LDAP and Password File plugins respectively. Your existing LDAP and Password file configurations have been moved to Authorization Configuration")
+        expect(div).to have_selector("div[class='information']", :text => "Support for LDAP and Password file authentication in GoCD core has been removed in favour of the bundled LDAP and Password File plugins respectively. Your existing LDAP and Password file configurations have been moved to Authorization Configuration")
       end
     end
   end
@@ -212,7 +186,7 @@ describe "admin/server/index.html.erb" do
       render
 
       Capybara.string(response.body).find('#user_management').tap do |div|
-        expect(div).to have_selector("label[for='server_configuration_form_allow_auto_login']", :text => /Allow users that exist/)
+        expect(div).to have_selector("label[for='server_configuration_form_allow_auto_login']", :text => 'Allow users to login via plugin into GoCD, even if they haven\'t been explicitly added to GoCD.')
         expect(div).to_not have_selector("input[name='server_configuration_form[allow_auto_login]'][type='hidden']")
         expect(div).to have_selector("input#server_configuration_form_allow_auto_login[name='server_configuration_form[allow_auto_login]'][disabled='disabled'][type='checkbox'][value='true']")
       end

@@ -16,14 +16,15 @@
 
 package com.thoughtworks.go.agent;
 
+import com.thoughtworks.go.CurrentGoCDVersion;
 import com.thoughtworks.go.agent.common.AgentBootstrapperBackwardCompatibility;
 import com.thoughtworks.go.agent.common.launcher.AgentProcessParent;
 import com.thoughtworks.go.agent.common.util.Downloader;
-import com.thoughtworks.go.agent.common.util.JarUtil;
 import com.thoughtworks.go.agent.launcher.DownloadableFile;
 import com.thoughtworks.go.agent.launcher.ServerBinaryDownloader;
 import com.thoughtworks.go.util.GoConstants;
 import com.thoughtworks.go.util.SslVerificationMode;
+import com.thoughtworks.go.util.SystemEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.thoughtworks.go.agent.common.util.LoggingHelper.CONSOLE_NDC.STDERR;
-import static com.thoughtworks.go.agent.common.util.LoggingHelper.CONSOLE_NDC.STDOUT;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.join;
 
@@ -49,7 +48,7 @@ public class AgentProcessParentImpl implements AgentProcessParent {
 
     public int run(String launcherVersion, String launcherMd5, ServerUrlGenerator urlGenerator, Map<String, String> env, Map context) {
         int exitValue = 0;
-        LOG.info("Agent is version: {}", JarUtil.getGoVersion(Downloader.AGENT_BINARY));
+        LOG.info("Agent is version: {}", CurrentGoCDVersion.getInstance().fullVersion());
         String command[] = new String[]{};
 
         try {
@@ -72,10 +71,19 @@ public class AgentProcessParentImpl implements AgentProcessParent {
             Process agent = invoke(command);
 
             // The next lines prevent the child process from blocking on Windows
+
+            AgentOutputAppender agentOutputAppenderForStdErr = new AgentOutputAppender(GO_AGENT_STDERR_LOG);
+            AgentOutputAppender agentOutputAppenderForStdOut = new AgentOutputAppender(GO_AGENT_STDOUT_LOG);
+
+            if (new SystemEnvironment().consoleOutToStdout()) {
+                agentOutputAppenderForStdErr.writeTo(AgentOutputAppender.Outstream.STDERR);
+                agentOutputAppenderForStdOut.writeTo(AgentOutputAppender.Outstream.STDOUT);
+            }
+
             agent.getOutputStream().close();
-            AgentConsoleLogThread stdErrThd = new AgentConsoleLogThread(agent.getErrorStream(), STDERR, GO_AGENT_STDERR_LOG);
+            AgentConsoleLogThread stdErrThd = new AgentConsoleLogThread(agent.getErrorStream(), agentOutputAppenderForStdErr);
             stdErrThd.start();
-            AgentConsoleLogThread stdOutThd = new AgentConsoleLogThread(agent.getInputStream(), STDOUT, GO_AGENT_STDOUT_LOG);
+            AgentConsoleLogThread stdOutThd = new AgentConsoleLogThread(agent.getInputStream(), agentOutputAppenderForStdOut);
             stdOutThd.start();
 
             Shutdown shutdownHook = new Shutdown(agent);

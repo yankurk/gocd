@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 ThoughtWorks, Inc.
+ * Copyright 2017 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import com.thoughtworks.go.server.service.GoConfigService;
 import com.thoughtworks.go.server.service.result.HttpOperationResult;
 import com.thoughtworks.go.util.SystemEnvironment;
 import com.thoughtworks.go.util.TestFileUtil;
+import com.thoughtworks.go.util.TimeProvider;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -42,7 +44,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import static com.thoughtworks.go.util.FileDigester.md5DigestOfStream;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -56,9 +57,11 @@ public class AgentRegistrationControllerTest {
     private SystemEnvironment systemEnvironment;
     private PluginsZip pluginsZip;
     private AgentConfigService agentConfigService;
+    private TimeProvider timeProvider;
 
     @Before
     public void setUp() throws Exception {
+        timeProvider = mock(TimeProvider.class);
         agentService = mock(AgentService.class);
         agentConfigService = mock(AgentConfigService.class);
         systemEnvironment = mock(SystemEnvironment.class);
@@ -66,7 +69,10 @@ public class AgentRegistrationControllerTest {
 
         when(systemEnvironment.getSslServerPort()).thenReturn(8443);
         pluginsZip = mock(PluginsZip.class);
-        controller = new AgentRegistrationController(agentService, goConfigService, systemEnvironment, pluginsZip, agentConfigService);
+        controller = new AgentRegistrationController(agentService, goConfigService, systemEnvironment, pluginsZip, agentConfigService, timeProvider);
+        controller.populateAgentChecksum();
+        controller.populateLauncherChecksum();
+        controller.populateTFSSDKChecksum();
     }
 
     @Test
@@ -79,7 +85,7 @@ public class AgentRegistrationControllerTest {
         ModelAndView modelAndView = controller.agentRequest("blahAgent-host", "blahAgent-uuid", "blah-location", "34567", "osx", "", "", "", "", "", "", false, request);
         assertThat(modelAndView.getView().getContentType(), is("application/json"));
 
-        verify(agentService).requestRegistration(new Username("some-agent-login-name"), AgentRuntimeInfo.fromServer(new AgentConfig("blahAgent-uuid", "blahAgent-host", request.getRemoteAddr()), false, "blah-location", 34567L, "osx", false));
+        verify(agentService).requestRegistration(new Username("some-agent-login-name"), AgentRuntimeInfo.fromServer(new AgentConfig("blahAgent-uuid", "blahAgent-host", request.getRemoteAddr()), false, "blah-location", 34567L, "osx", false, timeProvider));
     }
 
     @Test
@@ -94,7 +100,7 @@ public class AgentRegistrationControllerTest {
                 .thenReturn(new AgentConfig(uuid, "host", request.getRemoteAddr()));
         controller.agentRequest("host", uuid, "location", "233232", "osx", "someKey", "", "", "", "", "", false, request);
 
-        verify(agentService).requestRegistration(new Username("some-agent-login-name"), AgentRuntimeInfo.fromServer(new AgentConfig(uuid, "host", request.getRemoteAddr()), false, "location", 233232L, "osx", false));
+        verify(agentService).requestRegistration(new Username("some-agent-login-name"), AgentRuntimeInfo.fromServer(new AgentConfig(uuid, "host", request.getRemoteAddr()), false, "location", 233232L, "osx", false, timeProvider));
         verify(agentConfigService).updateAgent(any(UpdateConfigCommand.class), eq(uuid), any(HttpOperationResult.class), eq(new Username("some-agent-login-name")));
     }
 
@@ -111,7 +117,7 @@ public class AgentRegistrationControllerTest {
         controller.agentRequest("host", uuid, "location", "233232", "osx", "someKey", "", "", "autoregister-hostname", "", "", false, request);
 
         verify(agentService).requestRegistration(new Username("some-agent-login-name"), AgentRuntimeInfo.fromServer(
-                new AgentConfig(uuid, "autoregister-hostname", request.getRemoteAddr()), false, "location", 233232L, "osx", false));
+                new AgentConfig(uuid, "autoregister-hostname", request.getRemoteAddr()), false, "location", 233232L, "osx", false, timeProvider));
         verify(agentConfigService).updateAgent(any(UpdateConfigCommand.class), eq(uuid), any(HttpOperationResult.class), eq(new Username("some-agent-login-name")));
     }
 
@@ -125,7 +131,7 @@ public class AgentRegistrationControllerTest {
         when(agentService.agentUsername(uuid, request.getRemoteAddr(), "host")).thenReturn(new Username("some-agent-login-name"));
         controller.agentRequest("host", uuid, "location", "233232", "osx", "", "", "", "", "", "", false, request);
 
-        verify(agentService).requestRegistration(new Username("some-agent-login-name"), AgentRuntimeInfo.fromServer(new AgentConfig(uuid, "host", request.getRemoteAddr()), false, "location", 233232L, "osx", false));
+        verify(agentService).requestRegistration(new Username("some-agent-login-name"), AgentRuntimeInfo.fromServer(new AgentConfig(uuid, "host", request.getRemoteAddr()), false, "location", 233232L, "osx", false, timeProvider));
         verify(goConfigService, never()).updateConfig(any(UpdateConfigCommand.class));
     }
 
@@ -136,15 +142,15 @@ public class AgentRegistrationControllerTest {
         controller.checkAgentStatus(response);
 
         try (InputStream stream = new TFSJarDetector.DevelopmentServerTFSJarDetector(systemEnvironment).getJarURL().openStream()) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader(SystemEnvironment.AGENT_TFS_SDK_MD5_HEADER));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader(SystemEnvironment.AGENT_TFS_SDK_MD5_HEADER));
         }
 
         try (InputStream stream = JarDetector.create(systemEnvironment, "agent-launcher.jar")) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader(SystemEnvironment.AGENT_LAUNCHER_CONTENT_MD5_HEADER));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader(SystemEnvironment.AGENT_LAUNCHER_CONTENT_MD5_HEADER));
         }
 
         try (InputStream stream = JarDetector.create(systemEnvironment, "agent.jar")) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader(SystemEnvironment.AGENT_CONTENT_MD5_HEADER));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader(SystemEnvironment.AGENT_CONTENT_MD5_HEADER));
         }
 
         assertEquals("plugins-zip-md5", response.getHeader(SystemEnvironment.AGENT_PLUGINS_ZIP_MD5_HEADER));
@@ -157,7 +163,7 @@ public class AgentRegistrationControllerTest {
         assertEquals("8443", response.getHeader("Cruise-Server-Ssl-Port"));
 
         try (InputStream stream = JarDetector.create(systemEnvironment, "agent.jar")) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader("Content-MD5"));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader("Content-MD5"));
         }
     }
 
@@ -167,7 +173,7 @@ public class AgentRegistrationControllerTest {
         assertEquals("8443", response.getHeader("Cruise-Server-Ssl-Port"));
 
         try (InputStream stream = JarDetector.create(systemEnvironment, "agent-launcher.jar")) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader("Content-MD5"));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader("Content-MD5"));
         }
     }
 
@@ -178,7 +184,7 @@ public class AgentRegistrationControllerTest {
         assertEquals("application/octet-stream", response.getContentType());
 
         try (InputStream stream = JarDetector.create(systemEnvironment, "agent.jar")) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader("Content-MD5"));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader("Content-MD5"));
         }
         try (InputStream is = JarDetector.create(systemEnvironment, "agent.jar")) {
             assertTrue(Arrays.equals(IOUtils.toByteArray(is), response.getContentAsByteArray()));
@@ -192,7 +198,7 @@ public class AgentRegistrationControllerTest {
         assertEquals("application/octet-stream", response.getContentType());
 
         try (InputStream stream = JarDetector.create(systemEnvironment, "agent-launcher.jar")) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader("Content-MD5"));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader("Content-MD5"));
         }
         try (InputStream is = JarDetector.create(systemEnvironment, "agent-launcher.jar")) {
             assertTrue(Arrays.equals(IOUtils.toByteArray(is), response.getContentAsByteArray()));
@@ -227,7 +233,7 @@ public class AgentRegistrationControllerTest {
     public void shouldReturnChecksumOfTfsJar() throws Exception {
         controller.checkTfsImplVersion(response);
         try (InputStream stream = new TFSJarDetector.DevelopmentServerTFSJarDetector(systemEnvironment).getJarURL().openStream()) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader("Content-MD5"));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader("Content-MD5"));
         }
     }
 
@@ -237,7 +243,7 @@ public class AgentRegistrationControllerTest {
         assertEquals("application/octet-stream", response.getContentType());
 
         try (InputStream stream = new TFSJarDetector.DevelopmentServerTFSJarDetector(systemEnvironment).getJarURL().openStream()) {
-            assertEquals(md5DigestOfStream(stream), response.getHeader("Content-MD5"));
+            assertEquals(DigestUtils.md5Hex(stream), response.getHeader("Content-MD5"));
         }
         try (InputStream is = new TFSJarDetector.DevelopmentServerTFSJarDetector(systemEnvironment).getJarURL().openStream()) {
             assertTrue(Arrays.equals(IOUtils.toByteArray(is), response.getContentAsByteArray()));

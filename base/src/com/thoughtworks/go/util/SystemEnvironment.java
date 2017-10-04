@@ -16,10 +16,11 @@
 
 package com.thoughtworks.go.util;
 
+import ch.qos.logback.classic.Level;
 import com.thoughtworks.go.utils.Timeout;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Level;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -29,9 +30,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 public class SystemEnvironment implements Serializable, ConfigDirProvider {
 
-    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(SystemEnvironment.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SystemEnvironment.class);
 
     public static final String CRUISE_LISTEN_HOST = "cruise.listen.host";
     private static final String CRUISE_DATABASE_PORT = "cruise.database.port";
@@ -54,7 +57,6 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
 
     public static final String PARENT_LOADER_PRIORITY = "parent.loader.priority";
     public static final String AGENT_CONTENT_MD5_HEADER = "Agent-Content-MD5";
-    public static final String GO_ARTIFACT_PAYLOAD_SIZE_HEADER = "X-GO-ARTIFACT-SIZE";
 
     public static final String AGENT_LAUNCHER_CONTENT_MD5_HEADER = "Agent-Launcher-Content-MD5";
 
@@ -69,7 +71,6 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
 
     public static final String CONFIGURATION_NO = "N";
     public static final String RESOLVE_FANIN_REVISIONS = "resolve.fanin.revisions";
-    public static final String RESOLVE_FANIN_FALLBACK_TRIANGLE = "resolve.fanin.fallback.triangle";
     private String hsqlPath = null;
 
     public static final String ENABLE_CONFIG_MERGE_PROPERTY = "enable.config.merge";
@@ -137,6 +138,7 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
     public static GoSystemProperty<Integer> IDLE_TIMEOUT = new GoIntSystemProperty("idle.timeout", 30000);
     public static GoSystemProperty<Integer> RESPONSE_BUFFER_SIZE = new GoIntSystemProperty("response.buffer.size", 32768);
     public static final GoSystemProperty<Integer> API_REQUEST_IDLE_TIMEOUT_IN_SECONDS = new GoIntSystemProperty("api.request.idle.timeout.seconds", 300);
+    public static final GoSystemProperty<Integer> GO_SERVER_SESSION_TIMEOUT_IN_SECONDS = new GoIntSystemProperty("go.server.session.timeout.seconds", 60 * 60 * 24 * 14);
 
     public static GoSystemProperty<Integer> PLUGIN_NOTIFICATION_LISTENER_COUNT = new CachedProperty<>(new GoIntSystemProperty("plugin.notification.listener.count", 1));
 
@@ -208,7 +210,10 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
     public static GoSystemProperty<String> GO_SERVER_MODE = new GoStringSystemProperty("go.server.mode", "production");
     public static GoBooleanSystemProperty REAUTHENTICATION_ENABLED = new GoBooleanSystemProperty("go.security.reauthentication.enabled", true);
     public static GoSystemProperty<Long> REAUTHENTICATION_TIME_INTERVAL = new GoLongSystemProperty("go.security.reauthentication.interval", 1800 * 1000L);
-    public static GoSystemProperty<Boolean> INBUILT_LDAP_PASSWORD_AUTH_ENABLED = new GoBooleanSystemProperty("go.security.inbuilt.auth.enabled", false);
+    public static GoSystemProperty<Boolean> CONSOLE_OUT_TO_STDOUT = new GoBooleanSystemProperty("go.console.stdout", false);
+    private static GoSystemProperty<Boolean> AGENT_STATUS_API_ENABLED = new GoBooleanSystemProperty("go.agent.status.api.enabled", true);
+    private static GoSystemProperty<String> AGENT_STATUS_API_BIND_HOST = new GoStringSystemProperty("go.agent.status.api.bind.host", "localhost");
+    private static GoSystemProperty<Integer> AGENT_STATUS_API_BIND_PORT = new GoIntSystemProperty("go.agent.status.api.bind.port", 8152);
 
     private final static Map<String, String> GIT_ALLOW_PROTOCOL;
 
@@ -229,7 +234,6 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
     public static final String UNRESPONSIVE_JOB_WARNING_THRESHOLD = "cruise.unresponsive.job.warning";
     private File configDir;
     private volatile Boolean enforceRevisionCompatibilityWithUpstream;
-    private volatile Boolean enforceFanInFallbackTriangle;
 
     public SystemEnvironment() {
     }
@@ -314,6 +318,10 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
             return diskSpaceCacheRefresherInterval;
         }
         return diskSpaceCacheRefresherInterval = Long.parseLong(getPropertyImpl(DISK_SPACE_CACHE_REFRESHER_INTERVAL, "5000"));
+    }
+
+    public boolean consoleOutToStdout() {
+        return get(CONSOLE_OUT_TO_STDOUT);
     }
 
     //Used in Tests
@@ -643,10 +651,6 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
         return getPropertyImpl("user.dir");
     }
 
-    public boolean inbuiltLdapPasswordAuthEnabled() {
-        return get(INBUILT_LDAP_PASSWORD_AUTH_ENABLED);
-    }
-
     public static final ThreadLocal<Boolean> enforceServerIdImmutability = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
@@ -671,13 +675,6 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
 
     public int getTfsSocketTimeout() {
         return Integer.parseInt(getPropertyImpl(TFS_SOCKET_TIMEOUT_PROPERTY, String.valueOf(TFS_SOCKET_TIMEOUT_IN_MILLISECONDS)));
-    }
-
-    public boolean enforceFanInFallbackBehaviour() {
-        if (enforceFanInFallbackTriangle == null) {
-            enforceFanInFallbackTriangle = CONFIGURATION_YES.equals(getPropertyImpl(RESOLVE_FANIN_FALLBACK_TRIANGLE, CONFIGURATION_NO));
-        }
-        return enforceFanInFallbackTriangle;
     }
 
     public int getCruiseDbTraceLevel() {
@@ -816,6 +813,10 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
         return OPTIMIZE_FULL_CONFIG_SAVE.getValue();
     }
 
+    public int sessionTimeoutInSeconds() {
+        return GO_SERVER_SESSION_TIMEOUT_IN_SECONDS.getValue();
+    }
+
     public boolean isProductionMode() {
         return GO_SERVER_MODE.getValue().equalsIgnoreCase("production");
     }
@@ -826,6 +827,22 @@ public class SystemEnvironment implements Serializable, ConfigDirProvider {
 
     public long getReAuthenticationTimeInterval() {
         return REAUTHENTICATION_TIME_INTERVAL.getValue();
+    }
+
+    public Boolean getAgentStatusEnabled() {
+        return AGENT_STATUS_API_ENABLED.getValue();
+    }
+
+    public String getAgentStatusHostname() {
+        if (isBlank(AGENT_STATUS_API_BIND_HOST.getValue())) {
+            return null;
+        } else {
+            return AGENT_STATUS_API_BIND_HOST.getValue();
+        }
+    }
+
+    public int getAgentStatusPort() {
+        return AGENT_STATUS_API_BIND_PORT.getValue();
     }
 
     public static abstract class GoSystemProperty<T> {

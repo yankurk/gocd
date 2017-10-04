@@ -76,7 +76,7 @@ public class PluginInfoBuilderTest {
     public void setUp() {
         initMocks(this);
         githubDescriptor = new GoPluginDescriptor("github.oauth", "version1",
-                new GoPluginDescriptor.About("Github OAuth Plugin", "1.0", null, null, null, null),
+                new GoPluginDescriptor.About("GitHub OAuth Plugin", "1.0", null, null, null, null),
                 null, null, false);
         emailNotifier = new GoPluginDescriptor("email.notifier", "version1",
                 new GoPluginDescriptor.About("Email Notifier", "1.0", null, null, null, null),
@@ -88,7 +88,7 @@ public class PluginInfoBuilderTest {
                 new GoPluginDescriptor.About("Xunit Convertor", "1.0", null, null, null, null),
                 null, null, false);
         githubPR = new GoPluginDescriptor("github.pr", "version1",
-                new GoPluginDescriptor.About("Github PR", "1.0", null, null, null, null),
+                new GoPluginDescriptor.About("GitHub PR", "1.0", null, null, null, null),
                 null, null, false);
 
         dockerElasticAgentPlugin = new GoPluginDescriptor("cd.go.elastic-agent.docker", "1.0",
@@ -123,7 +123,7 @@ public class PluginInfoBuilderTest {
         when(manager.getPluginDescriptorFor("xunit.convertor")).thenReturn(xunitConvertor);
         when(manager.getPluginDescriptorFor("github.pr")).thenReturn(githubPR);
 
-        ElasticAgentMetadataStore.instance().setPluginInfo(new ElasticAgentPluginInfo(dockerElasticAgentPlugin, null, null, null, false));
+        ElasticAgentMetadataStore.instance().setPluginInfo(new ElasticAgentPluginInfo(dockerElasticAgentPlugin, null, null, null, null));
         AuthorizationMetadataStore.instance().setPluginInfo(new AuthorizationPluginInfo(ldapAuthPlugin, null, null, null, null, null));
 
         MetadataStoreHelper.clear();

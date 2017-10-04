@@ -27,8 +27,6 @@ import com.thoughtworks.go.config.materials.svn.SvnMaterialConfig;
 import com.thoughtworks.go.config.materials.tfs.TfsMaterialConfig;
 import com.thoughtworks.go.config.remote.PartialConfig;
 import com.thoughtworks.go.config.remote.RepoConfigOrigin;
-import com.thoughtworks.go.config.server.security.ldap.BaseConfig;
-import com.thoughtworks.go.config.server.security.ldap.BasesConfig;
 import com.thoughtworks.go.domain.RunIfConfigs;
 import com.thoughtworks.go.domain.config.*;
 import com.thoughtworks.go.domain.packagerepository.PackageDefinition;
@@ -48,7 +46,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.core.Is;
 import org.jdom2.input.JDOMParseException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -82,12 +79,6 @@ public class MagicalGoConfigXmlWriterTest {
         ConfigCache configCache = new ConfigCache();
         xmlWriter = new MagicalGoConfigXmlWriter(configCache, ConfigElementImplementationRegistryMother.withNoPlugins());
         xmlLoader = new MagicalGoConfigXmlLoader(configCache, ConfigElementImplementationRegistryMother.withNoPlugins());
-        new SystemEnvironment().set(SystemEnvironment.INBUILT_LDAP_PASSWORD_AUTH_ENABLED, true);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        new SystemEnvironment().set(SystemEnvironment.INBUILT_LDAP_PASSWORD_AUTH_ENABLED, false);
     }
 
     @Test
@@ -154,13 +145,12 @@ public class MagicalGoConfigXmlWriterTest {
         CruiseConfig cruiseConfig = ConfigMigrator.loadWithMigration(IOUtils.toInputStream(xml)).config;
         PartialConfig remotePart = PartialConfigMother.withPipeline("some-pipe");
         remotePart.setOrigin(new RepoConfigOrigin());
-        BasicCruiseConfig merged = new BasicCruiseConfig((BasicCruiseConfig)cruiseConfig,remotePart);
+        BasicCruiseConfig merged = new BasicCruiseConfig((BasicCruiseConfig) cruiseConfig, remotePart);
         try {
             xmlWriter.write(merged, output, true);
-        }
-        catch(GoConfigInvalidException ex) {
+        } catch (GoConfigInvalidException ex) {
             // ok
-            assertThat(ex.getMessage(),is("Attempted to save merged configuration with patials"));
+            assertThat(ex.getMessage(), is("Attempted to save merged configuration with patials"));
             return;
         }
         fail("should have thrown when saving merged configuration");
@@ -174,6 +164,7 @@ public class MagicalGoConfigXmlWriterTest {
         xmlWriter.write(cruiseConfig, output, false);
         assertXmlEquals(xml, output.toString());
     }
+
     @Test
     public void shouldNotWriteDuplicatedPipelines() throws Exception {
         String xml = ConfigFileFixture.TWO_PIPELINES;
@@ -195,11 +186,12 @@ public class MagicalGoConfigXmlWriterTest {
         xmlWriter.write(config, output, false);
         assertThat(output.toString(), containsString("<server"));
     }
+
     @Test
     public void shouldWriteConfigRepos() throws Exception {
         CruiseConfig config = GoConfigMother.configWithConfigRepo();
         xmlWriter.write(config, output, false);
-        assertThat(output.toString(), containsString("<config-repo plugin=\"myplugin\" id=\"id2\">"));
+        assertThat(output.toString(), containsString("<config-repo pluginId=\"myplugin\" id=\"id2\">"));
         assertThat(output.toString(), containsString("<git url=\"https://github.com/tomzo/gocd-indep-config-part.git\" />"));
     }
 
@@ -380,7 +372,7 @@ public class MagicalGoConfigXmlWriterTest {
     }
 
     @Test
-    public void shouldBeAValidXSD() throws  Exception {
+    public void shouldBeAValidXSD() throws Exception {
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         factory.newSchema(new StreamSource(getClass().getResourceAsStream("/cruise-config.xsd")));
     }
@@ -415,12 +407,6 @@ public class MagicalGoConfigXmlWriterTest {
         String content = "<cruise schemaVersion='" + CONFIG_SCHEMA_VERSION + "'>\n"
                 + "<server artifactsdir='artifactsDir' >"
                 + "<mailhost hostname=\"10.18.3.171\" port=\"25\" username=\"cruise2\" password=\"password\" tls=\"false\" from=\"cruise2@cruise.com\" admin=\"ps@somewhere.com\" />"
-                + "<security>"
-                + "<ldap uri=\"ldap://blah.blah.somewhere.com\" managerDn=\"cn=Active Directory Ldap User,ou=SomeSystems,ou=Accounts,ou=Principal,dc=corp,dc=somecompany,dc=com\" "
-                + "managerPassword=\"password\" searchFilter=\"(sAMAccountName={0})\">"
-                + "<bases><base value=\"ou=Employees,ou=Company,ou=Principal,dc=corp,dc=somecompany,dc=com\"/></bases>"
-                + "</ldap>"
-                + "</security>"
                 + "</server>"
                 + "<pipelines>\n"
                 + "<pipeline name='pipeline1' template='abc'>\n"
@@ -445,11 +431,6 @@ public class MagicalGoConfigXmlWriterTest {
                 "<svn url=\"svnurl\" username=\"foo\" encryptedPassword=\"pVyuW5ny9I6YT4Ou+KLZhQ==\" />"));
         assertThat(output.toString().replaceAll("\\s+", " "), containsString(
                 "<mailhost hostname=\"10.18.3.171\" port=\"25\" username=\"cruise2\" encryptedPassword=\"pVyuW5ny9I6YT4Ou+KLZhQ==\" tls=\"false\" from=\"cruise2@cruise.com\" admin=\"ps@somewhere.com\" />"));
-        String expectedLdapConfig = "<ldap uri=\"ldap://blah.blah.somewhere.com\" managerDn=\"cn=Active Directory Ldap User,ou=SomeSystems,ou=Accounts,ou=Principal,dc=corp,dc=somecompany,dc=com\" "
-                + "encryptedManagerPassword=\"pVyuW5ny9I6YT4Ou+KLZhQ==\" searchFilter=\"(sAMAccountName={0})\"> "
-                + "<bases> <base value=\"ou=Employees,ou=Company,ou=Principal,dc=corp,dc=somecompany,dc=com\" /> </bases> </ldap>";
-        assertThat(output.toString().replaceAll("\\s+", " "), containsString(
-                expectedLdapConfig));
     }
 
     @Test
@@ -514,10 +495,17 @@ public class MagicalGoConfigXmlWriterTest {
 
     @Test
     public void shouldWriteAllowOnlyKnownUsersFlag() throws Exception {
-        String content = ConfigFileFixture.configwithSecurity(
-                "    <security allowOnlyKnownUsersToLogin='false'>\n"
-                        + "      <passwordFile path=\"/home/cruise/projects/cruise_qa/cruise-twist-new/src/config/password.properties\" />\n"
-                        + "    </security>");
+        String content = ConfigFileFixture.configwithSecurity("<security>\n" +
+                "      <authConfigs>\n" +
+                "        <authConfig id=\"9cad79b0-4d9e-4a62-829c-eb4d9488062f\" pluginId=\"cd.go.authentication.passwordfile\">\n" +
+                "          <property>\n" +
+                "            <key>PasswordFilePath</key>\n" +
+                "            <value>../manual-testing/ant_hg/password.properties</value>\n" +
+                "          </property>\n" +
+                "        </authConfig>\n" +
+                "      </authConfigs>" +
+                "</security>");
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CruiseConfig cruiseConfig = ConfigMigrator.loadWithMigration(content).config;
         SecurityConfig securityConfig = cruiseConfig.server().security();
@@ -785,7 +773,7 @@ public class MagicalGoConfigXmlWriterTest {
             xmlWriter.write(cruiseConfig, output, false);
             fail();
         } catch (Exception e) {
-            assertThat(e.getMessage(), is("Duplicate unique value [passed] declared for identity constraint \"uniqueRunIfTypeForExec\" of element \"exec\"."));
+            assertThat(e.getMessage(), is("Duplicate unique value [passed] declared for identity constraint of element \"exec\"."));
         }
     }
 
@@ -819,24 +807,6 @@ public class MagicalGoConfigXmlWriterTest {
         }
 
         assertThat(new String(output.toByteArray()), containsString("<fetchartifact pipeline=\"uppest/upper/downer\" stage=\"stage\" job=\"job\" srcfile=\"src\" dest=\"dest\" />"));
-    }
-
-    @Test
-    public void shouldWriteMultipleSearchBases() throws Exception {
-        BaseConfig base1 = new BaseConfig("base1");
-        BaseConfig base2 = new BaseConfig("base2");
-        BasesConfig basesConfig = new BasesConfig(base1, base2);
-        LdapConfig ldapConfig = new LdapConfig("url", "managerDn", "managerPassword", "managerPassword", false, basesConfig, "filter");
-        SecurityConfig securityConfig = new SecurityConfig(ldapConfig, new PasswordFileConfig("some_path"), false);
-        ServerConfig serverConfig = new ServerConfig(securityConfig, new MailHost(new GoCipher()));
-        CruiseConfig cruiseConfig = new BasicCruiseConfig();
-        cruiseConfig.setServerConfig(serverConfig);
-
-        xmlWriter.write(cruiseConfig, output, false);
-        GoConfigHolder holder = xmlLoader.loadConfigHolder(output.toString());
-        BasesConfig actualBasesConfig = holder.config.server().security().ldapConfig().getBasesConfig();
-        assertThat(actualBasesConfig.size(), is(2));
-        assertThat(actualBasesConfig, hasItems(base1, base2));
     }
 
     @Test
@@ -911,7 +881,7 @@ public class MagicalGoConfigXmlWriterTest {
             xmlWriter.write(configToSave, output, false);
             fail("should not have allowed two repositories with same id");
         } catch (XsdValidationException e) {
-            assertThat(e.getMessage(), is("Duplicate unique value [id] declared for identity constraint \"uniqueRepositoryId\" of element \"repositories\"."));
+            assertThat(e.getMessage(), is("Duplicate unique value [id] declared for identity constraint of element \"repositories\"."));
         }
     }
 
@@ -931,7 +901,7 @@ public class MagicalGoConfigXmlWriterTest {
             xmlWriter.write(configToSave, output, false);
             fail("should not have allowed two package repositories with same id");
         } catch (XsdValidationException e) {
-            assertThat(e.getMessage(), is("Duplicate unique value [id] declared for identity constraint \"uniquePackageId\" of element \"cruise\"."));
+            assertThat(e.getMessage(), is("Duplicate unique value [id] declared for identity constraint of element \"cruise\"."));
         }
     }
 
@@ -1154,7 +1124,7 @@ public class MagicalGoConfigXmlWriterTest {
         try {
             xmlWriter.write(config, output, false);
             fail("expected to blow up");
-        }catch (XsdValidationException e){
+        } catch (XsdValidationException e) {
             assertThat(e.getMessage(), containsString("should conform to the pattern - \\S(.*\\S)?"));
         }
     }

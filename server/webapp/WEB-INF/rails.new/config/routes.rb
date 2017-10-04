@@ -113,7 +113,6 @@ Go::Application.routes.draw do
   post "admin/config/server/update" => "admin/server#update", as: :update_server_config
   post "admin/config/server/validate" => "admin/server#validate", as: :validate_server_config_params, constraints: HeaderConstraint.new
   post "admin/config/server/test_email" => "admin/server#test_email", as: :send_test_email
-  post "admin/config/server/validate_ldap" => "admin/server#validate_ldap", as: :validate_ldap_settings
 
   get "admin/pipelines" => "admin/pipeline_groups#index", as: :pipeline_groups
   get "admin/pipeline_group/new" => "admin/pipeline_groups#new", as: :pipeline_group_new
@@ -270,7 +269,7 @@ Go::Application.routes.draw do
 
       get 'dashboard', controller: :dashboard, action: :dashboard, as: :show_dashboard
 
-      get 'version', controller: :version, action: :show, as: :version
+      match 'version', controller: :version, action: :show, as: :version, via: %w(get head)
 
       get 'version_infos/stale', controller: :version_infos, action: :stale, as: :stale_version_info
       patch 'version_infos/go_server', controller: :version_infos, action: :update_server, as: :update_server_version_info
@@ -287,6 +286,10 @@ Go::Application.routes.draw do
           patch on: :member, action: :patch
           put on: :member, action: :put
         end
+      end
+      delete 'users', controller: 'users', action: 'bulk_delete'
+      resources :users, param: :login_name, only: [:create, :index, :show, :destroy], constraints: {login_name: /(.*?)/} do
+        patch :update, on: :member
       end
 
       match '*url', via: :all, to: 'errors#not_found'
@@ -330,7 +333,7 @@ Go::Application.routes.draw do
     resources :pipelines, only: [:edit], controller: :pipeline_configs, param: :pipeline_name, as: :pipeline_config, constraints: {pipeline_name: PIPELINE_NAME_FORMAT}
     resources :elastic_profiles, only: [:index], controller: :elastic_profiles, as: :elastic_profiles
     resources :status_reports, only: [:show], controller: :status_reports, param: :plugin_id, as: :status_reports, constraints: {plugin_id: PLUGIN_ID_FORMAT}, format: false
-
+    resources :new_plugins, only: [:index], controller: :plugins, as: :plugins
     namespace :security do
       resources :auth_configs, only: [:index], controller: :auth_configs, as: :auth_configs
       resources :roles, only: [:index], controller: :roles, as: :roles
@@ -390,8 +393,9 @@ Go::Application.routes.draw do
       post 'admin/command-repo-cache/reload' => 'commands#reload_cache', as: :admin_command_cache_reload, constraints: HeaderConstraint.new
 
       # Vendor Webhooks
-      post 'webhooks/github/notify' => 'git_hub#notify', as: :github_notify
-
+      post 'webhooks/github/notify' => 'web_hooks/git_hub#notify'
+      post 'webhooks/gitlab/notify' => 'web_hooks/git_lab#notify'
+      post 'webhooks/bitbucket/notify' => 'web_hooks/bit_bucket#notify'
 
       scope 'admin/feature_toggles' do
         defaults :no_layout => true, :format => :json do

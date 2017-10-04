@@ -19,5 +19,6 @@ JsRoutes.setup do |config|
     /^api_internal/,
     /^apiv\d/,
     /^admin_elastic_profile/,
+    /^admin_status_report/
   ]
 end

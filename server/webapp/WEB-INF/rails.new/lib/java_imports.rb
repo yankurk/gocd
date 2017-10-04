@@ -1,5 +1,5 @@
 ##########################GO-LICENSE-START################################
-# Copyright 2015 ThoughtWorks, Inc.
+# Copyright 2017 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ module JavaImports
   java_import com.thoughtworks.go.domain.ArtifactType unless defined? ArtifactType
   java_import com.thoughtworks.go.domain.buildcause.BuildCause unless defined? BuildCause
   java_import com.thoughtworks.go.domain.ConfigErrors unless defined? ConfigErrors
-  java_import com.thoughtworks.go.config.LdapConfig unless defined? LdapConfig
-  java_import com.thoughtworks.go.config.PasswordFileConfig unless defined? PasswordFileConfig
   java_import com.thoughtworks.go.config.CruiseConfig unless defined? CruiseConfig
   java_import com.thoughtworks.go.config.BasicCruiseConfig unless defined? BasicCruiseConfig
   java_import com.thoughtworks.go.config.EnvironmentConfig unless defined? EnvironmentConfig
@@ -203,8 +201,6 @@ module JavaImports
   java_import com.thoughtworks.go.server.service.lookups.CommandSnippet unless defined? CommandSnippet
   java_import com.thoughtworks.go.util.ProcessManager unless defined? ProcessManager
   java_import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginDescriptor unless defined? GoPluginDescriptor
-  java_import com.thoughtworks.go.config.server.security.ldap.BasesConfig unless defined? BasesConfig
-  java_import com.thoughtworks.go.config.server.security.ldap.BaseConfig unless defined? BaseConfig
   java_import com.thoughtworks.go.domain.valuestreammap.DependencyNodeType unless defined? DependencyNodeType
   java_import com.thoughtworks.go.server.service.responses.GoConfigOperationalResponse unless defined? GoConfigOperationalResponse
   java_import com.thoughtworks.go.domain.packagerepository.PackageRepository unless defined? PackageRepository
@@ -271,4 +267,5 @@ module JavaImports
   java_import com.thoughtworks.go.config.AdminUser unless defined? AdminUser
   java_import com.thoughtworks.go.plugin.access.elastic.ElasticAgentExtension unless defined? ElasticAgentExtension
   java_import com.thoughtworks.go.plugin.access.elastic.ElasticAgentMetadataStore unless defined? ElasticAgentMetadataStore
+  java_import com.thoughtworks.go.server.service.result.BulkDeletionFailureResult unless defined? BulkDeletionFailureResult
 end

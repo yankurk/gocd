@@ -17,6 +17,7 @@
 package com.thoughtworks.go.server.security;
 
 import com.thoughtworks.go.i18n.Localizer;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,12 @@ public class BasicAuthenticationFilter extends BasicProcessingFilter {
 
     @Override
     public void doFilterHttp(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain) throws IOException, ServletException {
+        // if bitbucket webhook, don't basic auth, the rails controller will handle this.
+        if (StringUtils.defaultIfBlank(httpRequest.getHeader("User-Agent"), "").startsWith("Bitbucket-Webhooks/")) {
+            chain.doFilter(httpRequest, httpResponse);
+            return;
+        }
+
         try {
             isProcessingBasicAuth.set(true);
             super.doFilterHttp(httpRequest, httpResponse, chain);
@@ -63,7 +70,7 @@ public class BasicAuthenticationFilter extends BasicProcessingFilter {
     }
 
     public void handleException(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Exception e) throws IOException {
-        String message = localizer.localize("INVALID_LDAP_ERROR");
+        String message = localizer.localize("AUTHENTICATION_ERROR");
         if (hasAccept(httpRequest, "text/html") || hasAccept(httpRequest, "application/xhtml")) {
             httpRequest.getSession().setAttribute(AbstractProcessingFilter.SPRING_SECURITY_LAST_EXCEPTION_KEY, new RuntimeException(message));
             httpRequest.setAttribute(SessionDenialAwareAuthenticationProcessingFilterEntryPoint.SESSION_DENIED, true);

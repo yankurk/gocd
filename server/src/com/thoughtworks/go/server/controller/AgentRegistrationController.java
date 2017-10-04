@@ -31,6 +31,8 @@ import com.thoughtworks.go.security.RegistrationJSONizer;
 import com.thoughtworks.go.server.service.*;
 import com.thoughtworks.go.server.service.result.HttpOperationResult;
 import com.thoughtworks.go.util.SystemEnvironment;
+import com.thoughtworks.go.util.TimeProvider;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
@@ -51,7 +54,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static com.thoughtworks.go.util.FileDigester.md5DigestOfStream;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -63,25 +65,23 @@ public class AgentRegistrationController {
     private final SystemEnvironment systemEnvironment;
     private PluginsZip pluginsZip;
     private final AgentConfigService agentConfigService;
+    private TimeProvider timeProvider;
     private volatile String agentChecksum;
     private volatile String agentLauncherChecksum;
     private volatile String tfsSdkChecksum;
 
     @Autowired
-    public AgentRegistrationController(AgentService agentService, GoConfigService goConfigService, SystemEnvironment systemEnvironment, PluginsZip pluginsZip, AgentConfigService agentConfigService) {
+    public AgentRegistrationController(AgentService agentService, GoConfigService goConfigService, SystemEnvironment systemEnvironment, PluginsZip pluginsZip, AgentConfigService agentConfigService, TimeProvider timeProvider) {
         this.agentService = agentService;
         this.goConfigService = goConfigService;
         this.systemEnvironment = systemEnvironment;
         this.pluginsZip = pluginsZip;
         this.agentConfigService = agentConfigService;
+        this.timeProvider = timeProvider;
     }
 
     @RequestMapping(value = "/admin/latest-agent.status", method = {RequestMethod.HEAD, RequestMethod.GET})
     public void checkAgentStatus(HttpServletResponse response) throws IOException {
-        populateAgentChecksum();
-        populateLauncherChecksum();
-        populateTFSSDKChecksum();
-
         response.setHeader(SystemEnvironment.AGENT_CONTENT_MD5_HEADER, agentChecksum);
         response.setHeader(SystemEnvironment.AGENT_LAUNCHER_CONTENT_MD5_HEADER, agentLauncherChecksum);
         response.setHeader(SystemEnvironment.AGENT_PLUGINS_ZIP_MD5_HEADER, pluginsZip.md5());
@@ -91,24 +91,18 @@ public class AgentRegistrationController {
 
     @RequestMapping(value = "/admin/agent", method = RequestMethod.HEAD)
     public void checkAgentVersion(HttpServletResponse response) throws IOException {
-        populateAgentChecksum();
-
         response.setHeader("Content-MD5", agentChecksum);
         setOtherHeaders(response);
     }
 
     @RequestMapping(value = "/admin/agent-launcher.jar", method = RequestMethod.HEAD)
     public void checkAgentLauncherVersion(HttpServletResponse response) throws IOException {
-        populateLauncherChecksum();
-
         response.setHeader("Content-MD5", agentLauncherChecksum);
         setOtherHeaders(response);
     }
 
     @RequestMapping(value = "/admin/tfs-impl.jar", method = RequestMethod.HEAD)
     public void checkTfsImplVersion(HttpServletResponse response) throws IOException {
-        populateTFSSDKChecksum();
-
         response.setHeader("Content-MD5", tfsSdkChecksum);
         setOtherHeaders(response);
     }
@@ -125,38 +119,31 @@ public class AgentRegistrationController {
         setOtherHeaders(response);
     }
 
-    private void populateLauncherChecksum() throws IOException {
-        synchronized (this) {
-            if (agentLauncherChecksum == null) {
-                agentLauncherChecksum = getChecksumFor(new AgentLauncherSrc());
-            }
+    @PostConstruct
+    public void populateLauncherChecksum() throws IOException {
+        if (agentLauncherChecksum == null) {
+            agentLauncherChecksum = getChecksumFor(new AgentLauncherSrc());
         }
     }
 
-    private void populateAgentChecksum() throws IOException {
-        synchronized (this) {
-            if (agentChecksum == null) {
-                agentChecksum = getChecksumFor(new AgentJarSrc());
-            }
+    @PostConstruct
+    public void populateAgentChecksum() throws IOException {
+        if (agentChecksum == null) {
+            agentChecksum = getChecksumFor(new AgentJarSrc());
         }
     }
 
-    private void populateTFSSDKChecksum() throws IOException {
-        synchronized (this) {
-            if (tfsSdkChecksum == null) {
-                tfsSdkChecksum = getChecksumFor(new TFSImplSrc());
-            }
+    @PostConstruct
+    public void populateTFSSDKChecksum() throws IOException {
+        if (tfsSdkChecksum == null) {
+            tfsSdkChecksum = getChecksumFor(new TFSImplSrc());
         }
     }
 
     private String getChecksumFor(final InputStreamSrc src) throws IOException {
-        InputStream inputStream = null;
-        String checksum = null;
-        try {
-            inputStream = src.invoke();
-            checksum = md5DigestOfStream(inputStream);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
+        String checksum;
+        try (InputStream inputStream = src.invoke()) {
+            checksum = DigestUtils.md5Hex(inputStream);
         }
         assert (checksum != null);
         return checksum;
@@ -251,10 +238,10 @@ public class AgentRegistrationController {
             boolean registeredAlready = goConfigService.hasAgent(uuid);
             long usablespace = Long.parseLong(usablespaceAsString);
 
-            AgentRuntimeInfo agentRuntimeInfo = AgentRuntimeInfo.fromServer(agentConfig, registeredAlready, location, usablespace, operatingSystem, supportsBuildCommandProtocol);
+            AgentRuntimeInfo agentRuntimeInfo = AgentRuntimeInfo.fromServer(agentConfig, registeredAlready, location, usablespace, operatingSystem, supportsBuildCommandProtocol, timeProvider);
 
             if (elasticAgentAutoregistrationInfoPresent(elasticAgentId, elasticPluginId)) {
-                agentRuntimeInfo = ElasticAgentRuntimeInfo.fromServer(agentRuntimeInfo, elasticAgentId, elasticPluginId);
+                agentRuntimeInfo = ElasticAgentRuntimeInfo.fromServer(agentRuntimeInfo, elasticAgentId, elasticPluginId, timeProvider);
             }
 
             keyEntry = agentService.requestRegistration(agentService.agentUsername(uuid, ipAddress, preferredHostname), agentRuntimeInfo);

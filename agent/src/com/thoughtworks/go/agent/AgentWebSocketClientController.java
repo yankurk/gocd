@@ -18,6 +18,7 @@ package com.thoughtworks.go.agent;
 
 import com.thoughtworks.go.agent.service.AgentUpgradeService;
 import com.thoughtworks.go.agent.service.SslInfrastructureService;
+import com.thoughtworks.go.agent.statusapi.AgentHealthHolder;
 import com.thoughtworks.go.buildsession.ArtifactsRepository;
 import com.thoughtworks.go.buildsession.BuildSession;
 import com.thoughtworks.go.buildsession.BuildVariables;
@@ -74,8 +75,9 @@ public class AgentWebSocketClientController extends AgentController {
                                           SystemEnvironment systemEnvironment, PluginManager pluginManager,
                                           PackageRepositoryExtension packageRepositoryExtension, SCMExtension scmExtension,
                                           TaskExtension taskExtension, HttpService httpService,
-                                          WebSocketClientHandler webSocketClientHandler, WebSocketSessionHandler webSocketSessionHandler) {
-        super(sslInfrastructureService, systemEnvironment, agentRegistry, pluginManager, subprocessLogger, agentUpgradeService);
+                                          WebSocketClientHandler webSocketClientHandler, WebSocketSessionHandler webSocketSessionHandler,
+                                          TimeProvider timeProvider, AgentHealthHolder agentHealthHolder) {
+        super(sslInfrastructureService, systemEnvironment, agentRegistry, pluginManager, subprocessLogger, agentUpgradeService, timeProvider, agentHealthHolder);
         this.server = server;
         this.manipulator = manipulator;
         this.packageRepositoryExtension = packageRepositoryExtension;
@@ -108,7 +110,6 @@ public class AgentWebSocketClientController extends AgentController {
         }
     }
 
-
     void process(Message message) throws InterruptedException {
         switch (message.getAction()) {
             case cancelBuild:
@@ -124,7 +125,6 @@ public class AgentWebSocketClientController extends AgentController {
                 cancelJobIfThereIsOneRunning();
                 Work work = MessageEncoding.decodeWork(message.getData());
                 LOG.debug("Got work from server: [{}]", work.description());
-                getAgentRuntimeInfo().idle();
                 runner = new JobRunner();
                 try {
                     runner.run(work, agentIdentifier(),
@@ -233,7 +233,10 @@ public class AgentWebSocketClientController extends AgentController {
         AgentIdentifier agent = agentIdentifier();
         LOG.trace("{} is pinging server [{}]", agent, server);
         getAgentRuntimeInfo().refreshUsableSpace();
-        webSocketSessionHandler.sendAndWaitForAcknowledgement(new Message(Action.ping, MessageEncoding.encodeData(getAgentRuntimeInfo())));
+        if (webSocketSessionHandler.sendAndWaitForAcknowledgement(new Message(Action.ping, MessageEncoding.encodeData(getAgentRuntimeInfo())))) {
+            pingSuccess();
+        }
+
         LOG.trace("{} pinged server [{}]", agent, server);
     }
 
