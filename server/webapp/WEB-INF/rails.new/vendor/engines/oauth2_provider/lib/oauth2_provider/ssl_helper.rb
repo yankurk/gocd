@@ -5,7 +5,7 @@ module Oauth2Provider
   module SslHelper
 
     def self.included(controller_class)
-      controller_class.before_filter :mandatory_ssl
+      controller_class.before_action :mandatory_ssl
     end
 
     protected

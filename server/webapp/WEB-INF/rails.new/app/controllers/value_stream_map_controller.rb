@@ -18,7 +18,7 @@ class ValueStreamMapController < ApplicationController
   include ApplicationHelper, PipelinesHelper
   layout "value_stream_map"
 
-  before_filter :redirect_to_stage_pdg_if_ie8, :only => [:show]
+  before_action :redirect_to_stage_pdg_if_ie8, :only => [:show]
 
   def show
     begin

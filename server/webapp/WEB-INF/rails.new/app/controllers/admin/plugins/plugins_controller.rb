@@ -16,7 +16,7 @@
 
 class Admin::Plugins::PluginsController < AdminController
 
-  before_filter :set_tab_name
+  before_action :set_tab_name
   include ::Admin::Plugins::PluginsHelper
 
   def index

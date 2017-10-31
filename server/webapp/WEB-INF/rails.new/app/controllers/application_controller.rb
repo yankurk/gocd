@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
 
   attr_accessor :error_template_for_request
 
-  before_filter :set_current_user, :local_access_only, :populate_config_validity, :set_site_urls_in_thread
+  before_action :set_current_user, :local_access_only, :populate_config_validity, :set_site_urls_in_thread
 
   helper_method :current_user_id_for_oauth
 
@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
   helper Oauth2Provider::ApplicationHelper
 
   if Rails.env.development?
-    before_filter do |controller|
+    before_action do |controller|
       response.headers["X-Controller-Action"] = "#{params[:controller]}##{params[:action]}"
     end
   end

@@ -20,7 +20,7 @@ class PipelinesController < ApplicationController
 
   skip_before_action :verify_authenticity_token, only: [:show_for_trigger, :show, :update_comment]
 
-  before_filter :set_tab_name
+  before_action :set_tab_name
 
   def build_cause
     result = HttpOperationResult.new

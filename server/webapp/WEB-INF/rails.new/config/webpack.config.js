@@ -26,10 +26,11 @@ var path        = require('path');
 var webpack     = require('webpack');
 var StatsPlugin = require('stats-webpack-plugin');
 
-var singlePageAppModuleDir = path.join(__dirname, '..', 'webpack', 'single_page_apps');
+var railsRoot = path.join(__dirname, '..');
+var singlePageAppModuleDir = path.join(railsRoot, 'webpack', 'single_page_apps');
 
-var mithrilVersionFromNpm          = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'node_modules/mithril/package.json'), 'utf8')).version;
-let mithrilPatchFileContentAsLines = fs.readFileSync(path.join(__dirname, '..', 'spec/webpack/patches/mithril.js'), 'utf8').split("\n");
+var mithrilVersionFromNpm          = JSON.parse(fs.readFileSync(path.join(railsRoot, 'node_modules/mithril/package.json'), 'utf8')).version;
+let mithrilPatchFileContentAsLines = fs.readFileSync(path.join(railsRoot, 'spec/webpack/patches/mithril.js'), 'utf8').split("\n");
 
 let isMithrilVersionLine = function (line) {
   return _.includes(line, 'm.version = ');
@@ -42,9 +43,9 @@ if (mithrilVersionFromNpm !== mithrilVersionFromPatch) {
   throw new Error("Please ensure that the patched mithril version is the same as the one installed via nodejs");
 }
 
-module.exports = function (env) {
-  var production = (env && env.production === 'true');
-  var outputDir  = (env && env.outputDir) || path.join(__dirname, '..', 'public', 'assets', 'webpack');
+module.exports = function (env = {}) {
+  var production = env.production === 'true';
+  var outputDir  = env.outputDir || path.join(railsRoot, 'public', 'assets', 'webpack');
 
   console.log(`Generating assets in ${outputDir}`);
 
@@ -55,7 +56,7 @@ module.exports = function (env) {
     return memo;
   }, {});
 
-  var assetsDir = path.join(__dirname, '..', 'webpack');
+  var assetsDir = path.join(railsRoot, 'webpack');
 
   var plugins = [];
   plugins.push(new StatsPlugin('manifest.json', {
@@ -111,7 +112,7 @@ module.exports = function (env) {
     resolve:   {
       modules:    _.compact([
         assetsDir,
-        production ? null : path.join(__dirname, '..', 'spec', 'webpack', 'patches'), // provide monkey patches libs for tests
+        production ? null : path.join(railsRoot, 'spec', 'webpack', 'patches'), // provide monkey patches libs for tests
         'node_modules']),
       extensions: ['.js', '.js.msx', '.msx', '.es6'],
       alias:      {
@@ -134,7 +135,7 @@ module.exports = function (env) {
             {
               loader:  'babel-loader',
               options: {
-                cacheDirectory: true
+                cacheDirectory: path.join(railsRoot, 'tmp/cache/webpacker')
               },
             }
           ]
@@ -146,7 +147,7 @@ module.exports = function (env) {
             {
               loader:  'babel-loader',
               options: {
-                cacheDirectory: true
+                cacheDirectory: path.join(railsRoot, 'tmp/cache/webpacker')
               },
             }
           ]
@@ -171,7 +172,7 @@ module.exports = function (env) {
       inject:          true,
       xhtml:           true,
       filename:        '_specRunner.html',
-      template:        path.join(__dirname, '..', 'spec', 'webpack', '_specRunner.html.ejs'),
+      template:        path.join(railsRoot, 'spec', 'webpack', '_specRunner.html.ejs'),
       jasmineJsFiles:  _.map(jasmineFiles.jsFiles.concat(jasmineFiles.bootFiles), function (file) {
         return '__jasmine/' + file;
       }),
@@ -183,7 +184,7 @@ module.exports = function (env) {
 
     config.plugins.push(new HtmlWebpackPlugin(jasmineIndexPage));
 
-    config.entry['specRoot'] = path.join(__dirname, '..', 'spec', 'webpack', 'specRoot.js');
+    config.entry['specRoot'] = path.join(railsRoot, 'spec', 'webpack', 'specRoot.js');
 
     var JasmineAssetsPlugin = function (options) {
       this.apply = function (compiler) {

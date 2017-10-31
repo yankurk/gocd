@@ -1,5 +1,5 @@
 ##########################GO-LICENSE-START################################
-# Copyright 2017 ThoughtWorks, Inc.
+# Copyright 2015 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #responsible for pretty printing hal+json responses for API clients
 
-%w(v1 v2 v3 v4 v5).each do |version|
+%w(v1 v2 v3 v4).each do |version|
   mime_type = "application/vnd.go.cd.#{version}+json"
   symbol    = "json_hal_#{version}".to_sym
 
@@ -26,7 +26,6 @@
   ActionController::Renderers.add symbol do |json, options|
     json = JSON.pretty_generate(json, options) << "\n" unless json.kind_of?(String)
     json = "#{options[:callback]}(#{json})" unless options[:callback].blank?
-    self.content_type ||= mime_type
-    json
+    render body: json, content_type: mime_type
   end
 end

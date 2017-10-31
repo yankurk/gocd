@@ -283,15 +283,13 @@ Go::Application.routes.draw do
     api_version(:module => 'ApiV2', header: {name: 'Accept', value: 'application/vnd.go.cd.v2+json'}) do
       namespace :admin do
         resources :plugin_info, controller: 'plugin_infos', param: :id, only: [:index, :show], constraints: {id: PLUGIN_ID_FORMAT}
-        resources :environments, param: :name, only: [:show, :destroy, :create, :index], constraints: {:name => ENVIRONMENT_NAME_FORMAT} do
-          patch on: :member, action: :patch
-          put on: :member, action: :put
-        end
+        resources :environments, param: :name, only: [:show, :destroy, :create, :index], constraints: {:name => ENVIRONMENT_NAME_FORMAT}
+        patch 'environments/:name', to: 'environments#patch', constraints: {:name => ENVIRONMENT_NAME_FORMAT}
+        put 'environments/:name', to: 'environments#put', constraints: {:name => ENVIRONMENT_NAME_FORMAT}
       end
+      resources :users, param: :login_name, only: [:create, :index, :show, :destroy], constraints: {login_name: /(.*?)/}
       delete 'users', controller: 'users', action: 'bulk_delete'
-      resources :users, param: :login_name, only: [:create, :index, :show, :destroy], constraints: {login_name: /(.*?)/} do
-        patch :update, on: :member
-      end
+      patch 'users/:login_name', to: 'users#update', constraints: {login_name: /(.*?)/}
 
       match '*url', via: :all, to: 'errors#not_found'
     end

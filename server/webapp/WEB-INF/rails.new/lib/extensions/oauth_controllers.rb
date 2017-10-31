@@ -16,7 +16,7 @@
 
 Oauth2Provider::ClientsController.class_eval do
   layout 'admin'
-  prepend_before_filter :set_tab_name, :set_view_title
+  prepend_before_action :set_tab_name, :set_view_title
 
   private
 
@@ -32,7 +32,7 @@ end
 Oauth2Provider::UserTokensController.class_eval do
   layout 'my-cruise'
 
-  prepend_before_filter :set_tab_name
+  prepend_before_action :set_tab_name
 
   def set_tab_name
     @current_tab_name = "preferences"

@@ -21,10 +21,10 @@ class StagesController < ApplicationController
   BASE_TIME = Time.parse("00:00:00")
   STAGE_DURATION_RANGE = 300
   layout "pipelines", :only => STAGE_DETAIL_ACTIONS
-  before_filter :load_stage_details, :only => STAGE_DETAIL_ACTIONS
-  before_filter :load_stage_history, :only => STAGE_DETAIL_ACTIONS - [:pipeline]
-  before_filter :load_current_config_version, :only => STAGE_DETAIL_ACTIONS << :history
-  before_filter :set_format, :only => :tests
+  before_action :load_stage_details, :only => STAGE_DETAIL_ACTIONS
+  before_action :load_stage_history, :only => STAGE_DETAIL_ACTIONS - [:pipeline]
+  before_action :load_current_config_version, :only => STAGE_DETAIL_ACTIONS << :history
+  before_action :set_format, :only => :tests
 
   STAGE_HISTORY_PAGE_SIZE = 10
 
@@ -57,7 +57,7 @@ class StagesController < ApplicationController
     render_stage
   end
 
-  def stage_config #_need_to_rename #/Users/jyoti/projects/mygocd/server/webapp/WEB-INF/rails.new/vendor/bundle/jruby/1.9/gems/actionpack-4.0.4/lib/action_controller/test_case.rb line 656
+  def stage_config
     @ran_with_config_revision = go_config_service.getConfigAtVersion(@stage.getStage().getConfigVersion())
     render_stage
   end
