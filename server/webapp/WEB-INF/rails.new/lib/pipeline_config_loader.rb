@@ -29,8 +29,8 @@ module PipelineConfigLoader
 
     def load_pipeline_except_for *except_for
       options = except_for.extract_options!
-      before_filter :load_pipeline, :except => except_for
-      before_filter(:load_pause_info, :except => except_for) unless options[:skip_pause_info]
+      before_action :load_pipeline, :except => except_for
+      before_action(:load_pause_info, :except => except_for) unless options[:skip_pause_info]
     end
   end
 

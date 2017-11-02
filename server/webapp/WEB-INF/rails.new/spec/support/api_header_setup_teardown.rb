@@ -21,8 +21,6 @@ module ApiHeaderSetupTeardown
   def setup_header
     request.env['HTTP_ACCEPT'] = current_api_accept_header
     request.headers['Accept'] = current_api_accept_header
-    warn request.headers.inspect
-    warn request.env.inspect
   end
 
   def teardown_header

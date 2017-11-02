@@ -25,7 +25,7 @@ module JobConfigLoader
   module ClassMethods
     def load_job_except_for *actions
       load_stage_except_for *actions
-      before_filter :load_job, :except => actions
+      before_action :load_job, :except => actions
     end
   end
 

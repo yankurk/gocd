@@ -25,7 +25,7 @@ module StageConfigLoader
   module ClassMethods
     def load_stage_except_for *actions
       load_pipeline_except_for *actions
-      before_filter :load_stage, :except => actions
+      before_action :load_stage, :except => actions
     end
   end
 
