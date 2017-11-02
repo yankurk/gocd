@@ -21,18 +21,21 @@ module ApiSpecHelper
   end
 
   [:get, :delete, :head].each do |http_verb|
-    class_eval(<<-EOS, __FILE__, __LINE__)
+    class_eval(<<-EOS, __FILE__, __LINE__ + 1)
       def #{http_verb}_with_api_header(path, params={}, headers={})
-        #{http_verb} path, params, {'Accept' => current_api_accept_header}.merge(headers)
+        setup_header
+        #{http_verb} path, params: params
       end
     EOS
   end
 
   [:post, :put, :patch].each do |http_verb|
-    class_eval(<<-EOS, __FILE__, __LINE__)
+    class_eval(<<-EOS, __FILE__, __LINE__ + 1)
       def #{http_verb}_with_api_header(path, params={}, headers={})
-        controller.stub(:verify_content_type_on_post)
-        #{http_verb} path, params, {'Accept' => current_api_accept_header}.merge(headers)
+        allow(controller).to receive(:verify_content_type_on_post).and_return(@verify_content_type_on_post = double())
+
+        setup_header
+        #{http_verb} path, params: params
       end
     EOS
   end

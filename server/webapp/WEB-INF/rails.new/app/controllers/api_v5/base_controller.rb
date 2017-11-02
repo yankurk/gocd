@@ -53,6 +53,7 @@ module ApiV5
 
     class << self
       def default_accepts_header
+        warn "DEFAULT_FORMAT: #{DEFAULT_FORMAT.inspect}"
         DEFAULT_ACCEPTS_HEADER
       end
     end
@@ -86,7 +87,7 @@ module ApiV5
     end
 
     def render_message(message, status = :ok, data = {})
-      render DEFAULT_FORMAT => { message: message.strip }.merge(data), status: status
+      render DEFAULT_FORMAT => { message: message.strip }.merge(data), status: status, layout: false
     end
 
     def render_unprocessable_entity_error(exception)

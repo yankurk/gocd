@@ -14,31 +14,30 @@
 # # limitations under the License.
 # ##########################################################################
 #
-# # $rack_default_headers = Rack::MockRequest::DEFAULT_ENV.dup
+# $rack_default_headers = Rack::MockRequest::DEFAULT_ENV.dup
 # warn "$rack_default_headers.frozen?: #{$rack_default_headers.frozen?}"
 module ApiHeaderSetupTeardown
-#
-#   def setup_header
-#     dup = $rack_default_headers.dup
-#     warn "dup.frozen?: #{dup.frozen?}"
-#     warn "Rack::MockRequest::DEFAULT_ENV.frozen?: #{Rack::MockRequest::DEFAULT_ENV.frozen?}"
-#     # Rack::MockRequest::DEFAULT_ENV.replace(dup)
-#     # Rack::MockRequest::DEFAULT_ENV.merge!({'HTTP_ACCEPT' => "application/vnd.go.cd.v#{supported_version}+json"})
-#   end
-#
-  def teardown_header
-    # Rack::MockRequest::DEFAULT_ENV.replace($rack_default_headers.dup)
+
+  def setup_header
+    request.env['HTTP_ACCEPT'] = current_api_accept_header
+    request.headers['Accept'] = current_api_accept_header
+    warn request.headers.inspect
+    warn request.env.inspect
   end
-#
-#
-#   # def self.included(klass)
-#   #   klass.class_eval do
-#   #     before :each do
-#   #       setup_header
-#   #     end
-#   #     after :each do
-#   #       teardown_header
-#   #     end
-#   #   end
-#   # end
+
+  def teardown_header
+    request.headers['Accept'] = nil
+    request.env['HTTP_ACCEPT'] = nil
+  end
+
+  def self.included(klass)
+    klass.class_eval do
+      before :each do
+        setup_header
+      end
+      after :each do
+        teardown_header
+      end
+    end
+  end
 end
