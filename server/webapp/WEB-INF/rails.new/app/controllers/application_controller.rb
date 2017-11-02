@@ -43,6 +43,11 @@ class ApplicationController < ActionController::Base
     include ActionRescue
   end
 
+  # in most places in java, we expect `params` to be a Map, which it currently is not.
+  def params
+    @_params ||= super.tap {|p| p.permit!}.to_unsafe_h
+  end
+
   # user
   def set_current_user
     @user = com.thoughtworks.go.server.util.UserHelper.getUserName()

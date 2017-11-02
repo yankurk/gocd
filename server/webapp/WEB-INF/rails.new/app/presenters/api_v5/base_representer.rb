@@ -110,10 +110,6 @@ module ApiV5
     def with_default_values(hash)
       hash ||= {}
 
-      if hash.respond_to?(:to_unsafe_h) #ActionController::Parameters
-        hash = hash.to_unsafe_h
-      end
-
       if hash.respond_to?(:has_key?)
         hash = hash.deep_symbolize_keys
       end

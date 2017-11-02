@@ -53,7 +53,6 @@ module ApiV5
 
     class << self
       def default_accepts_header
-        warn "DEFAULT_FORMAT: #{DEFAULT_FORMAT.inspect}"
         DEFAULT_ACCEPTS_HEADER
       end
     end

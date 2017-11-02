@@ -24,7 +24,7 @@ module ApiSpecHelper
     class_eval(<<-EOS, __FILE__, __LINE__ + 1)
       def #{http_verb}_with_api_header(path, params={}, headers={})
         setup_header
-        #{http_verb} path, params: params
+        #{http_verb} path, params: params, as: :json
       end
     EOS
   end
@@ -35,7 +35,7 @@ module ApiSpecHelper
         allow(controller).to receive(:verify_content_type_on_post).and_return(@verify_content_type_on_post = double())
 
         setup_header
-        #{http_verb} path, params: params
+        #{http_verb} path, params: params, as: :json
       end
     EOS
   end
