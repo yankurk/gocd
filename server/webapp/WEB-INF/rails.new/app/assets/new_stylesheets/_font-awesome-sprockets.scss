@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 ThoughtWorks, Inc.
+ * Copyright 2017 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// ensure that none of the files required here will output any css.
-// These should be pure mixins
 
-@import 'go-variables';
-@import 'variables';
-@import 'settings';
-@import 'foundation-sites/scss/foundation';
-@import "bourbon/app/assets/stylesheets/bourbon";
-@import 'font-awesome-glyphs';
+$fa-font-path: 'font-awesome/fonts';
