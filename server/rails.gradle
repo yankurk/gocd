@@ -177,6 +177,8 @@ task compileAssets {
 }
 
 task rspec(type: ExecuteUnderRailsTask) {
+  dependsOn(yarnInstall)
+
   outputs.upToDateWhen { false }
 
   description = "Run specs (pass '-Popts=...' to pass options)"
@@ -193,6 +195,8 @@ task rspec(type: ExecuteUnderRailsTask) {
 }
 
 task parallelRspec(type: ExecuteUnderRailsTask) {
+  dependsOn(yarnInstall)
+
   outputs.upToDateWhen { false }
 
   description = "Run specs in parallel (pass '-Popts=...' to pass options)"
