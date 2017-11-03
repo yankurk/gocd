@@ -100,7 +100,7 @@ describe ApiV1::Admin::MergedEnvironmentsController do
       it 'should render the environment' do
         login_as_admin
 
-        get_with_api_header :show, environment_name: @environment_name
+        get_with_api_header :show, params: { environment_name: @environment_name }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@environment_config, ApiV1::Admin::MergedEnvironments::MergedEnvironmentConfigRepresenter))
       end
@@ -110,7 +110,7 @@ describe ApiV1::Admin::MergedEnvironmentsController do
 
         @environment_name = SecureRandom.hex
         allow(@environment_config_service).to receive(:getMergedEnvironmentforDisplay).and_return(nil)
-        get_with_api_header :show, environment_name: @environment_name, withconfigrepo: 'true'
+        get_with_api_header :show, params: { environment_name: @environment_name, withconfigrepo: 'true' }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end

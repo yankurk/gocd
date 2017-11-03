@@ -133,7 +133,7 @@ describe Admin::ServerController do
         operation_result.setMessage(LocalizedMessage.composite([LocalizedMessage.string("SAVED_CONFIGURATION_SUCCESSFULLY"), LocalizedMessage.string("CONFIG_MERGED")].to_java(com.thoughtworks.go.i18n.Localizable)))
       end
 
-      post :update, :server_configuration_form => @valid_server_params, :cruise_config_md5 => "foo_bar_baz"
+      post :update, params: { :server_configuration_form => @valid_server_params, :cruise_config_md5 => "foo_bar_baz" }
 
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully. The configuration was modified by someone else, but your changes were merged successfully.", 'success',[])
     end
@@ -142,25 +142,25 @@ describe Admin::ServerController do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       stub_update_server_config(@mail_host, "newArtifactDir", 10, 20, nil, @should_allow_auto_login, nil, nil, nil, localized_success_message, "foo_bar_baz")
 
-      post :update, :server_configuration_form => @valid_server_params, :cruise_config_md5 => "foo_bar_baz"
+      post :update, params: { :server_configuration_form => @valid_server_params, :cruise_config_md5 => "foo_bar_baz" }
 
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully.", 'success', [])
     end
 
     it "should validate mailHost params" do
-      post :update, :server_configuration_form => @valid_mail_host_params.except(:hostName)
+      post :update, params: { :server_configuration_form => @valid_mail_host_params.except(:hostName) }
       assert_index_rendered_with_error("Hostname is required.")
 
-      post :update, :server_configuration_form => @valid_mail_host_params.except(:port)
+      post :update, params: { :server_configuration_form => @valid_mail_host_params.except(:port) }
       assert_index_rendered_with_error("Port is required.")
 
-      post :update, :server_configuration_form => @valid_mail_host_params.merge(:port => "invalid-port")
+      post :update, params: { :server_configuration_form => @valid_mail_host_params.merge(:port => "invalid-port") }
       assert_index_rendered_with_error("Invalid port.")
 
-      post :update, :server_configuration_form => @valid_mail_host_params.except(:from)
+      post :update, params: { :server_configuration_form => @valid_mail_host_params.except(:from) }
       assert_index_rendered_with_error("From email address is required.")
 
-      post :update, :server_configuration_form => @valid_mail_host_params.except(:adminMail)
+      post :update, params: { :server_configuration_form => @valid_mail_host_params.except(:adminMail) }
       assert_index_rendered_with_error("Admin email address is required.")
     end
 
@@ -168,7 +168,7 @@ describe Admin::ServerController do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       stub_update_server_config(MailHost.new(com.thoughtworks.go.security.GoCipher.new),   "newArtifactDir", 10, 20, nil, @should_allow_auto_login, nil, nil, nil, localized_success_message, "foo_bar_baz")
 
-      post :update, :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting), :cruise_config_md5 => "foo_bar_baz"
+      post :update, params: { :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting), :cruise_config_md5 => "foo_bar_baz" }
 
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully.", 'success')
     end
@@ -177,7 +177,7 @@ describe Admin::ServerController do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       stub_update_server_config(MailHost.new(com.thoughtworks.go.security.GoCipher.new),   "newArtifactDir", nil, nil, nil, @should_allow_auto_login, nil, nil,nil,  localized_success_message, "foo_bar_baz")
 
-      post :update, :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never"), :cruise_config_md5 => "foo_bar_baz"
+      post :update, params: { :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never"), :cruise_config_md5 => "foo_bar_baz" }
 
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully.", 'success')
     end
@@ -186,7 +186,7 @@ describe Admin::ServerController do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       stub_update_server_config(MailHost.new(com.thoughtworks.go.security.GoCipher.new),   "newArtifactDir", nil, nil, '0', @should_allow_auto_login, nil, nil, nil, localized_success_message, "foo_bar_baz")
 
-      post :update, :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never", :timeoutType => 'neverTimeout'), :cruise_config_md5 => "foo_bar_baz"
+      post :update, params: { :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never", :timeoutType => 'neverTimeout'), :cruise_config_md5 => "foo_bar_baz" }
 
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully.", 'success')
     end
@@ -195,7 +195,7 @@ describe Admin::ServerController do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       stub_update_server_config(MailHost.new(com.thoughtworks.go.security.GoCipher.new),   "newArtifactDir", nil, nil, '42', @should_allow_auto_login, nil, nil, nil,localized_success_message, "foo_bar_baz")
 
-      post :update, :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never", :timeoutType => 'overrideTimeout', :jobTimeout => '42'), :cruise_config_md5 => "foo_bar_baz"
+      post :update, params: { :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never", :timeoutType => 'overrideTimeout', :jobTimeout => '42'), :cruise_config_md5 => "foo_bar_baz" }
 
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully.", 'success')
     end
@@ -203,7 +203,7 @@ describe Admin::ServerController do
     it "should update the server site url and secure site url" do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       stub_update_server_config(MailHost.new(com.thoughtworks.go.security.GoCipher.new),   "newArtifactDir", nil, nil, nil, @should_allow_auto_login, "http://site_url", "https://secure_site_url", nil, localized_success_message, "foo_bar_baz")
-      post :update, :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never", :siteUrl => "http://site_url", :secureSiteUrl => "https://secure_site_url"), :cruise_config_md5 => "foo_bar_baz"
+      post :update, params: { :server_configuration_form => @valid_security_config_params.merge(@valid_artifacts_setting).merge(:purgeArtifacts => "Never", :siteUrl => "http://site_url", :secureSiteUrl => "https://secure_site_url"), :cruise_config_md5 => "foo_bar_baz" }
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully.", 'success')
     end
 
@@ -214,7 +214,7 @@ describe Admin::ServerController do
         result = operation_result
       end
 
-      post :update, :server_configuration_form => @valid_mail_host_params
+      post :update, params: { :server_configuration_form => @valid_mail_host_params }
 
       assert_index_rendered_with_error("From address is not a valid email address.")
     end
@@ -222,7 +222,7 @@ describe Admin::ServerController do
     it "should update command repository location" do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       stub_update_server_config(@mail_host,   "newArtifactDir", 10, 20, nil, @should_allow_auto_login, nil, nil, "value",localized_success_message, nil)
-      post :update, :server_configuration_form => @valid_server_params.merge(:commandRepositoryLocation => "value")
+      post :update, params: { :server_configuration_form => @valid_server_params.merge(:commandRepositoryLocation => "value") }
       assert_redirected_with_flash("/admin/config/server", "Saved configuration successfully.", 'success')
     end
 
@@ -230,7 +230,7 @@ describe Admin::ServerController do
       it "on validation failure, should set cruise_config_md5 to old-md5 sent in request instead of latest md5" do
         allow(@cruise_config).to receive(:getMd5).and_return "new-md5"
 
-        post :update, :server_configuration_form => @valid_server_params.merge(:port => "abcd"), :cruise_config_md5 => "old-md5"
+        post :update, params: { :server_configuration_form => @valid_server_params.merge(:port => "abcd"), :cruise_config_md5 => "old-md5" }
 
         expect(assigns[:cruise_config_md5]).to eq("old-md5")
       end
@@ -279,7 +279,7 @@ describe Admin::ServerController do
       @default_localized_result.invalid("INVALID_EMAIL", ["@foo.com"].to_java(java.lang.String))
       expect(@server_config_service).to receive(:validateEmail).with("@foo.com").and_return(@default_localized_result)
 
-      get :validate, :email => "@foo.com"
+      get :validate, params: { :email => "@foo.com" }
 
       expect(assigns[:result]).to eq(@default_localized_result)
     end
@@ -288,7 +288,7 @@ describe Admin::ServerController do
       @default_localized_result.invalid("INVALID_PORT", ["-1"].to_java(java.lang.String))
       expect(@server_config_service).to receive(:validatePort).with(-1).and_return(@default_localized_result)
 
-      get :validate, :port => "-1"
+      get :validate, params: { :port => "-1" }
 
       expect(assigns[:result]).to eq(@default_localized_result)
     end
@@ -296,7 +296,7 @@ describe Admin::ServerController do
     it "should validate hostname" do
       expect(@server_config_service).to receive(:validateHostName).with("foo.com").and_return(@default_localized_result)
 
-      get :validate, :hostName => "foo.com"
+      get :validate, params: { :hostName => "foo.com" }
 
       expect(assigns[:result]).to eq(@default_localized_result)
     end
@@ -305,7 +305,7 @@ describe Admin::ServerController do
       expect(@server_config_service).to receive(:validatePort).with(-1).and_return(@default_localized_result)
       @default_localized_result.invalid("INVALID_PORT", [].to_java(java.lang.Object))
 
-      get :validate, :port => "-1"
+      get :validate, params: { :port => "-1" }
 
       json = JSON.parse(response.body)
       expect(json["error"]).to eq("Invalid port.")
@@ -315,7 +315,7 @@ describe Admin::ServerController do
     it "should return error if invalid" do
       expect(@server_config_service).to receive(:validateHostName).with("foo.com").and_return(@default_localized_result)
 
-      get :validate, :hostName => "foo.com"
+      get :validate, params: { :hostName => "foo.com" }
 
       json = JSON.parse(response.body)
       expect(json["error"]).to eq(nil)
@@ -339,7 +339,7 @@ describe Admin::ServerController do
         res = op_result
       end
 
-      post :test_email, :server_configuration_form => @valid_mail_host_params
+      post :test_email, params: { :server_configuration_form => @valid_mail_host_params }
 
       json = JSON.parse(response.body)
       expect(json["error"]).to eq("Invalid port.")
@@ -347,7 +347,7 @@ describe Admin::ServerController do
     end
 
     it "should validate port" do
-      post :test_email, :server_configuration_form => @valid_mail_host_params.except(:port)
+      post :test_email, params: { :server_configuration_form => @valid_mail_host_params.except(:port) }
 
       json = JSON.parse(response.body)
       expect(json["error"]).to eq("Port is required.")
@@ -359,7 +359,7 @@ describe Admin::ServerController do
 
       expect(@server_config_service).to receive(:sendTestMail).with(mail_host, an_instance_of(HttpLocalizedOperationResult))
 
-      post :test_email, :server_configuration_form => @valid_mail_host_params
+      post :test_email, params: { :server_configuration_form => @valid_mail_host_params }
 
       json = JSON.parse(response.body)
       expect(json["error"]).to eq(nil)

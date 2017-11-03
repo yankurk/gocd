@@ -59,7 +59,7 @@ describe ApiV1::VersionInfosController do
         expect(@go_latest_version).to receive(:valid?).and_return(true)
         expect(@version_info_service).to receive(:updateServerLatestVersion).with('16.1.0-123', @result).and_return(@model)
 
-        patch_with_api_header :update_server, :message => @message, :message_signature => @message_signature, :signing_public_key => @signing_public_key, :signing_public_key_signature => @signing_public_key_signature
+        patch_with_api_header :update_server, params: { :message => @message, :message_signature => @message_signature, :signing_public_key => @signing_public_key, :signing_public_key_signature => @signing_public_key_signature }
 
         actual_json = JSON.parse(response.body)
         actual_json.delete('_links')
@@ -74,7 +74,7 @@ describe ApiV1::VersionInfosController do
       it 'should be bad request if message is tampered' do
         expect(@go_latest_version).to receive(:valid?).and_return(false)
 
-        patch_with_api_header :update_server, message: 'message', :signature => 'signature'
+        patch_with_api_header :update_server, params: { message: 'message', :signature => 'signature' }
 
         expect(response.code).to eq('400')
       end
@@ -87,7 +87,7 @@ describe ApiV1::VersionInfosController do
         allow(HttpLocalizedOperationResult).to receive(:new).and_return(error_result)
         expect(@version_info_service).to receive(:updateServerLatestVersion).with('15.ABC-123', error_result).and_return(nil)
 
-        patch_with_api_header :update_server, message: bad_message, :signature => 'signature'
+        patch_with_api_header :update_server, params: { message: bad_message, :signature => 'signature' }
 
         expect(response.code).to eq('400')
       end
@@ -136,7 +136,7 @@ describe ApiV1::VersionInfosController do
 
     describe "update_server" do
       it 'should return a 404' do
-        patch_with_api_header :update_server, message: 'message', :signature => 'signature'
+        patch_with_api_header :update_server, params: { message: 'message', :signature => 'signature' }
 
         expect(response.code).to eq('404')
       end

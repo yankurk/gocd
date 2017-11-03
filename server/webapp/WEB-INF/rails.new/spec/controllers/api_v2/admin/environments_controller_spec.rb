@@ -98,7 +98,7 @@ describe ApiV2::Admin::EnvironmentsController do
       it 'should render the environment' do
         login_as_admin
 
-        get_with_api_header :show, name: @environment_name
+        get_with_api_header :show, params: { name: @environment_name }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@environment_config, ApiV2::Config::EnvironmentConfigRepresenter))
       end
@@ -108,7 +108,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
         @environment_name = SecureRandom.hex
         allow(@environment_config_service).to receive(:getEnvironmentForEdit).and_return(nil)
-        get_with_api_header :show, name: @environment_name
+        get_with_api_header :show, params: { name: @environment_name }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -198,7 +198,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
         controller.request.env['HTTP_IF_MATCH'] = "\"#{Digest::MD5.hexdigest(@md5)}\""
 
-        put_with_api_header :put, name: @environment_name, :environment => hash
+        put_with_api_header :put, params: { name: @environment_name, :environment => hash }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@environment_config, ApiV2::Config::EnvironmentConfigRepresenter))
       end
@@ -207,14 +207,14 @@ describe ApiV2::Admin::EnvironmentsController do
         login_as_admin
         controller.request.env['HTTP_IF_MATCH'] = 'old-etag'
 
-        put_with_api_header :put, name: @environment_name, :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []}
+        put_with_api_header :put, params: { name: @environment_name, :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []} }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for environment 'foo-environment'. Please update your copy of the config with the changes.")
       end
 
       it 'should not put environment config if no etag is passed' do
         login_as_admin
-        put_with_api_header :put, name: @environment_name, :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []}
+        put_with_api_header :put, params: { name: @environment_name, :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []} }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for environment 'foo-environment'. Please update your copy of the config with the changes.")
       end
@@ -224,7 +224,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
         @environment_name = SecureRandom.hex
         allow(@environment_config_service).to receive(:getEnvironmentForEdit).and_return(nil)
-        put_with_api_header :put, name: @environment_name
+        put_with_api_header :put, params: { name: @environment_name }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -318,7 +318,7 @@ describe ApiV2::Admin::EnvironmentsController do
       it 'should allow patching environments' do
         expect(@environment_config_service).to receive(:patchEnvironment).with(@environment_config, @pipelines_to_add, @pipelines_to_remove, @agents_to_add, @agents_to_remove, @env_vars_to_add, @env_vars_to_remove, anything, @result).and_return(@result)
 
-        patch_with_api_header :patch, name: @environment_name, :pipelines => {add: @pipelines_to_add, remove: @pipelines_to_remove}, :agents => {add: @agents_to_add, remove: @agents_to_remove}, :environment_variables => {add: @env_vars_to_add, remove: @env_vars_to_remove}
+        patch_with_api_header :patch, params: { name: @environment_name, :pipelines => {add: @pipelines_to_add, remove: @pipelines_to_remove}, :agents => {add: @agents_to_add, remove: @agents_to_remove}, :environment_variables => {add: @env_vars_to_add, remove: @env_vars_to_remove} }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@environment_config, ApiV2::Config::EnvironmentConfigRepresenter))
       end
@@ -328,14 +328,14 @@ describe ApiV2::Admin::EnvironmentsController do
           result.badRequest(LocalizedMessage.string("PIPELINES_WITH_NAMES_NOT_FOUND", pipelines_to_add))
         end
 
-        patch_with_api_header :patch, name: @environment_name, :pipelines => {add: @pipelines_to_add, remove: @pipelines_to_remove}, :agents => {add: @agents_to_add, remove: @agents_to_remove}, :environment_variables => {add: @env_vars_to_add, remove: @env_vars_to_remove}
+        patch_with_api_header :patch, params: { name: @environment_name, :pipelines => {add: @pipelines_to_add, remove: @pipelines_to_remove}, :agents => {add: @agents_to_add, remove: @agents_to_remove}, :environment_variables => {add: @env_vars_to_add, remove: @env_vars_to_remove} }
         expect(response).to have_api_message_response(400, 'Pipelines(s) with name(s) [foo] not found.')
       end
 
       it 'should render 404 when a environment does not exist' do
         @environment_name = SecureRandom.hex
         allow(@environment_config_service).to receive(:getEnvironmentForEdit).and_return(nil)
-        patch_with_api_header :patch, name: @environment_name
+        patch_with_api_header :patch, params: { name: @environment_name }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -419,14 +419,14 @@ describe ApiV2::Admin::EnvironmentsController do
           result.setMessage(LocalizedMessage.string('RESOURCE_DELETE_SUCCESSFUL', 'environment', @environment_config.name))
         end
 
-        delete_with_api_header :destroy, name: @environment_name
+        delete_with_api_header :destroy, params: { name: @environment_name }
         expect(response).to have_api_message_response(200, "The environment 'foo-environment' was deleted successfully.")
       end
 
       it 'should render 404 when a environment does not exist' do
         @environment_name = SecureRandom.hex
         allow(@environment_config_service).to receive(:getEnvironmentForEdit).and_return(nil)
-        delete_with_api_header :destroy, name: @environment_name
+        delete_with_api_header :destroy, params: { name: @environment_name }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -510,7 +510,7 @@ describe ApiV2::Admin::EnvironmentsController do
       it 'should render 200 created when environment is created' do
         expect(@environment_config_service).to receive(:createEnvironment)
 
-        post_with_api_header :create, :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []}
+        post_with_api_header :create, params: { :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []} }
         expect(response.status).to be(200)
         expect(actual_response).to eq(expected_response(@environment_config, ApiV2::Config::EnvironmentConfigRepresenter))
       end
@@ -520,7 +520,7 @@ describe ApiV2::Admin::EnvironmentsController do
           result.conflict(LocalizedMessage.string("RESOURCE_ALREADY_EXISTS", 'environment', env.name));
         end
 
-        post_with_api_header :create, :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []}
+        post_with_api_header :create, params: { :environment => {name: @environment_name, pipelines: [], agents: [], environment_variables: []} }
         expect(response).to have_api_message_response(409, "Failed to add environment. The environment 'foo-environment' already exists.")
       end
     end

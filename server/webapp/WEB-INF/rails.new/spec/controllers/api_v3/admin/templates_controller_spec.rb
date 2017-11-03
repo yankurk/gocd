@@ -166,7 +166,7 @@ describe ApiV3::Admin::TemplatesController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(PipelineTemplateConfig)).and_return('md5')
         expect(@template_config_service).to receive(:loadForView).with('template', @result).and_return(@template)
 
-        get_with_api_header :show, template_name: 'template'
+        get_with_api_header :show, params: { template_name: 'template' }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@template, ApiV3::Admin::Templates::TemplateConfigRepresenter))
@@ -175,7 +175,7 @@ describe ApiV3::Admin::TemplatesController do
       it 'should return 404 if the template does not exist' do
         expect(@template_config_service).to receive(:loadForView).with('non-existent-template', @result).and_return(nil)
 
-        get_with_api_header :show, template_name: 'non-existent-template'
+        get_with_api_header :show, params: { template_name: 'non-existent-template' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
 
@@ -267,7 +267,7 @@ describe ApiV3::Admin::TemplatesController do
       it 'should deserialize template from given parameters' do
         allow(controller).to receive(:etag_for).and_return('some-md5')
         expect(@template_config_service).to receive(:createTemplateConfig).with(anything, an_instance_of(PipelineTemplateConfig), anything)
-        post_with_api_header :create, template: template_hash
+        post_with_api_header :create, params: { template: template_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@template, ApiV3::Admin::Templates::TemplateConfigRepresenter))
@@ -281,7 +281,7 @@ describe ApiV3::Admin::TemplatesController do
         allow(result).to receive(:httpCode).and_return(422)
         expect(@template_config_service).to receive(:createTemplateConfig).with(anything, an_instance_of(PipelineTemplateConfig), result)
 
-        post_with_api_header :create, template: template_hash
+        post_with_api_header :create, params: { template: template_hash }
 
         expect(response).to have_api_message_response(422, "Save failed")
       end
@@ -358,7 +358,7 @@ describe ApiV3::Admin::TemplatesController do
 
         expect(@template_config_service).to receive(:updateTemplateConfig).with(anything, an_instance_of(PipelineTemplateConfig), anything, anything)
 
-        put_with_api_header :update, template_name: 'some-template', template: template_hash
+        put_with_api_header :update, params: { template_name: 'some-template', template: template_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@template, ApiV3::Admin::Templates::TemplateConfigRepresenter))
@@ -368,7 +368,7 @@ describe ApiV3::Admin::TemplatesController do
         allow(controller).to receive(:load_template).and_return(@template)
         allow(controller).to receive(:check_for_stale_request).and_return(nil)
 
-        put_with_api_header :update, template_name: 'foo', template: template_hash
+        put_with_api_header :update, params: { template_name: 'foo', template: template_hash }
 
         expect(response).to have_api_message_response(422, 'Renaming of Templates is not supported by this API.')
       end
@@ -379,7 +379,7 @@ describe ApiV3::Admin::TemplatesController do
         allow(controller).to receive(:etag_for).and_return('another-etag')
         controller.request.env['HTTP_IF_MATCH'] = "some-etag"
 
-        put_with_api_header :update, template_name: 'some-template', template: template_hash
+        put_with_api_header :update, params: { template_name: 'some-template', template: template_hash }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for Template 'some-template'. Please update your copy of the config with the changes." )
       end
@@ -391,7 +391,7 @@ describe ApiV3::Admin::TemplatesController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(PipelineTemplateConfig)).exactly(3).times.and_return('md5')
         expect(@template_config_service).to receive(:updateTemplateConfig).with(anything, an_instance_of(PipelineTemplateConfig), anything, "md5")
 
-        put_with_api_header :update, template_name: 'some-template', template: template_hash
+        put_with_api_header :update, params: { template_name: 'some-template', template: template_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@template, ApiV3::Admin::Templates::TemplateConfigRepresenter))
@@ -409,7 +409,7 @@ describe ApiV3::Admin::TemplatesController do
           result.unprocessableEntity(LocalizedMessage::string("SAVE_FAILED_WITH_REASON", "Validation failed"))
         end
 
-        put_with_api_header :update, template_name: 'some-template'
+        put_with_api_header :update, params: { template_name: 'some-template' }
 
         expect(response).to have_api_message_response(422, 'Save failed. Validation failed')
       end
@@ -495,7 +495,7 @@ describe ApiV3::Admin::TemplatesController do
       it 'should raise an error if template is not found' do
         expect(@template_config_service).to receive(:loadForView).and_return(nil)
 
-        delete_with_api_header :destroy, template_name: 'foo'
+        delete_with_api_header :destroy, params: { template_name: 'foo' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
@@ -506,7 +506,7 @@ describe ApiV3::Admin::TemplatesController do
         allow(@template_config_service).to receive(:deleteTemplateConfig).with(anything, an_instance_of(PipelineTemplateConfig), result) do |user, template, result|
           result.setMessage(LocalizedMessage::string("RESOURCE_DELETE_SUCCESSFUL", 'template', 'some-template'))
         end
-        delete_with_api_header :destroy, template_name: 'some-template'
+        delete_with_api_header :destroy, params: { template_name: 'some-template' }
 
         expect(response).to have_api_message_response(200, "The template 'some-template' was deleted successfully.")
       end
@@ -517,7 +517,7 @@ describe ApiV3::Admin::TemplatesController do
         allow(@template_config_service).to receive(:deleteTemplateConfig).with(anything, an_instance_of(PipelineTemplateConfig), result) do |user, template, result|
           result.unprocessableEntity(LocalizedMessage::string("SAVE_FAILED_WITH_REASON", "Validation failed"))
         end
-        delete_with_api_header :destroy, template_name: 'some-template'
+        delete_with_api_header :destroy, params: { template_name: 'some-template' }
 
         expect(response).to have_api_message_response(422, "Save failed. Validation failed")
       end

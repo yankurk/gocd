@@ -45,14 +45,14 @@ describe ApiV1::Admin::ConfigReposController do
 
       it 'should render the package repo' do
         allow(@config_repo_service).to receive(:getConfigRepo).with(@config_repo_id).and_return(@config_repo)
-        get_with_api_header :show, id: @config_repo_id
+        get_with_api_header :show, params: { id: @config_repo_id }
         expect(response.status).to eq(200)
         expect(actual_response).to eq(expected_response(@config_repo, ApiV1::Config::ConfigRepoRepresenter))
       end
 
       it 'should render 404 when a config repo with specified id does not exist' do
         allow(@config_repo_service).to receive(:getConfigRepo).with('invalid-package-id').and_return(nil)
-        get_with_api_header :show, id: 'invalid-package-id'
+        get_with_api_header :show, params: { id: 'invalid-package-id' }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -179,13 +179,13 @@ describe ApiV1::Admin::ConfigReposController do
           result.setMessage(LocalizedMessage.string('RESOURCE_DELETE_SUCCESSFUL', 'config repo', @config_repo_id))
         end
 
-        delete_with_api_header :destroy, id: @config_repo_id
+        delete_with_api_header :destroy, params: { id: @config_repo_id }
         expect(response).to have_api_message_response(200, "The config repo '#{@config_repo_id}' was deleted successfully.")
       end
 
       it 'should render 404 when config repo does not exist' do
         allow(@config_repo_service).to receive(:getConfigRepo).with('invalid-package-id').and_return(nil)
-        delete_with_api_header :destroy, id: 'invalid-package-id'
+        delete_with_api_header :destroy, params: { id: 'invalid-package-id' }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -250,7 +250,7 @@ describe ApiV1::Admin::ConfigReposController do
       it 'should render 200 created when config repo is created' do
         allow(@config_repo_service).to receive(:getConfigRepo).and_return(@config_repo)
         expect(@config_repo_service).to receive(:createConfigRepo).with(an_instance_of(ConfigRepoConfig), an_instance_of(Username), an_instance_of(HttpLocalizedOperationResult))
-        post_with_api_header :create, :config_repo => get_config_repo_json(@config_repo_id)
+        post_with_api_header :create, params: { :config_repo => get_config_repo_json(@config_repo_id) }
 
         expect(response.status).to be(200)
         expect(actual_response).to eq(expected_response(@config_repo, ApiV1::Config::ConfigRepoRepresenter))
@@ -261,7 +261,7 @@ describe ApiV1::Admin::ConfigReposController do
           result.unprocessableEntity(LocalizedMessage::string("SAVE_FAILED_WITH_REASON", "Validation failed"))
         end
 
-        post_with_api_header :create, :config_repo => get_config_repo_json(@config_repo_id)
+        post_with_api_header :create, params: { :config_repo => get_config_repo_json(@config_repo_id) }
         expect(response).to have_api_message_response(422, "Save failed. Validation failed")
       end
     end
@@ -322,7 +322,7 @@ describe ApiV1::Admin::ConfigReposController do
 
         controller.request.env['HTTP_IF_MATCH'] = "\"#{Digest::MD5.hexdigest(@md5)}\""
 
-        put_with_api_header :update, id: @config_repo_id, :config_repo => hash
+        put_with_api_header :update, params: { id: @config_repo_id, :config_repo => hash }
         expect(response.status).to eq(200)
         expect(actual_response).to eq(expected_response(@config_repo, ApiV1::Config::ConfigRepoRepresenter))
       end
@@ -332,7 +332,7 @@ describe ApiV1::Admin::ConfigReposController do
         controller.request.env['HTTP_IF_MATCH'] = 'old-etag'
         hash = get_config_repo_json(@config_repo_id)
 
-        put_with_api_header :update, id: @config_repo_id, :config_repo => hash
+        put_with_api_header :update, params: { id: @config_repo_id, :config_repo => hash }
 
         expect(response.status).to eq(412)
         expect(actual_response).to eq({:message => "Someone has modified the configuration for config repo '#{@config_repo_id}'. Please update your copy of the config with the changes."})
@@ -342,7 +342,7 @@ describe ApiV1::Admin::ConfigReposController do
         allow(@config_repo_service).to receive(:getConfigRepo).with(@config_repo_id).and_return(@config_repo_id)
         hash = get_config_repo_json(@config_repo_id)
 
-        put_with_api_header :update, id: @config_repo_id, :config_repo => hash
+        put_with_api_header :update, params: { id: @config_repo_id, :config_repo => hash }
 
         expect(response.status).to eq(412)
         expect(actual_response).to eq({:message => "Someone has modified the configuration for config repo '#{@config_repo_id}'. Please update your copy of the config with the changes."})
@@ -350,7 +350,7 @@ describe ApiV1::Admin::ConfigReposController do
 
       it 'should render 404 when a package does not exist' do
         allow(@config_repo_service).to receive(:getConfigRepo).with('non-existent-package-id').and_return(nil)
-        put_with_api_header :update, id: 'non-existent-package-id'
+        put_with_api_header :update, params: { id: 'non-existent-package-id' }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
       

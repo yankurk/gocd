@@ -94,7 +94,7 @@ describe ApiV2::Admin::PluginInfosController do
 
       expect(@plugin_service).to receive(:pluginInfos).with('scm').and_return([plugin_info])
 
-      get_with_api_header :index, type: 'scm'
+      get_with_api_header :index, params: { type: 'scm' }
 
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response([plugin_info], ApiV2::Plugin::PluginInfosRepresenter))
@@ -103,7 +103,7 @@ describe ApiV2::Admin::PluginInfosController do
     it 'should be a unprocessible entity for a invalid plugin type' do
       expect(@plugin_service).to receive(:pluginInfos).with('invalid_type').and_raise(InvalidPluginTypeException.new)
 
-      get_with_api_header :index, type: 'invalid_type'
+      get_with_api_header :index, params: { type: 'invalid_type' }
 
       expect(response.code).to eq('422')
       json = JSON.parse(response.body).deep_symbolize_keys
@@ -139,7 +139,7 @@ describe ApiV2::Admin::PluginInfosController do
 
       expect(@plugin_service).to receive(:pluginInfo).with('plugin_id').and_return(plugin_info)
 
-      get_with_api_header :show, id: 'plugin_id'
+      get_with_api_header :show, params: { id: 'plugin_id' }
 
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response(plugin_info, ApiV2::Plugin::PluginInfoRepresenter))
@@ -148,7 +148,7 @@ describe ApiV2::Admin::PluginInfosController do
     it 'should return 404 in absence of plugin_info' do
       expect(@plugin_service).to receive(:pluginInfo).with('plugin_id').and_return(nil)
 
-      get_with_api_header :show, id: 'plugin_id'
+      get_with_api_header :show, params: { id: 'plugin_id' }
 
       expect(response.code).to eq('404')
       json = JSON.parse(response.body).deep_symbolize_keys

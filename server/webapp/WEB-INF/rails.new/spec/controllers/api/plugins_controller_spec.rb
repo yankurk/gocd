@@ -29,13 +29,13 @@ describe Api::PluginsController do
 
   it "should return plugin status as false when not set" do
     expect(@system_environment).to receive(:pluginStatus).and_return(GoConstants::ENABLE_PLUGINS_RESPONSE_FALSE)
-    get :status, {:no_layout => true}
+    get :status, params: { :no_layout => true }
     expect(response.body).to eq("disabled")
     end
 
   it "should return plugin status as true when set" do
     expect(@system_environment).to receive(:pluginStatus).and_return(GoConstants::ENABLE_PLUGINS_RESPONSE_TRUE)
-    get :status, {:no_layout => true}
+    get :status, params: { :no_layout => true }
     expect(response.body).to eq("enabled")
   end
 

@@ -89,7 +89,7 @@ describe ApiV1::Admin::PluginSettingsController do
         expect(@plugin_service).to receive(:getPluginSettings).with('plugin.id.1').and_return(@plugin_settings)
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(@plugin_settings).and_return('md5')
 
-        get_with_api_header :show, plugin_id: 'plugin.id.1'
+        get_with_api_header :show, params: { plugin_id: 'plugin.id.1' }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response({plugin_settings: @plugin_settings}, ApiV1::Config::PluginSettingsRepresenter))
@@ -98,7 +98,7 @@ describe ApiV1::Admin::PluginSettingsController do
       it 'should render 404 for a non existent plugin' do
         expect(@plugin_service).to receive(:getPluginSettings).with('plugin.id.2').and_return(nil)
 
-        get_with_api_header :show, plugin_id: 'plugin.id.2'
+        get_with_api_header :show, params: { plugin_id: 'plugin.id.2' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
@@ -181,7 +181,7 @@ describe ApiV1::Admin::PluginSettingsController do
         hash = {plugin_id: 'plugin.id.2',configuration: [{"key" => 'url', "value" => 'git@github.com:foo/bar.git'}, {"key" => 'password', "value" => "some-value"}]}
         expect(@plugin_service).to receive(:createPluginSettings).with(anything, anything, an_instance_of(PluginSettings))
 
-        post_with_api_header :create, plugin_setting: hash
+        post_with_api_header :create, params: { plugin_setting: hash }
 
         expect(response).to be_ok
         real_response = actual_response
@@ -199,7 +199,7 @@ describe ApiV1::Admin::PluginSettingsController do
         allow(result).to receive(:httpCode).and_return(422)
         expect(@plugin_service).to receive(:createPluginSettings).with(anything, result, an_instance_of(PluginSettings))
 
-        post_with_api_header :create, plugin_setting: hash
+        post_with_api_header :create, params: { plugin_setting: hash }
 
         expect(response).to have_api_message_response(422, "Save failed")
       end
@@ -295,7 +295,7 @@ describe ApiV1::Admin::PluginSettingsController do
         expect(@plugin_service).to receive(:getPluginSettings).with('plugin.id.1').and_return(@plugin_settings)
         expect(@plugin_service).to receive(:updatePluginSettings).with(anything, result, an_instance_of(PluginSettings), "md5")
 
-        put_with_api_header :update, plugin_id: 'plugin.id.1', plugin_setting: hash
+        put_with_api_header :update, params: { plugin_id: 'plugin.id.1', plugin_setting: hash }
 
         expect(response).to have_api_message_response(422, "Save failed")
       end
@@ -306,7 +306,7 @@ describe ApiV1::Admin::PluginSettingsController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(PluginSettings)).and_return('another-etag')
         expect(@plugin_service).to receive(:getPluginSettings).with('plugin.id.1').and_return(@plugin_settings)
 
-        put_with_api_header :update, plugin_id: 'plugin.id.1', plugin_setting: hash
+        put_with_api_header :update, params: { plugin_id: 'plugin.id.1', plugin_setting: hash }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for Plugin Settings 'plugin.id.1'. Please update your copy of the config with the changes." )
       end
@@ -322,7 +322,7 @@ describe ApiV1::Admin::PluginSettingsController do
         expect(@plugin_service).to receive(:getPluginSettings).with('plugin.id.1').and_return(@plugin_settings)
         expect(@plugin_service).to receive(:updatePluginSettings).with(anything, anything, an_instance_of(PluginSettings), "md5")
 
-        put_with_api_header :update, plugin_id: 'plugin.id.1', plugin_setting: hash
+        put_with_api_header :update, params: { plugin_id: 'plugin.id.1', plugin_setting: hash }
 
         expect(response).to be_ok
         real_response = actual_response

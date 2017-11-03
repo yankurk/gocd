@@ -93,7 +93,7 @@ describe Admin::PipelinesController do
     end
 
     it "should load pause_info for json" do
-      get :pause_info, :pipeline_name => "HelloWorld", :format => "json"
+      get :pause_info, params: { :pipeline_name => "HelloWorld", :format => "json" }
 
       expect(assigns[:pipeline]).not_to be_nil
       expect(assigns[:pause_info]).to eq(@pause_info)
@@ -122,7 +122,7 @@ describe Admin::PipelinesController do
 
       describe "GET general" do
         it "should load pipeline name, pipeline label template" do
-          get :edit, {:pipeline_name => "HelloWorld", :current_tab => 'general', :stage_parent => "pipelines"}
+          get :edit, params: { :pipeline_name => "HelloWorld", :current_tab => 'general', :stage_parent => "pipelines" }
 
           expect(assigns[:pipeline].name()).to eq(CaseInsensitiveString.new("HelloWorld"))
           expect(assigns[:pipeline].getLabelTemplate()).to eq("some_label_template")
@@ -133,7 +133,7 @@ describe Admin::PipelinesController do
 
       describe "GET project_management" do
         it "should load mingle gadget config" do
-          get :edit, {:pipeline_name => "HelloWorld", :current_tab => 'project_management', :stage_parent=>"pipelines"}
+          get :edit, params: { :pipeline_name => "HelloWorld", :current_tab => 'project_management', :stage_parent=>"pipelines" }
 
           assigns[:pipeline].getMingleConfig().getProjectIdentifier() == "go"
           assigns[:pipeline].getMingleConfig().getQuotedMql() == "'status' > 'In Dev'"
@@ -155,7 +155,7 @@ describe Admin::PipelinesController do
           nil
         end
 
-        get :edit, :pipeline_name => "HelloWorld", :current_tab => 'general', :stage_parent=>"pipelines"
+        get :edit, params: { :pipeline_name => "HelloWorld", :current_tab => 'general', :stage_parent=>"pipelines" }
 
         expect(assigns[:pipeline]).to be_nil
         expect(response.status).to eq(401)
@@ -188,7 +188,7 @@ describe Admin::PipelinesController do
       it "should set config attributes on pipeline when updating" do
         stub_save_for_success
 
-        put :update, :pipeline_name => "pipeline-name", :current_tab => 'general', :pipeline => {"labelTemplate" => "${COUNT}-something"}, :config_md5 => "md5", :stage_parent=>"pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'general', :pipeline => {"labelTemplate" => "${COUNT}-something"}, :config_md5 => "md5", :stage_parent=>"pipelines" }
 
         expect(assigns[:pipeline]).to eq(@pipeline)
         expect(@pipeline.getLabelTemplate()).to eq("${COUNT}-something")
@@ -199,7 +199,7 @@ describe Admin::PipelinesController do
         stub_save_for_success
         @pipeline.variables().add("key1", "value1")
 
-        put :update, :pipeline_name => "pipeline-name", :current_tab => 'general', :config_md5 => "md5", :default_as_empty_list => ["pipeline>variables"], :stage_parent=>"pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'general', :config_md5 => "md5", :default_as_empty_list => ["pipeline>variables"], :stage_parent=>"pipelines" }
 
         expect(assigns[:pipeline].variables().isEmpty()).to eq(true)
 
@@ -207,7 +207,7 @@ describe Admin::PipelinesController do
 
         stub_save_for_success
 
-        put :update, :pipeline_name => "pipeline-name", :current_tab => 'general', :config_md5 => "md5", :default_as_empty_list => ["pipeline>params"], :stage_parent=>"pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'general', :config_md5 => "md5", :default_as_empty_list => ["pipeline>params"], :stage_parent=>"pipelines" }
 
         expect(assigns[:pipeline].getParams().isEmpty()).to eq(true)
         expect(assigns[:pause_info]).to eq(@pause_info)
@@ -219,7 +219,7 @@ describe Admin::PipelinesController do
           result.badRequest(LocalizedMessage.string("FAILED_TO_UPDATE_PIPELINE", ["pipeline-name"]))
         end
 
-        put :update, :pipeline_name => "pipeline-name", :current_tab => 'general', :pipeline => {"labelTemplate" => "${COUNT}-#junk"}, :config_md5 => "md5", :stage_parent=>"pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'general', :pipeline => {"labelTemplate" => "${COUNT}-#junk"}, :config_md5 => "md5", :stage_parent=>"pipelines" }
 
         expect(assigns[:errors].size).to eq(0)
         expect(assigns[:pause_info]).to eq(@pause_info)
@@ -236,7 +236,7 @@ describe Admin::PipelinesController do
           @pipeline.addParam(ParamConfig.new("to-be-deleted", "original-deleted-value"))
           @pipeline.addParam(ParamConfig.new("to-be-modified", "original-value"))
 
-          put :update, :pipeline_name => "pipeline-name", :current_tab => 'parameters', :config_md5 => "md5", :stage_parent=>"pipelines", :default_as_empty_list => ["pipeline>params"],
+          put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'parameters', :config_md5 => "md5", :stage_parent=>"pipelines", :default_as_empty_list => ["pipeline>params"], }
               :pipeline => {:params => [{:name => "to-be-modified", :valueForDisplay => "modified-value"},
                                         {:name => "added", :valueForDisplay => "added-value"}]}
           expect(assigns[:pause_info]).to eq(@pause_info)
@@ -268,7 +268,7 @@ describe Admin::PipelinesController do
           @pipeline.addParam(ParamConfig.new("to-be-deleted", "original-deleted-value"))
           @pipeline.addParam(ParamConfig.new("to-be-modified", "original-value"))
 
-          put :update, :pipeline_name => "pipeline-name", :current_tab => 'parameters', :config_md5 => "md5", :stage_parent=>"pipelines", :default_as_empty_list => ["pipeline>params"], :pipeline => {:params => [{:name => "renamed", :valueForDisplay => "renamed-value", :original_name => "to-be-deleted"},
+          put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'parameters', :config_md5 => "md5", :stage_parent=>"pipelines", :default_as_empty_list => ["pipeline>params"], :pipeline => {:params => [{:name => "renamed", :valueForDisplay => "renamed-value", :original_name => "to-be-deleted"}, }
                                                                                                                                                                                                                    {:name => "to-be-modified", :valueForDisplay => "modified-value"}]}
           params = assigns[:pipeline].getParams()
           expect(params.size()).to eq(2)
@@ -324,7 +324,7 @@ describe Admin::PipelinesController do
       allow(@security_service).to receive(:hasViewOrOperatePermissionForPipeline).and_return(true)
       expect(@template_config_service).to receive(:getTemplateViewModels).with(anything).and_return([])
 
-      get :new, :group => "foo.bar"
+      get :new, params: { :group => "foo.bar" }
 
       expect(assigns[:group_name]).to eq("foo.bar")
       list_of_pipelines = java.util.ArrayList.new
@@ -434,7 +434,7 @@ describe Admin::PipelinesController do
       stub_save_for_success
       expect(@pipeline_pause_service).to receive(:pause).with("new-pip", "Under construction", @user)
 
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip"}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip"}} }
 
       expect(assigns[:group_name]).to eq("new-group")
     end
@@ -446,7 +446,7 @@ describe Admin::PipelinesController do
       stub_save_for_success
       expect(@pipeline_pause_service).to receive(:pause).with("new-pip", "Under construction", @user)
 
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip"}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip"}} }
 
       expect(@cruise_config.getAllErrors().size).to eq(0)
       expect(assigns[:pause_info]).to eq(@pause_info)
@@ -470,7 +470,7 @@ describe Admin::PipelinesController do
       expect(@go_config_service).to receive(:updateUserPipelineSelections).with(selected_pipeline_id, current_user_entity_id, CaseInsensitiveString.new(pipeline_name))
 
       stub_save_for_success
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name}} }
     end
 
     it "should NOT update a users pipeline selections when that user does not successfully creates a new pipeline" do
@@ -488,7 +488,7 @@ describe Admin::PipelinesController do
       stub_save_for_validation_error do |result, _, _|
         result.unauthorized(com.thoughtworks.go.i18n.LocalizedMessage.string("UNAUTHORIZED_TO_CREATE_PIPELINE"), nil)
       end
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name}} }
     end
 
     it "should create a new pipeline based on a template" do
@@ -502,7 +502,7 @@ describe Admin::PipelinesController do
       stub_save_for_success
       expect(@pipeline_pause_service).to receive(:pause).with("new-pip", "Under construction", @user)
 
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip", :configurationType => PipelineConfig::CONFIGURATION_TYPE_TEMPLATE, :templateName => template_name}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip", :configurationType => PipelineConfig::CONFIGURATION_TYPE_TEMPLATE, :templateName => template_name}} }
 
       expect(@cruise_config.getAllErrors().size).to eq(0)
       expect(assigns[:pause_info]).to eq(@pause_info)
@@ -531,7 +531,7 @@ describe Admin::PipelinesController do
         result.badRequest(LocalizedMessage.string("SAVE_FAILED"));
       end
 
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => ""}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => ""}} }
 
       expect(assigns[:errors].size).to eq(1)
       expect(assigns[:errors][0]).to eq("empty pipeline name")
@@ -575,7 +575,7 @@ describe Admin::PipelinesController do
         result.badRequest(LocalizedMessage.string("SAVE_FAILED"));
       end
 
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "", :configurationType => PipelineConfig::CONFIGURATION_TYPE_TEMPLATE, :templateName => "some_template"}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "", :configurationType => PipelineConfig::CONFIGURATION_TYPE_TEMPLATE, :templateName => "some_template"}} }
 
       expect(assigns[:errors].size).to eq(1)
       expect(assigns[:errors][0]).to eq("empty pipeline name")
@@ -604,7 +604,7 @@ describe Admin::PipelinesController do
 
       job = {:name => "job", :tasks => {:taskOptions => "ant", "ant" => {}}}
       stage = {:name => "stage", :jobs => [job]}
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "defaultGroup", :pipeline => {:name => "new-pip", :stage => stage}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "defaultGroup", :pipeline => {:name => "new-pip", :stage => stage}} }
 
       expect(assigns[:group_name]).to eq("defaultGroup")
     end
@@ -617,7 +617,7 @@ describe Admin::PipelinesController do
       expect(@pipeline_pause_service).to receive(:pause).with("new-pip", "Under construction", @user)
 
       pkg_params = {:create_or_associate_pkg_def => "associate", :package_definition => {:repositoryId => "repo-id"}, :packageId => "pkg-id"}
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip", :materials => {:materialType => PackageMaterialConfig::TYPE}}}, :material => pkg_params
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip", :materials => {:materialType => PackageMaterialConfig::TYPE}}}, :material => pkg_params }
 
       expect(assigns[:group_name]).to eq("new-group")
       new_pipeline = @cruise_config.getPipelineConfigByName(CaseInsensitiveString.new("new-pip"))
@@ -633,7 +633,7 @@ describe Admin::PipelinesController do
       expect(@pipeline_pause_service).to receive(:pause).with("new-pip", "Under construction", @user)
 
       pkg_params = {:create_or_associate_pkg_def => "create", :package_definition => {:repositoryId => "repo-id", :name => "pkg-name"}}
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip", :materials => {:materialType => PackageMaterialConfig::TYPE}}}, :material => pkg_params
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => "new-pip", :materials => {:materialType => PackageMaterialConfig::TYPE}}}, :material => pkg_params }
 
       expect(assigns[:group_name]).to eq("new-group")
       new_pipeline = @cruise_config.getPipelineConfigByName(CaseInsensitiveString.new("new-pip"))
@@ -662,7 +662,7 @@ describe Admin::PipelinesController do
 
       # params do not matter since we have stubbed save for error & @pipeline is the object that is worked upon
       pkg_params = {:create_or_associate_pkg_def => "associate", :package_definition => {:repositoryId => "repo-id"}, :packageId => "pkg-id"}
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "defaultGroup", :pipeline => {:name => "new-pip", :materials => {:materialType => PackageMaterialConfig::TYPE}}}, :material => pkg_params
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "defaultGroup", :pipeline => {:name => "new-pip", :materials => {:materialType => PackageMaterialConfig::TYPE}}}, :material => pkg_params }
 
       expect(assigns[:group_name]).to eq("defaultGroup")
       expect(assigns[:package_configuration].name).to eq("package3-name")
@@ -680,7 +680,7 @@ describe Admin::PipelinesController do
 
       job = {:name => "job", :tasks => {:taskOptions => "pluggableTask", "pluggableTask" => {:foo => "bar"}}}
       stage = {:name => "stage", :jobs => [job]}
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name, :stage => stage}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name, :stage => stage}} }
 
       expect(@cruise_config.getAllErrors().size).to eq(0)
       expect(assigns[:pause_info]).to eq(@pause_info)
@@ -709,7 +709,7 @@ describe Admin::PipelinesController do
 
       job = {:name => "job", :tasks => {:taskOptions => "pluggableTask", "pluggableTask" => {:key => "value"}}}
       stage = {:name => "stage", :jobs => [job]}
-      post :create, :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name, :stage => stage}}
+      post :create, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "new-group", :pipeline => {:name => pipeline_name, :stage => stage}} }
 
       task_to_be_saved = assigns[:pipeline].getFirstStageConfig().getJobs().first().getTasks().first()
       expect(task_to_be_saved.instance_of?(PluggableTask)).to eq(true)
@@ -737,7 +737,7 @@ describe Admin::PipelinesController do
 
     describe "clone:get" do
       it "should populate variables for cloning pipeline with pipeline name and group" do
-        get :clone, :pipeline_name => "foo.bar", :config_md5 => "1234abcd", :group => "group1"
+        get :clone, params: { :pipeline_name => "foo.bar", :config_md5 => "1234abcd", :group => "group1" }
 
         clonedPipeline = @pipeline.duplicate()
         expect(assigns[:pipeline]).to eq(clonedPipeline)
@@ -760,7 +760,7 @@ describe Admin::PipelinesController do
         stub_save_for_success
         expect(@pipeline_pause_service).to receive(:pause).with("new-pip", "Under construction", @user)
 
-        post :save_clone, :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s
+        post :save_clone, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s }
 
         expect(@cruise_config.getAllErrors().size).to eq(0)
         expect(assigns[:pause_info]).to eq(@pause_info)
@@ -776,7 +776,7 @@ describe Admin::PipelinesController do
         stub_save_for_success
         expect(@pipeline_pause_service).to receive(:pause).with("new-pip", "Under construction", @user)
 
-        post :save_clone, :config_md5 => "1234abcd", :pipeline_group => {:pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s
+        post :save_clone, params: { :config_md5 => "1234abcd", :pipeline_group => {:pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s }
 
         expect(@cruise_config.getAllErrors().size).to eq(0)
         expect(assigns[:pause_info]).to eq(@pause_info)
@@ -794,7 +794,7 @@ describe Admin::PipelinesController do
            result.badRequest(LocalizedMessage.string("FAILED_TO_UPDATE_PIPELINE", ["pipeline-name"]))
         end
 
-        post :save_clone, :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s
+        post :save_clone, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s }
 
         expect(@cruise_config.getAllErrors().size).to eq(1)
         expect(assigns[:errors].size).to eq(1)
@@ -814,7 +814,7 @@ describe Admin::PipelinesController do
 
         expect(@go_config_service).to receive(:updateUserPipelineSelections).with(selected_pipeline_id, current_user_entity_id, CaseInsensitiveString.new("new-pip"))
 
-        post :save_clone, :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s
+        post :save_clone, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s }
       end
 
       it "should not update the user's pipeline selections when save clone is not successful" do
@@ -822,7 +822,7 @@ describe Admin::PipelinesController do
           result.badRequest(LocalizedMessage.string("FAILED_TO_UPDATE_PIPELINE", ["pipeline-name"]))
         end
 
-        post :save_clone, :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s
+        post :save_clone, params: { :config_md5 => "1234abcd", :pipeline_group => {:group => "group1", :pipeline => {:name => "new-pip"}}, :pipeline_name => @pipeline.name().to_s }
 
         expect(@go_config_service).to_not receive(:updateUserPipelineSelections)
       end
@@ -837,7 +837,7 @@ describe Admin::PipelinesController do
       allow(@go_config_service).to receive(:registry)
     end
     it "should render error if pipeline to be cloned does not exist" do
-      get :clone, :pipeline_name => "doesNotExist", :config_md5 => "1234abcd", :group => "group1"
+      get :clone, params: { :pipeline_name => "doesNotExist", :config_md5 => "1234abcd", :group => "group1" }
 
       expect(response.response_code).to eq(404)
       assert_template layout: "application"

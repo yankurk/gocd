@@ -61,7 +61,7 @@ shared_examples_for :material_controller do
       it "should load new material" do
         setup_for_new_material
 
-        get :new, :pipeline_name => "pipeline-name"
+        get :new, params: { :pipeline_name => "pipeline-name" }
 
         assert_material_is_initialized
         expect(assigns[:cruise_config]).to eq(@cruise_config)
@@ -80,7 +80,7 @@ shared_examples_for :material_controller do
 
         expect(@pipeline.materialConfigs().size).to eq(1)
 
-        post :create, :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload
+        post :create, params: { :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload }
 
         expect(@pipeline.materialConfigs().size).to eq(2)
         expect(@cruise_config.getAllErrors().size).to eq(0)
@@ -95,7 +95,7 @@ shared_examples_for :material_controller do
           result.badRequest(LocalizedMessage.string("UNAUTHORIZED_TO_EDIT_PIPELINE", ["pipeline-name"]))
         end
 
-        post :create, :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload
+        post :create, params: { :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload }
 
         expect(@cruise_config.getAllErrors().size).to eq(1)
 
@@ -114,7 +114,7 @@ shared_examples_for :material_controller do
       it "should edit an existing material" do
         setup_other_form_objects
 
-        get :edit, :pipeline_name => "pipeline-name", :finger_print => @material.getPipelineUniqueFingerprint()
+        get :edit, params: { :pipeline_name => "pipeline-name", :finger_print => @material.getPipelineUniqueFingerprint() }
 
         expect(assigns[:material]).to eq(@material)
         expect(assigns[:cruise_config]).to eq(@cruise_config)
@@ -136,7 +136,7 @@ shared_examples_for :material_controller do
 
         expect(@pipeline.materialConfigs().size).to eq(1)
 
-        put :update, :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload, :finger_print => @material.getPipelineUniqueFingerprint()
+        put :update, params: { :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload, :finger_print => @material.getPipelineUniqueFingerprint() }
 
         expect(@pipeline.materialConfigs().size).to eq(1)
         expect(@cruise_config.getAllErrors().size).to eq(0)
@@ -151,7 +151,7 @@ shared_examples_for :material_controller do
 
         expect(@pipeline.materialConfigs().size).to eq(1)
 
-        put :update, :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload, :finger_print => @material.getPipelineUniqueFingerprint()
+        put :update, params: { :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload, :finger_print => @material.getPipelineUniqueFingerprint() }
 
         expect(@pipeline.materialConfigs().size).to eq(1)
         expect(@cruise_config.getAllErrors().size).to eq(0)
@@ -167,7 +167,7 @@ shared_examples_for :material_controller do
           result.badRequest(LocalizedMessage.string("UNAUTHORIZED_TO_EDIT_PIPELINE", ["pipeline-name"]))
         end
 
-        put :update, :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload, :finger_print => @material.getPipelineUniqueFingerprint()
+        put :update, params: { :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :material => update_payload, :finger_print => @material.getPipelineUniqueFingerprint() }
 
         expect(assigns[:errors].size).to eq(1)
         expect(response.status).to eq(400)

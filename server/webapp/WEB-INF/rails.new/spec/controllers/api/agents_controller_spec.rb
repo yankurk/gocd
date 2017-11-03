@@ -36,7 +36,7 @@ describe Api::AgentsController do
       expect(@job_instance_service).to receive(:totalCompletedJobsCountOn).with('uuid').and_return(10)
       expect(@job_instance_service).to receive(:completedJobsOnAgent).with('uuid', anything, anything, anything).and_return(create_agent_job_run_history_model)
 
-      get :job_run_history, :uuid => 'uuid', :offset => '5', :no_layout => true
+      get :job_run_history, params: { :uuid => 'uuid', :offset => '5', :no_layout => true }
 
       expect(response.body).to eq(AgentJobRunHistoryAPIModel.new(Pagination.pageStartingAt(5, 10, 10), create_agent_job_run_history_model).to_json)
     end

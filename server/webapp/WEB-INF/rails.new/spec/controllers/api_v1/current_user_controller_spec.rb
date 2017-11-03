@@ -40,7 +40,7 @@ describe ApiV1::CurrentUserController do
     it("allows updating user and returns a JSON representation of the user") do
       expect(@user_service).to receive(:save).with(@user_obj, TriState.TRUE, TriState.FALSE, 'foo@example.com', 'foo, bar', an_instance_of(HttpLocalizedOperationResult)).and_return(@user_obj)
 
-      patch_with_api_header :update, login_name: @user_obj.name, enabled: true, email_me: false, email: 'foo@example.com', checkin_aliases: 'foo, bar'
+      patch_with_api_header :update, params: { login_name: @user_obj.name, enabled: true, email_me: false, email: 'foo@example.com', checkin_aliases: 'foo, bar' }
 
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response(@user_obj, ApiV1::UserRepresenter))

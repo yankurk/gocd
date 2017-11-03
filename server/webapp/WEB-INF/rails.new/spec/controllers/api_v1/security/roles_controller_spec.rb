@@ -85,14 +85,14 @@ describe ApiV1::Admin::Security::RolesController do
 
         expect(@service).to receive(:listAll).and_return([plugin_role_config, gocd_role_config])
 
-        get_with_api_header :index, type: 'plugin'
+        get_with_api_header :index, params: { type: 'plugin' }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response([plugin_role_config], ApiV1::Security::RolesConfigRepresenter))
       end
 
       it 'should error out if listing roles by a wrong type' do
-        get_with_api_header :index, type: 'invalid'
+        get_with_api_header :index, params: { type: 'invalid' }
 
         expect(response).to have_api_message_response(400, 'Bad role type `invalid`. Valid values are `gocd` and `plugin`')
       end
@@ -172,7 +172,7 @@ describe ApiV1::Admin::Security::RolesController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(PluginRoleConfig)).and_return('md5')
         expect(@service).to receive(:findRole).with('blackbird').and_return(role)
 
-        get_with_api_header :show, role_name: 'blackbird'
+        get_with_api_header :show, params: { role_name: 'blackbird' }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(role, ApiV1::Security::RoleConfigRepresenter))
@@ -181,7 +181,7 @@ describe ApiV1::Admin::Security::RolesController do
       it 'should return 404 if the security auth config does not exist' do
         expect(@service).to receive(:findRole).with('non-existent-security-auth-config').and_return(nil)
 
-        get_with_api_header :show, role_name: 'non-existent-security-auth-config'
+        get_with_api_header :show, params: { role_name: 'non-existent-security-auth-config' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
@@ -275,7 +275,7 @@ describe ApiV1::Admin::Security::RolesController do
         allow(controller).to receive(:etag_for).and_return('some-md5')
         expect(@service).to receive(:findRole).with(anything).and_return(nil)
         expect(@service).to receive(:create).with(anything, an_instance_of(PluginRoleConfig), an_instance_of(HttpLocalizedOperationResult))
-        post_with_api_header :create, role: plugin_role_hash
+        post_with_api_header :create, params: { role: plugin_role_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(role, ApiV1::Security::RoleConfigRepresenter))
@@ -291,7 +291,7 @@ describe ApiV1::Admin::Security::RolesController do
         expect(@service).to receive(:findRole).with(anything).and_return(nil)
         expect(@service).to receive(:create).with(anything, an_instance_of(RoleConfig), result)
 
-        post_with_api_header :create, role: role_hash
+        post_with_api_header :create, params: { role: role_hash }
 
         expect(response).to have_api_message_response(422, 'Save failed')
       end
@@ -299,7 +299,7 @@ describe ApiV1::Admin::Security::RolesController do
       it 'should check for existence of role with same name' do
         expect(@service).to receive(:findRole).with('blackbird').and_return(PluginRoleConfig.new)
 
-        post_with_api_header :create, role: role_hash
+        post_with_api_header :create, params: { role: role_hash }
 
         expected_role = RoleConfig.new(CaseInsensitiveString.new('blackbird'), RoleUser.new('bob'), RoleUser.new('alice'))
         expected_role.addError('name', 'Role names should be unique. Role with the same name exists.')
@@ -373,7 +373,7 @@ describe ApiV1::Admin::Security::RolesController do
         allow(controller).to receive(:load_entity_from_config).and_return(role)
         allow(controller).to receive(:check_for_stale_request).and_return(nil)
 
-        put_with_api_header :update, role_name: 'foo', role: plugin_role_hash
+        put_with_api_header :update, params: { role_name: 'foo', role: plugin_role_hash }
 
         expect(response).to have_api_message_response(422, 'Renaming of roles is not supported by this API.')
       end
@@ -384,7 +384,7 @@ describe ApiV1::Admin::Security::RolesController do
         allow(controller).to receive(:etag_for).and_return('another-etag')
         controller.request.env['HTTP_IF_MATCH'] = 'some-etag'
 
-        put_with_api_header :update, role_name: 'blackbird', role: plugin_role_hash
+        put_with_api_header :update, params: { role_name: 'blackbird', role: plugin_role_hash }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for role 'blackbird'. Please update your copy of the config with the changes.")
       end
@@ -397,7 +397,7 @@ describe ApiV1::Admin::Security::RolesController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(PluginRoleConfig)).exactly(3).times.and_return('md5')
         expect(@service).to receive(:update).with(anything, 'md5', an_instance_of(PluginRoleConfig), anything)
 
-        put_with_api_header :update, role_name: 'blackbird', role: plugin_role_hash
+        put_with_api_header :update, params: { role_name: 'blackbird', role: plugin_role_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(role, ApiV1::Security::RoleConfigRepresenter))
@@ -479,7 +479,7 @@ describe ApiV1::Admin::Security::RolesController do
       it 'should raise an error if role is not found' do
         expect(@service).to receive(:findRole).and_return(nil)
 
-        delete_with_api_header :destroy, role_name: 'foo'
+        delete_with_api_header :destroy, params: { role_name: 'foo' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
@@ -491,7 +491,7 @@ describe ApiV1::Admin::Security::RolesController do
         allow(@service).to receive(:delete).with(anything, an_instance_of(PluginRoleConfig), result) do |user, role, result|
           result.setMessage(LocalizedMessage::string('RESOURCE_DELETE_SUCCESSFUL', 'role', 'foo'))
         end
-        delete_with_api_header :destroy, role_name: 'foo'
+        delete_with_api_header :destroy, params: { role_name: 'foo' }
 
         expect(response).to have_api_message_response(200, "The role 'foo' was deleted successfully.")
       end
@@ -503,7 +503,7 @@ describe ApiV1::Admin::Security::RolesController do
         allow(@service).to receive(:delete).with(anything, an_instance_of(PluginRoleConfig), result) do |user, role, result|
           result.unprocessableEntity(LocalizedMessage::string('SAVE_FAILED_WITH_REASON', 'Validation failed'))
         end
-        delete_with_api_header :destroy, role_name: 'foo'
+        delete_with_api_header :destroy, params: { role_name: 'foo' }
 
         expect(response).to have_api_message_response(422, 'Save failed. Validation failed')
       end

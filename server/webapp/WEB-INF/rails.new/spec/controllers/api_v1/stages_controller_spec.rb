@@ -59,7 +59,7 @@ describe ApiV1::StagesController do
         it 'should get stage instance json' do
           @stage_model=StageMother.passedStageInstance('stage', 'job', 'pipeline')
           expect(@stage_service).to receive(:findStageWithIdentifier).with('pipeline', 1, 'stage', '1', @user.getUsername.to_s, anything).and_return(@stage_model)
-          get_with_api_header :show, pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1'
+          get_with_api_header :show, params: { pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1' }
           expect(response).to be_ok
           expect(actual_response).to eq(expected_response(@stage_model, ApiV1::StageRepresenter))
         end
@@ -187,7 +187,7 @@ describe ApiV1::StagesController do
           @stage_instance_models = [StageMother.toStageInstanceModel(StageMother.passedStageInstance('stage', 'job', 'pipeline'))]
           expect(@stage_service).to receive(:getCount).and_return(10)
           expect(@stage_service).to receive(:findDetailedStageHistoryByOffset).with('pipeline', 'stage', anything, @user.getUsername.to_s, anything).and_return(@stage_instance_models)
-          get_with_api_header :history, pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1'
+          get_with_api_header :history, params: { pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1' }
           expect(response).to be_ok
           expect(actual_response).to eq(expected_response_with_options(@stage_instance_models, {pipeline_name: 'pipeline', stage_name: 'stage'}, ApiV1::StageHistoryRepresenter))
         end

@@ -32,14 +32,14 @@ describe Api::MaterialsController do
       expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
         result.unauthorized(LocalizedMessage.string('API_ACCESS_UNAUTHORIZED'), HealthStateType.unauthorised())
       end
-      post :notify, @params
+      post :notify, params: { @params }
       expect(response.status).to eq(401)
       expect(response.body).to eq("Unauthorized to access this API.\n")
     end
 
     it "should return 200 when notify is successful" do
       expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)).and_return(nil)
-      post :notify, @params
+      post :notify, params: { @params }
       expect(response.status).to eq(200)
     end
 
@@ -47,7 +47,7 @@ describe Api::MaterialsController do
       expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
         result.badRequest(LocalizedMessage.string('API_BAD_REQUEST'))
       end
-      post :notify, @params
+      post :notify, params: { @params }
       expect(response.status).to eq(400)
       expect(response.body).to eq("The request could not be understood by Go Server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.\n")
     end
@@ -76,7 +76,7 @@ describe Api::MaterialsController do
       expect(controller).to receive(:current_user).and_return(loser)
       expect(@material_config_service).to receive(:getMaterialConfigs).with("loser").and_return([create_material_config_model])
 
-      get :list_configs, :no_layout => true
+      get :list_configs, params: { :no_layout => true }
 
       expect(response.body).to eq([MaterialConfigAPIModel.new(create_material_config_model)].to_json)
     end
@@ -101,7 +101,7 @@ describe Api::MaterialsController do
       expect(@material_service).to receive(:getTotalModificationsFor).with(material_config).and_return(10)
       expect(@material_service).to receive(:getModificationsFor).with(material_config, anything).and_return([create_modification_view_model])
 
-      get :modifications, :fingerprint => "fingerprint", :offset => "5", :no_layout => true
+      get :modifications, params: { :fingerprint => "fingerprint", :offset => "5", :no_layout => true }
 
       expect(response.body).to eq(MaterialHistoryAPIModel.new(Pagination.pageStartingAt(5, 10, 10), [create_modification_view_model]).to_json)
     end
@@ -113,7 +113,7 @@ describe Api::MaterialsController do
         result.notAcceptable("Not Acceptable", HealthStateType.general(HealthStateScope::GLOBAL))
       end
 
-      get :modifications, :fingerprint => "fingerprint", :no_layout => true
+      get :modifications, params: { :fingerprint => "fingerprint", :no_layout => true }
 
       expect(response.status).to eq(406)
       expect(response.body).to eq("Not Acceptable\n")

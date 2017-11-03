@@ -56,7 +56,7 @@ describe Admin::CommandsController do
         invalid_command_snippet_2 = CommandSnippetMother.invalidSnippetWithInvalidContentInArg("bad0")
         expect(@command_repository_service).to receive(:getAllInvalidCommandSnippets).and_return([invalid_command_snippet_1, invalid_command_snippet_2])
 
-        get :index, {:format => :html}
+        get :index, params: { :format => :html }
 
         expect(assigns[:invalid_commands]).to eq([invalid_command_snippet_2, invalid_command_snippet_1])
         assert_template layout: false
@@ -73,7 +73,7 @@ describe Admin::CommandsController do
       it "should render command definition as json" do
         expect(@command_repository_service).to receive(:getCommandSnippetByRelativePath).with("maven").and_return(@snippet)
 
-        get :show, :command_name => 'maven'
+        get :show, params: { :command_name => 'maven' }
 
         expected_response = {'name' => 'robocopy', 'description' => 'some-description', 'author' => 'Go Team',
                              'authorinfo' => 'TWEr@thoughtworks.com', 'moreinfo' => 'http://some-url', 'command' => 'robocopy', 'arguments' => "pack\ncomponent.nuspec"}
@@ -85,7 +85,7 @@ describe Admin::CommandsController do
         snippet = CommandSnippetMother.validSnippet("robocopy1")
         expect(@command_repository_service).to receive(:getCommandSnippetByRelativePath).with("maven").and_return(snippet)
 
-        get :show, :command_name => 'maven'
+        get :show, params: { :command_name => 'maven' }
 
         expect(JSON.parse(response.body)).to eq({"name" => "robocopy1", "description" => nil, "author" => nil, "authorinfo" => nil,
                                              "moreinfo" => nil, "command" => "robocopy1", "arguments" => "pack\ncomponent.nuspec"})
@@ -94,7 +94,7 @@ describe Admin::CommandsController do
       it "should fail request if task definition cannot be found" do
         expect(@command_repository_service).to receive(:getCommandSnippetByRelativePath).with("robo").and_return(nil)
 
-        get :show, :command_name => "robo"
+        get :show, params: { :command_name => "robo" }
 
         expect(response.response_code).to eq(404)
         expect(response.body).to eq("Command definition not found")
@@ -106,7 +106,7 @@ describe Admin::CommandsController do
         matched_commands = [CommandSnippetMother.validSnippet("robocopy1"), CommandSnippetMother.validSnippet("robocopy2")]
         expect(@command_repository_service).to receive(:lookupCommand).with("robo").and_return(matched_commands)
 
-        get :lookup, :lookup_prefix => "robo", :format => "text"
+        get :lookup, params: { :lookup_prefix => "robo", :format => "text" }
 
         expect(response.body).to eq("robocopy1|/some/path/robocopy1.xml\nrobocopy2|/some/path/robocopy2.xml")
       end

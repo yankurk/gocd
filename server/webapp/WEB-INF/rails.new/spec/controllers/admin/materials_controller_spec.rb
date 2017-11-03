@@ -52,7 +52,7 @@ describe Admin::MaterialsController do
     end
 
     it "should set current tab param" do
-      get :index, {:stage_parent => "pipelines", :pipeline_name => @pipeline_name}
+      get :index, params: { :stage_parent => "pipelines", :pipeline_name => @pipeline_name }
 
       expect(controller.params[:current_tab]).to eq('materials')
       assert_template layout: "pipelines/details"
@@ -86,7 +86,7 @@ describe Admin::MaterialsController do
       @pipeline.addMaterialConfig(hg = HgMaterialConfig.new("url", nil))
       expect(@pipeline.materialConfigs().size).to eq(2)
 
-      delete :destroy, :stage_parent => "pipelines", :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :finger_print => @material_config.getPipelineUniqueFingerprint()
+      delete :destroy, params: { :stage_parent => "pipelines", :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :finger_print => @material_config.getPipelineUniqueFingerprint() }
 
       expect(@pipeline.materialConfigs().size).to eq(1)
       expect(@pipeline.materialConfigs().first).to eq(hg)
@@ -102,7 +102,7 @@ describe Admin::MaterialsController do
 
       expect(@pipeline.materialConfigs().size).to eq(1)
 
-      delete :destroy, :stage_parent => "pipelines", :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :finger_print => @material_config.getPipelineUniqueFingerprint()
+      delete :destroy, params: { :stage_parent => "pipelines", :pipeline_name => "pipeline-name", :config_md5 => "1234abcd", :finger_print => @material_config.getPipelineUniqueFingerprint() }
 
       expect(@cruise_config.getAllErrors().size).to eq(1)
       expect(response.status).to eq(400)

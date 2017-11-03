@@ -82,7 +82,7 @@ describe Api::WebHooks::GitHubController do
           )
           .and_return(true)
 
-        post :notify, params
+        post :notify, params: { params }
         expect(response.status).to eq(202)
         expect(response.body).to eq('OK!')
       end
@@ -100,7 +100,7 @@ describe Api::WebHooks::GitHubController do
                                  'Content-Type' => 'application/json'
                                })
 
-        post :notify, params
+        post :notify, params: { params }
         expect(response.status).to eq(400)
         expect(response.body).to eq("HMAC signature specified via `X-Hub-Signature' did not match!")
       end
@@ -123,7 +123,7 @@ describe Api::WebHooks::GitHubController do
 
         request.env['RAW_POST_DATA'] = params_string
 
-        post :notify, params
+        post :notify, params: { params }
         expect(response.status).to eq(202)
         expect(response.body).to eq(params[:zen])
       end
@@ -179,7 +179,7 @@ describe Api::WebHooks::GitHubController do
           )
           .and_return(true)
 
-        post :notify, payload: params_string
+        post :notify, params: { payload: params_string }
         expect(response.status).to eq(202)
         expect(response.body).to eq('OK!')
       end
@@ -198,7 +198,7 @@ describe Api::WebHooks::GitHubController do
                                  'Content-Type' => 'application/x-www-form-urlencoded'
                                })
 
-        post :notify, payload: params_string
+        post :notify, params: { payload: params_string }
         expect(response.status).to eq(400)
         expect(response.body).to eq("HMAC signature specified via `X-Hub-Signature' did not match!")
       end
@@ -223,7 +223,7 @@ describe Api::WebHooks::GitHubController do
 
         request.env['RAW_POST_DATA'] = params_string
 
-        post :notify, payload: params_string
+        post :notify, params: { payload: params_string }
 
         expect(response.status).to eq(202)
         expect(response.body).to eq(params[:zen])

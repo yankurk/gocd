@@ -49,7 +49,7 @@ describe PipelinesController do
     it "should render build cause" do
       expect(@pipeline_history_service).to receive(:findPipelineInstance).with("pipeline_name", 10, @user, @status).and_return(@pim)
 
-      get :build_cause, :pipeline_name => "pipeline_name", :pipeline_counter => "10"
+      get :build_cause, params: { :pipeline_name => "pipeline_name", :pipeline_counter => "10" }
 
       expect(assigns[:pipeline_instance]).to eq(@pim)
       assert_template "build_cause"
@@ -64,7 +64,7 @@ describe PipelinesController do
       expect(controller).to receive(:render).with("build_cause", layout: false).never
       expect(controller).to receive(:render_operation_result_if_failure).with(@status)
 
-      get :build_cause, :pipeline_name => "pipeline_name", :pipeline_counter => "10", :layout => false
+      get :build_cause, params: { :pipeline_name => "pipeline_name", :pipeline_counter => "10", :layout => false }
     end
 
     it "should route to build_cause action" do
@@ -224,7 +224,7 @@ describe PipelinesController do
       result.unauthorized(LocalizedMessage.cannotViewPipeline("pipeline"), nil)
     end
 
-    get :material_search, :pipeline_name => 'pipeline', :fingerprint => 'sha', :search => 'search', :no_layout => true
+    get :material_search, params: { :pipeline_name => 'pipeline', :fingerprint => 'sha', :search => 'search', :no_layout => true }
     expect(response.status).to eq(401)
   end
 
@@ -233,7 +233,7 @@ describe PipelinesController do
       result.unauthorized(LocalizedMessage.cannotViewPipeline("pipeline"), nil)
     end
 
-    post :material_search, :pipeline_name => 'pipeline', :fingerprint => 'sha', :search => 'search', :no_layout => true
+    post :material_search, params: { :pipeline_name => 'pipeline', :fingerprint => 'sha', :search => 'search', :no_layout => true }
     expect(response.status).to eq(401)
     assert_template layout: false
   end
@@ -244,7 +244,7 @@ describe PipelinesController do
     pkg_config = MaterialConfigsMother.packageMaterialConfig()
     expect(@go_config_service).to receive(:materialForPipelineWithFingerprint).with('pipeline', 'sha').and_return(pkg_config)
 
-    get :material_search, :pipeline_name => 'pipeline', :fingerprint => 'sha', :search => 'search'
+    get :material_search, params: { :pipeline_name => 'pipeline', :fingerprint => 'sha', :search => 'search' }
 
     expect(response).to be_success
     assert_template layout: false
@@ -341,13 +341,13 @@ describe PipelinesController do
       it 'updates the comment using the pipeline history service' do
         expect(@pipeline_history_service).to receive(:updateComment).with('pipeline_name', 1, 'test comment', current_user, @localized_result)
 
-        post :update_comment, pipeline_name: 'pipeline_name', pipeline_counter: 1, comment: 'test comment', format: :json
+        post :update_comment, params: { pipeline_name: 'pipeline_name', pipeline_counter: 1, comment: 'test comment', format: :json }
       end
 
       it 'renders success json' do
         allow(@pipeline_history_service).to receive(:updateComment).with('pipeline_name', 1, 'test comment', current_user, @localized_result)
 
-        post :update_comment, pipeline_name: 'pipeline_name', pipeline_counter: 1, comment: 'test comment', format: :json
+        post :update_comment, params: { pipeline_name: 'pipeline_name', pipeline_counter: 1, comment: 'test comment', format: :json }
 
         expect(JSON.load(response.body)).to eq({'status' => 'success'})
       end
@@ -359,7 +359,7 @@ describe PipelinesController do
           result.unauthorized(LocalizedMessage.cannotOperatePipeline("pipeline_name"), nil)
         end
 
-        post :update_comment, pipeline_name: 'pipeline_name', pipeline_counter: 1, comment: 'test comment', format: :json
+        post :update_comment, params: { pipeline_name: 'pipeline_name', pipeline_counter: 1, comment: 'test comment', format: :json }
         assert_response(401)
       end
 

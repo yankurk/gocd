@@ -69,7 +69,7 @@ describe Api::FeatureTogglesController do
     it "should update the value of a specified key to true when sent 'on'" do
       expect(@feature_toggle_service).to receive(:changeValueOfToggle).with("key.to.toggle", true)
 
-      post :update, :toggle_key => "key.to.toggle", :toggle_value => "on"
+      post :update, params: { :toggle_key => "key.to.toggle", :toggle_value => "on" }
 
       output = JSON.parse response.body
       expect(response.status).to eq(200)
@@ -79,7 +79,7 @@ describe Api::FeatureTogglesController do
     it "should update the value of a specified key to false when sent 'off'" do
       expect(@feature_toggle_service).to receive(:changeValueOfToggle).with("key.to.toggle", false)
 
-      post :update, :toggle_key => "key.to.toggle", :toggle_value => "off"
+      post :update, params: { :toggle_key => "key.to.toggle", :toggle_value => "off" }
 
       output = JSON.parse response.body
       expect(response.status).to eq(200)
@@ -89,7 +89,7 @@ describe Api::FeatureTogglesController do
     it "should fail when the value is not provided" do
       expect(@feature_toggle_service).to_not receive(:changeValueOfToggle)
 
-      post :update, :toggle_key => "key.to.toggle"
+      post :update, params: { :toggle_key => "key.to.toggle" }
 
       output = JSON.parse response.body
       expect(response.status).to eq(422)
@@ -99,7 +99,7 @@ describe Api::FeatureTogglesController do
     it "should fail when the value is not 'on' or 'off'" do
       expect(@feature_toggle_service).to_not receive(:changeValueOfToggle)
 
-      post :update, :toggle_key => "key.to.toggle", :toggle_value => "not_on_or_off"
+      post :update, params: { :toggle_key => "key.to.toggle", :toggle_value => "not_on_or_off" }
 
       output = JSON.parse response.body
       expect(response.status).to eq(422)
@@ -109,7 +109,7 @@ describe Api::FeatureTogglesController do
     it "should fail when the updation fails with a runtime exception" do
       expect(@feature_toggle_service).to receive(:changeValueOfToggle).and_raise(java.lang.RuntimeException.new "Ouch. Something failed.")
 
-      post :update, :toggle_key => "key.to.toggle", :toggle_value => "on"
+      post :update, params: { :toggle_key => "key.to.toggle", :toggle_value => "on" }
 
       output = JSON.parse response.body
       expect(response.status).to eq(500)
@@ -119,7 +119,7 @@ describe Api::FeatureTogglesController do
     it "should fail when the updation fails with anything else" do
       expect(@feature_toggle_service).to receive(:changeValueOfToggle).and_raise("Ouch. Something failed again.")
 
-      post :update, :toggle_key => "key.to.toggle", :toggle_value => "on"
+      post :update, params: { :toggle_key => "key.to.toggle", :toggle_value => "on" }
 
       output = JSON.parse response.body
       expect(response.status).to eq(500)

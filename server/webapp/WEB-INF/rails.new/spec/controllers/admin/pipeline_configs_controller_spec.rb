@@ -102,7 +102,7 @@ describe Admin::PipelineConfigsController do
     it 'should load the pipeline_config object corresponding to the pipeline_name' do
       expect(@pipeline_config_service).to receive(:getPipelineConfig).with('pipeline1').and_return('pipeline_config_object')
 
-      get :edit, :pipeline_name => 'pipeline1'
+      get :edit, params: { :pipeline_name => 'pipeline1' }
 
       expect(assigns[:pipeline_config]).to eq('pipeline_config_object')
     end
@@ -111,7 +111,7 @@ describe Admin::PipelineConfigsController do
       expect(@user_service).to receive(:allUsernames).and_return('all users')
       expect(@user_service).to receive(:allRoleNames).and_return('all roles')
 
-      get :edit, :pipeline_name => 'pipeline1'
+      get :edit, params: { :pipeline_name => 'pipeline1' }
 
       expect(assigns[:all_users]).to eq('all users')
       expect(assigns[:all_roles]).to eq('all roles')

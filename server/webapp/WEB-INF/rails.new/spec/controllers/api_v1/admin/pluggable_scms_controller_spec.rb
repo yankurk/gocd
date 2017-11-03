@@ -141,7 +141,7 @@ describe ApiV1::Admin::PluggableScmsController do
         expect(@pluggable_scm_service).to receive(:findPluggableScmMaterial).with('material').exactly(2).times.and_return(@scm)
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(@scm).and_return('md5')
 
-        get_with_api_header :show, material_name: 'material'
+        get_with_api_header :show, params: { material_name: 'material' }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@scm, ApiV1::Scms::PluggableScmRepresenter))
@@ -150,7 +150,7 @@ describe ApiV1::Admin::PluggableScmsController do
       it 'should return 404 if the pluggable scm material does not exist' do
         expect(@pluggable_scm_service).to receive(:findPluggableScmMaterial).with('non-existent-material').and_return(nil)
 
-        get_with_api_header :show, material_name: 'non-existent-material'
+        get_with_api_header :show, params: { material_name: 'non-existent-material' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
 
@@ -220,7 +220,7 @@ describe ApiV1::Admin::PluggableScmsController do
         allow(controller).to receive(:etag_for_entity_in_config).and_return('some-md5')
         hash = {id: 'scm-id', name: 'foo', auto_update: false, plugin_metadata: {id: 'foo', version: '1'}, configuration: [{"key" => 'url', "value" => 'git@github.com:foo/bar.git'}, {"key" => 'password', "value" => "some-value"}]}
         expect(@pluggable_scm_service).to receive(:createPluggableScmMaterial).with(anything, an_instance_of(SCM), anything)
-        post_with_api_header :create, pluggable_scm: hash
+        post_with_api_header :create, params: { pluggable_scm: hash }
 
         expect(response).to be_ok
         real_response = actual_response
@@ -234,7 +234,7 @@ describe ApiV1::Admin::PluggableScmsController do
         hash = {name: 'foo', auto_update: false, plugin_metadata: {id: 'some-plugin', version: '1'}, configuration: [{"key" => 'url', "value" => 'git@github.com:foo/bar.git'}, {"key" => 'password', "encrypted_value" => 'baz'}]}
         expect(@pluggable_scm_service).to receive(:createPluggableScmMaterial).with(anything, an_instance_of(SCM), anything)
 
-        post_with_api_header :create, hash
+        post_with_api_header :create, params: hash
 
         expect(actual_response).to have_key(:id)
       end
@@ -325,7 +325,7 @@ describe ApiV1::Admin::PluggableScmsController do
         expect(@pluggable_scm_service).to receive(:findPluggableScmMaterial).exactly(2).times.and_return(@scm)
         expect(@pluggable_scm_service).to receive(:updatePluggableScmMaterial).with(anything, an_instance_of(SCM), anything, 'md5')
 
-        put_with_api_header :update, material_name: 'material', pluggable_scm: hash
+        put_with_api_header :update, params: { material_name: 'material', pluggable_scm: hash }
 
         expect(response).to be_ok
         real_response = actual_response
@@ -337,7 +337,7 @@ describe ApiV1::Admin::PluggableScmsController do
         allow(controller).to receive(:check_for_stale_request).and_return(nil)
         params = {id: '1', name: 'material', auto_update: false, plugin_metadata: {id: 'some-plugin', version: '1'}, configuration: [{"key" => 'url', "value" => 'git@github.com:foo/bar.git'}]}
 
-        put_with_api_header :update, material_name: 'foo', pluggable_scm: params
+        put_with_api_header :update, params: { material_name: 'foo', pluggable_scm: params }
 
         expect(response).to have_api_message_response(422, 'Renaming of SCM material is not supported by this API.')
       end
@@ -356,7 +356,7 @@ describe ApiV1::Admin::PluggableScmsController do
 
         params = {material_name: 'material'}
 
-        put_with_api_header :update, params
+        put_with_api_header :update, params: params
 
         expect(response).to have_api_message_response(422, 'Save failed. Validation failed')
       end
@@ -367,7 +367,7 @@ describe ApiV1::Admin::PluggableScmsController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(SCM)).and_return('another-etag')
         expect(@pluggable_scm_service).to receive(:findPluggableScmMaterial).with('foo').and_return(@scm)
 
-        put_with_api_header :update, material_name: 'foo', pluggable_scm: params
+        put_with_api_header :update, params: { material_name: 'foo', pluggable_scm: params }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for SCM 'foo'. Please update your copy of the config with the changes." )
 
@@ -381,7 +381,7 @@ describe ApiV1::Admin::PluggableScmsController do
         expect(@pluggable_scm_service).to receive(:findPluggableScmMaterial).with('material').exactly(3).times.and_return(@scm)
         expect(@pluggable_scm_service).to receive(:updatePluggableScmMaterial).with(anything, an_instance_of(SCM), anything, "md5")
 
-        put_with_api_header :update, material_name: 'material', pluggable_scm: hash
+        put_with_api_header :update, params: { material_name: 'material', pluggable_scm: hash }
 
         expect(response).to be_ok
         real_response = actual_response

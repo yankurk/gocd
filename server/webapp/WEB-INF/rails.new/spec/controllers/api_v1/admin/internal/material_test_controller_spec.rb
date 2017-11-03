@@ -65,7 +65,7 @@ describe ApiV1::Admin::Internal::MaterialTestController do
         expect_any_instance_of(com.thoughtworks.go.config.materials.svn.SvnMaterialConfig).
           to receive(:ensureEncrypted)
 
-        post_with_api_header :test, {
+        post_with_api_header :test, params: {
           type:       'svn',
           attributes: {
             url: 'https://example.com/git/FooBarWidgets.git',
@@ -77,7 +77,7 @@ describe ApiV1::Admin::Internal::MaterialTestController do
       end
 
       it 'validates material before testing connection' do
-        post_with_api_header :test, {
+        post_with_api_header :test, params: {
           type:       'svn',
           attributes: {
             url: 'https://example.com/svn/FooBarWidgets.git',
@@ -95,7 +95,7 @@ describe ApiV1::Admin::Internal::MaterialTestController do
         expect(@git_material).to receive(:checkConnection).with(an_instance_of(CheckConnectionSubprocessExecutionContext)).
           and_return(com.thoughtworks.go.domain.materials.ValidationBean.notValid('boom!'))
 
-        post_with_api_header :test, {
+        post_with_api_header :test, params: {
           type:       'git',
           attributes: {
             url: 'https://example.com/git/FooBarWidgets.git'
@@ -125,7 +125,7 @@ describe ApiV1::Admin::Internal::MaterialTestController do
           expect(pipeline_config.name).to eq(CaseInsensitiveString.new('BuildLinux'))
         end
 
-        post_with_api_header :test, {
+        post_with_api_header :test, params: {
           type:          'git',
           pipeline_name: 'BuildLinux',
           attributes:    {
@@ -142,7 +142,7 @@ describe ApiV1::Admin::Internal::MaterialTestController do
         expect(@git_material).to receive(:checkConnection).with(an_instance_of(CheckConnectionSubprocessExecutionContext)).
           and_return(com.thoughtworks.go.domain.materials.ValidationBean.valid)
 
-        post_with_api_header :test, {
+        post_with_api_header :test, params: {
           type:          'git',
           pipeline_name: '',
           attributes:    {

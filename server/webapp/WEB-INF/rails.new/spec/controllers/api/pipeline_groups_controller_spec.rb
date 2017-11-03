@@ -37,7 +37,7 @@ describe Api::PipelineGroupsController do
       expect(controller).to receive(:current_user).and_return(loser)
       expect(@pipeline_configs_service).to receive(:getGroupsForUser).with("loser").and_return([create_pipeline_group_config_model])
 
-      get :list_configs, :no_layout => true
+      get :list_configs, params: { :no_layout => true }
 
       expect(response.body).to eq([PipelineGroupConfigAPIModel.new(create_pipeline_group_config_model)].to_json)
     end

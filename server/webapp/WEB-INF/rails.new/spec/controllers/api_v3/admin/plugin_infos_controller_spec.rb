@@ -116,7 +116,7 @@ describe ApiV3::Admin::PluginInfosController do
       expect(@default_plugin_manager).to receive(:plugins).and_return([bad_plugin, good_plugin])
       expect(@default_plugin_info_finder).to receive(:allPluginInfos).with(nil).and_return([good_plugin_info])
 
-      get_with_api_header :index, include_bad: true
+      get_with_api_header :index, params: { include_bad: true }
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response([good_plugin_info, bad_plugin_info], ApiV3::Plugin::PluginInfosRepresenter))
     end
@@ -130,7 +130,7 @@ describe ApiV3::Admin::PluginInfosController do
 
       expect(@default_plugin_info_finder).to receive(:allPluginInfos).with('scm').and_return([plugin_info])
 
-      get_with_api_header :index, type: 'scm'
+      get_with_api_header :index, params: { type: 'scm' }
 
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response([plugin_info], ApiV3::Plugin::PluginInfosRepresenter))
@@ -139,7 +139,7 @@ describe ApiV3::Admin::PluginInfosController do
     it 'should be a unprocessible entity for a invalid plugin type' do
       expect(@default_plugin_info_finder).to receive(:allPluginInfos).with('invalid_type').and_raise(InvalidPluginTypeException.new)
 
-      get_with_api_header :index, type: 'invalid_type'
+      get_with_api_header :index, params: { type: 'invalid_type' }
 
       expect(response.code).to eq('422')
       json = JSON.parse(response.body).deep_symbolize_keys
@@ -179,7 +179,7 @@ describe ApiV3::Admin::PluginInfosController do
 
       expect(@default_plugin_info_finder).to receive(:pluginInfoFor).with('plugin_id').and_return(plugin_info)
 
-      get_with_api_header :show, id: 'plugin_id'
+      get_with_api_header :show, params: { id: 'plugin_id' }
 
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response(plugin_info, ApiV3::Plugin::PluginInfoRepresenter))
@@ -196,7 +196,7 @@ describe ApiV3::Admin::PluginInfosController do
       expect(@default_plugin_info_finder).to receive(:pluginInfoFor).with('bad.plugin').and_return(nil)
       expect(@default_plugin_manager).to receive(:getPluginDescriptorFor).with('bad.plugin').and_return(bad_plugin)
 
-      get_with_api_header :show, id: 'bad.plugin'
+      get_with_api_header :show, params: { id: 'bad.plugin' }
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response(bad_plugin_info, ApiV3::Plugin::PluginInfoRepresenter))
     end
@@ -205,7 +205,7 @@ describe ApiV3::Admin::PluginInfosController do
       expect(@default_plugin_info_finder).to receive(:pluginInfoFor).with('plugin_id').and_return(nil)
       expect(@default_plugin_manager).to receive(:getPluginDescriptorFor).with('plugin_id').and_return(nil)
 
-      get_with_api_header :show, id: 'plugin_id'
+      get_with_api_header :show, params: { id: 'plugin_id' }
 
       expect(response.code).to eq('404')
       json = JSON.parse(response.body).deep_symbolize_keys

@@ -67,7 +67,7 @@ describe Api::StagesController do
       user = Username.new(CaseInsensitiveString.new("sriki"))
       allow(@controller).to receive(:current_user).and_return(user)
       expect(@schedule_service).to receive(:cancelAndTriggerRelevantStages).with(42, user, an_instance_of(HttpLocalizedOperationResult))
-      post :cancel, {:id => "42", :no_layout => true}
+      post :cancel, params: { :id => "42", :no_layout => true }
     end
   end
 
@@ -81,7 +81,7 @@ describe Api::StagesController do
       user = Username.new(CaseInsensitiveString.new("sriki"))
       allow(@controller).to receive(:current_user).and_return(user)
       expect(@schedule_service).to receive(:cancelAndTriggerRelevantStages).with("blah_pipeline", "blah_stage", user, an_instance_of(HttpLocalizedOperationResult))
-      post :cancel_stage_using_pipeline_stage_name, {:pipeline_name => "blah_pipeline", :stage_name => "blah_stage", :no_layout => true}
+      post :cancel_stage_using_pipeline_stage_name, params: { :pipeline_name => "blah_pipeline", :stage_name => "blah_stage", :no_layout => true }
     end
 
     describe "route" do
@@ -175,7 +175,7 @@ describe Api::StagesController do
       expect(@stage_service).to receive(:getCount).and_return(10)
       expect(@stage_service).to receive(:findDetailedStageHistoryByOffset).with('pipeline', 'stage', anything, "loser", anything).and_return([create_stage_model])
 
-      get :history, :pipeline_name => 'pipeline', :stage_name => 'stage', :offset => '5', :no_layout => true
+      get :history, params: { :pipeline_name => 'pipeline', :stage_name => 'stage', :offset => '5', :no_layout => true }
 
       expect(response.body).to eq(StageHistoryAPIModel.new(Pagination.pageStartingAt(5, 10, 10), [create_stage_model]).to_json)
     end
@@ -188,7 +188,7 @@ describe Api::StagesController do
         result.notAcceptable("Not Acceptable", HealthStateType.general(HealthStateScope::GLOBAL))
       end
 
-      get :history, :pipeline_name => 'pipeline', :stage_name => 'stage', :no_layout => true
+      get :history, params: { :pipeline_name => 'pipeline', :stage_name => 'stage', :no_layout => true }
 
       expect(response.status).to eq(406)
       expect(response.body).to eq("Not Acceptable\n")
@@ -271,7 +271,7 @@ describe Api::StagesController do
       expect(controller).to receive(:current_user).and_return(loser)
       expect(@stage_service).to receive(:findStageWithIdentifier).with('pipeline', 1, 'stage', '1', "loser", anything).and_return(create_stage_model_for_instance)
 
-      get :instance_by_counter, :pipeline_name => 'pipeline', :stage_name => 'stage', :pipeline_counter => '1', :stage_counter => '1', :no_layout => true
+      get :instance_by_counter, params: { :pipeline_name => 'pipeline', :stage_name => 'stage', :pipeline_counter => '1', :stage_counter => '1', :no_layout => true }
 
       expect(response.body).to eq(StageAPIModel.new(create_stage_model_for_instance).to_json)
     end
@@ -283,7 +283,7 @@ describe Api::StagesController do
         result.notAcceptable("Not Acceptable", HealthStateType.general(HealthStateScope::GLOBAL))
       end
 
-      get :instance_by_counter, :pipeline_name => 'pipeline', :stage_name => 'stage', :pipeline_counter => '1', :stage_counter => '1', :no_layout => true
+      get :instance_by_counter, params: { :pipeline_name => 'pipeline', :stage_name => 'stage', :pipeline_counter => '1', :stage_counter => '1', :no_layout => true }
 
       expect(response.status).to eq(406)
       expect(response.body).to eq("Not Acceptable\n")

@@ -95,7 +95,7 @@ describe ApiV1::Admin::Internal::PackageRepositoryCheckConnectionController do
           result.setMessage(LocalizedMessage::string("CONNECTION_OK"))
         end
 
-        post_with_api_header :repository_check_connection, pacakge_repository_check_connection: repository
+        post_with_api_header :repository_check_connection, params: { pacakge_repository_check_connection: repository }
 
         expect(response).to have_api_message_response(200, "Connection OK. {0}")
       end
@@ -173,7 +173,7 @@ describe ApiV1::Admin::Internal::PackageRepositoryCheckConnectionController do
           result.setMessage(LocalizedMessage::string("CONNECTION_OK"))
         end
 
-        post_with_api_header :package_check_connection, package_repository_check_connection: @package_definition
+        post_with_api_header :package_check_connection, params: { package_repository_check_connection: @package_definition }
 
         expect(response).to have_api_message_response(200, "Connection OK. {0}")
       end
@@ -182,7 +182,7 @@ describe ApiV1::Admin::Internal::PackageRepositoryCheckConnectionController do
 
         expect(@package_repository_service).to receive(:getPackageRepository).with(anything).and_return(nil)
 
-        post_with_api_header :package_check_connection, package_repository_check_connection: @package_definition
+        post_with_api_header :package_check_connection, params: { package_repository_check_connection: @package_definition }
         expect(response).to have_api_message_response(404, "Either the resource you requested was not found, or you are not authorized to perform this action.")
       end
     end

@@ -61,7 +61,7 @@ describe Admin::StatusReportsController do
     end
 
     it 'should verify availability of plugin' do
-      get :show, :plugin_id => 'invalid_plugin_id'
+      get :show, params: { :plugin_id => 'invalid_plugin_id' }
 
       expect(response.response_code).to eq(404)
     end
@@ -75,7 +75,7 @@ describe Admin::StatusReportsController do
       pluginDescriptor = GoPluginDescriptor.new('com.tw.myplugin', nil, nil, nil, nil, nil)
       ElasticAgentMetadataStore.instance().setPluginInfo(com.thoughtworks.go.plugin.domain.elastic.ElasticAgentPluginInfo.new(pluginDescriptor, nil, nil, nil, capabilities))
 
-      get :show, :plugin_id => 'com.tw.myplugin'
+      get :show, params: { :plugin_id => 'com.tw.myplugin' }
 
       expect(response).to be_ok
       expect(assigns[:status_report]).to eq('status_report')
@@ -91,7 +91,7 @@ describe Admin::StatusReportsController do
       pluginDescriptor = GoPluginDescriptor.new('com.tw.myplugin', nil, nil, nil, nil, nil)
       ElasticAgentMetadataStore.instance().setPluginInfo(com.thoughtworks.go.plugin.domain.elastic.ElasticAgentPluginInfo.new(pluginDescriptor, nil, nil, nil, capabilities))
 
-      get :show, :plugin_id => 'com.tw.myplugin'
+      get :show, params: { :plugin_id => 'com.tw.myplugin' }
 
       expect(response.response_code).to eq(404)
     end

@@ -80,7 +80,7 @@ describe Api::WebHooks::GitLabController do
           .with('branch', all_matching_repos)
           .and_return(true)
 
-        post :notify, params
+        post :notify, params: { params }
         expect(response.status).to eq(202)
         expect(response.body).to eq('OK!')
       end
@@ -98,7 +98,7 @@ describe Api::WebHooks::GitLabController do
                                  'Content-Type' => 'application/json'
                                })
 
-        post :notify, params
+        post :notify, params: { params }
         expect(response.status).to eq(400)
         expect(response.body).to eq("Token specified in the `X-Gitlab-Token' header did not match!")
       end

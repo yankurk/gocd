@@ -78,7 +78,7 @@ describe ComparisonController do
           pipeline_instances << PipelineInstanceModel.createPipeline("some_pipeline", i, "some-label", BuildCause.createWithEmptyModifications(), stage_history_for("dev", "prod"))
         end
 
-        get :show, :pipeline_name => "some_pipeline", :from_counter => "10", :to_counter => "17"
+        get :show, params: { :pipeline_name => "some_pipeline", :from_counter => "10", :to_counter => "17" }
 
         expect(assigns[:from_pipeline]).to eq(from_pipeline)
         expect(assigns[:to_pipeline]).to eq(to_pipeline)
@@ -88,10 +88,10 @@ describe ComparisonController do
 
     describe "show edge cases" do
       it "should bump up pipeline counter to 1 when counter is 0" do
-        get :show, :pipeline_name => "some_pipeline", :from_counter => "0", :to_counter => "42"
+        get :show, params: { :pipeline_name => "some_pipeline", :from_counter => "0", :to_counter => "42" }
         expect(response).to redirect_to(compare_pipelines_path(:pipeline_name => "some_pipeline", :from_counter => "1", :to_counter => "42"))
 
-        get :show, :pipeline_name => "some_pipeline", :from_counter => "42", :to_counter => "0"
+        get :show, params: { :pipeline_name => "some_pipeline", :from_counter => "42", :to_counter => "0" }
         expect(response).to redirect_to(compare_pipelines_path(:pipeline_name => "some_pipeline", :from_counter => "42", :to_counter => "1"))
       end
     end
@@ -101,7 +101,7 @@ describe ComparisonController do
         result = HttpLocalizedOperationResult.new
         allow(HttpLocalizedOperationResult).to receive(:new).and_return(result)
         expect(@phs).to receive(:findMatchingPipelineInstances).with("some_pipeline", "query", 10, @loser, result).and_return(:from_pipeline)
-        get :list, :pipeline_name => "some_pipeline", :other_pipeline_counter => 10, :q => "query", :format => "json"
+        get :list, params: { :pipeline_name => "some_pipeline", :other_pipeline_counter => 10, :q => "query", :format => "json" }
         expect(assigns[:pipeline_instances]).to eq(:from_pipeline)
       end
     end
@@ -109,7 +109,7 @@ describe ComparisonController do
     describe "timeline" do
       it "should get pipeline history" do
         expect(@phs).to receive(:findPipelineInstancesByPageNumber).with("pipeline_up", 5, 10, "loser").and_return(:some_pipeline_instances)
-        get :timeline, :pipeline_name => "pipeline_up", :page => "5"
+        get :timeline, params: { :pipeline_name => "pipeline_up", :page => "5" }
         expect(assigns[:pipeline_instances]).to eq(:some_pipeline_instances)
       end
     end

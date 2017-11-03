@@ -78,13 +78,13 @@ describe ConfigView::TemplatesController do
     it "should return a template object of the given name" do
       template_config = 'template config'
       expect(@template_config_service).to receive(:loadForView).with('template.name', an_instance_of(HttpLocalizedOperationResult)).and_return(template_config)
-      get :show, {:name => 'template.name'}
+      get :show, params: { :name => 'template.name' }
       expect(assigns[:template_config]).to eq(template_config)
     end
 
     it "should return nil for template config when template name does not exist" do
       expect(@template_config_service).to receive(:loadForView).with('template.name', an_instance_of(HttpLocalizedOperationResult)).and_return(nil)
-      get :show, {:name => 'template.name'}
+      get :show, params: { :name => 'template.name' }
       expect(assigns[:template_config]).to eq(nil)
     end
 
@@ -96,7 +96,7 @@ describe ConfigView::TemplatesController do
       allow(HttpLocalizedOperationResult).to receive(:new).and_return(result)
       template_name = 'template.name'
       expect(@template_config_service).to receive(:loadForView).with(template_name, result).and_return(nil)
-      get :show, {:name => template_name}
+      get :show, params: { :name => template_name }
       expect(assigns[:template_config]).to eq(nil)
       expect(response).to render_template("shared/config_error")
       expect(response.status).to eq(404)

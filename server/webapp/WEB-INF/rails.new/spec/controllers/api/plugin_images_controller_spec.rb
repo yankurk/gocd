@@ -27,7 +27,7 @@ describe Api::PluginImagesController do
     image = com.thoughtworks.go.plugin.domain.common.Image.new('image/foo', Base64.strict_encode64('some-image-data'), SecureRandom.hex(32))
     expect(@default_plugin_info_finder).to receive(:getImage).with('foo', image.getHash).and_return(image)
 
-    get :show, plugin_id: 'foo', hash: image.getHash
+    get :show, params: { plugin_id: 'foo', hash: image.getHash }
     expect(response).to be_ok
     expect(response.headers['Cache-Control']).to eq('max-age=31557600, private')
     expect(response.headers['Content-Type']).to eq('image/foo')
@@ -38,7 +38,7 @@ describe Api::PluginImagesController do
     hash = SecureRandom.hex(32)
     expect(@default_plugin_info_finder).to receive(:getImage).with('foo', hash).and_return(nil)
 
-    get :show, plugin_id: 'foo', hash: hash
+    get :show, params: { plugin_id: 'foo', hash: hash }
     expect(response).to be_not_found
   end
 end

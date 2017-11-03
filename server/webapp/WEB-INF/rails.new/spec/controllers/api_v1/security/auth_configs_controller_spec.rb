@@ -149,7 +149,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(SecurityAuthConfig)).and_return('md5')
         expect(@security_auth_config_service).to receive(:findProfile).with('ldap').and_return(auth_config)
 
-        get_with_api_header :show, auth_config_id: 'ldap'
+        get_with_api_header :show, params: { auth_config_id: 'ldap' }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(auth_config, ApiV1::Security::AuthConfigRepresenter))
@@ -158,7 +158,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       it 'should return 404 if the security auth config does not exist' do
         expect(@security_auth_config_service).to receive(:findProfile).with('non-existent-security-auth-config').and_return(nil)
 
-        get_with_api_header :show, auth_config_id: 'non-existent-security-auth-config'
+        get_with_api_header :show, params: { auth_config_id: 'non-existent-security-auth-config' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
@@ -244,7 +244,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         auth_config = SecurityAuthConfig.new('ldap', 'cd.go.ldap')
         allow(controller).to receive(:etag_for).and_return('some-md5')
         expect(@security_auth_config_service).to receive(:create).with(anything, an_instance_of(SecurityAuthConfig), an_instance_of(HttpLocalizedOperationResult))
-        post_with_api_header :create, auth_config: auth_config_hash
+        post_with_api_header :create, params: { auth_config: auth_config_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(auth_config, ApiV1::Security::AuthConfigRepresenter))
@@ -258,7 +258,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         allow(result).to receive(:httpCode).and_return(422)
         expect(@security_auth_config_service).to receive(:create).with(anything, an_instance_of(SecurityAuthConfig), result)
 
-        post_with_api_header :create, auth_config: auth_config_hash
+        post_with_api_header :create, params: { auth_config: auth_config_hash }
 
         expect(response).to have_api_message_response(422, 'Save failed')
       end
@@ -329,7 +329,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         allow(controller).to receive(:load_entity_from_config).and_return(auth_config)
         allow(controller).to receive(:check_for_stale_request).and_return(nil)
 
-        put_with_api_header :update, auth_config_id: 'foo', auth_config: auth_config_hash
+        put_with_api_header :update, params: { auth_config_id: 'foo', auth_config: auth_config_hash }
 
         expect(response).to have_api_message_response(422, 'Renaming of security auth config IDs is not supported by this API.')
       end
@@ -340,7 +340,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         allow(controller).to receive(:etag_for).and_return('another-etag')
         controller.request.env['HTTP_IF_MATCH'] = 'some-etag'
 
-        put_with_api_header :update, auth_config_id: 'ldap', auth_config: auth_config_hash
+        put_with_api_header :update, params: { auth_config_id: 'ldap', auth_config: auth_config_hash }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for Security auth config 'ldap'. Please update your copy of the config with the changes.")
       end
@@ -353,7 +353,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(SecurityAuthConfig)).exactly(3).times.and_return('md5')
         expect(@security_auth_config_service).to receive(:update).with(anything, 'md5', an_instance_of(SecurityAuthConfig), anything)
 
-        put_with_api_header :update, auth_config_id: 'ldap', auth_config: auth_config_hash
+        put_with_api_header :update, params: { auth_config_id: 'ldap', auth_config: auth_config_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(auth_config, ApiV1::Security::AuthConfigRepresenter))
@@ -436,7 +436,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       it 'should raise an error if auth_config is not found' do
         expect(@security_auth_config_service).to receive(:findProfile).and_return(nil)
 
-        delete_with_api_header :destroy, auth_config_id: 'foo'
+        delete_with_api_header :destroy, params: { auth_config_id: 'foo' }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
@@ -448,7 +448,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         allow(@security_auth_config_service).to receive(:delete).with(anything, an_instance_of(SecurityAuthConfig), result) do |user, auth_config, result|
           result.setMessage(LocalizedMessage::string('RESOURCE_DELETE_SUCCESSFUL', 'auth_config', 'foo'))
         end
-        delete_with_api_header :destroy, auth_config_id: 'foo'
+        delete_with_api_header :destroy, params: { auth_config_id: 'foo' }
 
         expect(response).to have_api_message_response(200, "The auth_config 'foo' was deleted successfully.")
       end
@@ -460,7 +460,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         allow(@security_auth_config_service).to receive(:delete).with(anything, an_instance_of(SecurityAuthConfig), result) do |user, auth_config, result|
           result.unprocessableEntity(LocalizedMessage::string('SAVE_FAILED_WITH_REASON', 'Validation failed'))
         end
-        delete_with_api_header :destroy, auth_config_id: 'foo'
+        delete_with_api_header :destroy, params: { auth_config_id: 'foo' }
 
         expect(response).to have_api_message_response(422, 'Save failed. Validation failed')
       end
@@ -567,7 +567,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         verify_response = VerifyConnectionResponse.new('success', 'Connection check passed', nil)
 
         expect(@security_auth_config_service).to receive(:verify_connection).with(auth_config).and_return(verify_response)
-        post_with_api_header :verify_connection, {auth_config: auth_config_hash}
+        post_with_api_header :verify_connection, params: { auth_config: auth_config_hash }
 
         expect(response).to be_ok
         expect(actual_response).to eq({
@@ -581,7 +581,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         verify_response = VerifyConnectionResponse.new('failure', 'Connection check failed', nil)
 
         expect(@security_auth_config_service).to receive(:verify_connection).with(auth_config).and_return(verify_response)
-        post_with_api_header :verify_connection, {auth_config: auth_config_hash}
+        post_with_api_header :verify_connection, params: { auth_config: auth_config_hash }
 
         expect(response.code).to eq('422')
         expect(actual_response).to eq({

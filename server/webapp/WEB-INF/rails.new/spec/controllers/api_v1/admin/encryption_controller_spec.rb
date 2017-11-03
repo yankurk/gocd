@@ -74,7 +74,7 @@ describe ApiV1::Admin::EncryptionController do
   describe "encryption" do
     it 'should return the encrypted value of the plain text passed' do
       login_as_admin
-      post_with_api_header :encrypt_value, {value: 'foo'}
+      post_with_api_header :encrypt_value, params: { value: 'foo' }
 
       expect(response).to be_ok
       expected_response(GoCipher.new.encrypt('foo'), ApiV1::EncryptedValueRepresenter)

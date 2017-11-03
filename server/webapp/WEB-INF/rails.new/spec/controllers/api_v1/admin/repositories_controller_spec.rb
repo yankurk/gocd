@@ -98,7 +98,7 @@ describe ApiV1::Admin::RepositoriesController do
 
       it 'should render the package repository' do
         allow(@package_repository_service).to receive(:getPackageRepository).with(@repo_id).and_return(@package_repo)
-        get_with_api_header :show, repo_id: @repo_id
+        get_with_api_header :show, params: { repo_id: @repo_id }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@package_repo, ApiV1::Config::PackageRepositoryRepresenter))
       end
@@ -106,7 +106,7 @@ describe ApiV1::Admin::RepositoriesController do
       it 'should render 404 when a package repository does not exist' do
         allow(@package_repository_service).to receive(:getPackageRepository).and_return(nil)
 
-        get_with_api_header :show, repo_id: 'invalid-package-repo-id'
+        get_with_api_header :show, params: { repo_id: 'invalid-package-repo-id' }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -179,14 +179,14 @@ describe ApiV1::Admin::RepositoriesController do
           result.setMessage(LocalizedMessage.string("RESOURCE_DELETE_SUCCESSFUL", 'package repository', @package_repo.getId()))
         end
 
-        delete_with_api_header :destroy, repo_id: @repo_id
+        delete_with_api_header :destroy, params: { repo_id: @repo_id }
         expect(response).to have_api_message_response(200, "The package repository 'npm' was deleted successfully.")
       end
 
       it 'should render 404 when a package repository does not exist' do
         allow(@package_repository_service).to receive(:getPackageRepository).with(@repo_id).and_return(nil)
 
-        delete_with_api_header :destroy, repo_id: @repo_id
+        delete_with_api_header :destroy, params: { repo_id: @repo_id }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -255,7 +255,7 @@ describe ApiV1::Admin::RepositoriesController do
         expect(@package_repository_service).to receive(:createPackageRepository).with(an_instance_of(PackageRepository), an_instance_of(Username), an_instance_of(HttpLocalizedOperationResult))
         allow(@package_repository_service).to receive(:getPackageRepository).and_return(@package_repo)
 
-        post_with_api_header :create, :repository => {repo_id: @repo_id, name: @repo_id, plugin_metadata: {id: 'npm', version: '1'}, configuration: []}
+        post_with_api_header :create, params: { :repository => {repo_id: @repo_id, name: @repo_id, plugin_metadata: {id: 'npm', version: '1'}, configuration: []} }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@package_repo, ApiV1::Config::PackageRepositoryRepresenter))
       end
@@ -264,7 +264,7 @@ describe ApiV1::Admin::RepositoriesController do
         expect(@package_repository_service).to receive(:createPackageRepository).with(an_instance_of(PackageRepository), an_instance_of(Username), an_instance_of(HttpLocalizedOperationResult))
         allow(@package_repository_service).to receive(:getPackageRepository).and_return(@package_repo)
 
-        post_with_api_header :create, :repository => {name: @repo_id, plugin_metadata: {id: 'npm', version: '1'}, configuration: []}
+        post_with_api_header :create, params: { :repository => {name: @repo_id, plugin_metadata: {id: 'npm', version: '1'}, configuration: []} }
         expect(actual_response).to have_key(:repo_id)
       end
 
@@ -273,7 +273,7 @@ describe ApiV1::Admin::RepositoriesController do
           result.unprocessableEntity(LocalizedMessage.string("PLUGIN_ID_INVALID", 'invalid_id'));
         end
 
-        post_with_api_header :create, :repository => {name: @repo_id, type: 'invalid_id', configuration: []}
+        post_with_api_header :create, params: { :repository => {name: @repo_id, type: 'invalid_id', configuration: []} }
         expect(response).to have_api_message_response(422, 'Invalid plugin id')
       end
 
@@ -344,7 +344,7 @@ describe ApiV1::Admin::RepositoriesController do
         expect(@package_repository_service).to receive(:updatePackageRepository).with(an_instance_of(PackageRepository), anything, anything, result, anything)
         hash = {repo_id: @repo_id, name: @repo_id, plugin_metadata: {id: 'some-id', version: '1'}, configuration: []}
 
-        put_with_api_header :update, :repo_id => @repo_id, :repository => hash
+        put_with_api_header :update, params: { :repo_id => @repo_id, :repository => hash }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@package_repo, ApiV1::Config::PackageRepositoryRepresenter))
       end
@@ -356,7 +356,7 @@ describe ApiV1::Admin::RepositoriesController do
         allow(@entity_hashing_service).to receive(:md5ForEntity).and_return(@md5)
 
         hash = {repo_id: @repo_id, name: "foo", plugin_metadata: {id: 'npm', version: '1'}, configuration: [{key: 'REPO_URL', value: 'https://foo.bar'}]}
-        put_with_api_header :update, :repo_id => @repo_id, :repository => hash
+        put_with_api_header :update, params: { :repo_id => @repo_id, :repository => hash }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for Package Repository 'npm'. Please update your copy of the config with the changes.")
       end
@@ -366,7 +366,7 @@ describe ApiV1::Admin::RepositoriesController do
         allow(@entity_hashing_service).to receive(:md5ForEntity).and_return(@md5)
 
         hash = {repo_id: @repo_id, name: "foo", plugin_metadata: {id: 'npm', version: '1'}, configuration: [{key: 'REPO_URL', value: 'https://foo.bar'}]}
-        put_with_api_header :update, :repo_id => @repo_id, :repository => hash
+        put_with_api_header :update, params: { :repo_id => @repo_id, :repository => hash }
 
         expect(response).to have_api_message_response(412, "Someone has modified the configuration for Package Repository 'npm'. Please update your copy of the config with the changes.")
       end
@@ -376,7 +376,7 @@ describe ApiV1::Admin::RepositoriesController do
         allow(@package_repository_service).to receive(:getPackageRepository).with('non-existing-repo-id').and_return(nil)
         hash = {repo_id: 'non-existing-repo-id', name: "foo", plugin_metadata: {id: 'npm', version: '1'}, configuration: [{key: 'REPO_URL', value: 'https://foo.bar'}]}
 
-        put_with_api_header :update, :repo_id => 'non-existing-repo-id', :repository => hash
+        put_with_api_header :update, params: { :repo_id => 'non-existing-repo-id', :repository => hash }
 
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end

@@ -64,7 +64,7 @@ describe ApiV1::Admin::Internal::CommandSnippetsController do
 
         expect(@command_repository_service).to receive(:lookupCommand).with('rake').and_return([snippet])
 
-        get_with_api_header :index, prefix: 'rake'
+        get_with_api_header :index, params: { prefix: 'rake' }
 
         expect(response).to be_ok
         expect(actual_response).to eq(JSON.parse(snippet_hash.to_json).deep_symbolize_keys)

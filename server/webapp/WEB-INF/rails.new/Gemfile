@@ -29,6 +29,7 @@ group :development, :test do
   gem 'listen'
 
   gem 'rspec_junit_formatter'
+  gem 'rails-controller-testing'
 
   # to enable debugging, turn on debug flag:
   # -Djruby.debug.fullTrace=true

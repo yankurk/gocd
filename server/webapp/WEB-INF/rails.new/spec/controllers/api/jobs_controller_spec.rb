@@ -78,7 +78,7 @@ describe Api::JobsController do
     allow(@job_instance_service).to receive(:waitingJobPlans).and_return(waitingJobPlans)
     fake_template_presence 'api/jobs/scheduled', 'some data'
 
-    get :scheduled, :format => "xml", :no_layout => true
+    get :scheduled, params: { :format => "xml", :no_layout => true }
 
     context = XmlWriterContext.new("http://test.host/go", nil, nil, nil, nil)
     expect(assigns[:doc]).to eq(:dom)
@@ -93,7 +93,7 @@ describe Api::JobsController do
       expect(@job_instance_service).to receive(:getJobHistoryCount).and_return(10)
       expect(@job_instance_service).to receive(:findJobHistoryPage).with('pipeline', 'stage', 'job', anything, "loser", anything).and_return([create_job_model])
 
-      get :history, :pipeline_name => 'pipeline', :stage_name => 'stage', :job_name => 'job', :offset => '5', :no_layout => true
+      get :history, params: { :pipeline_name => 'pipeline', :stage_name => 'stage', :job_name => 'job', :offset => '5', :no_layout => true }
 
       expect(response.body).to eq(JobHistoryAPIModel.new(Pagination.pageStartingAt(5, 10, 10), [create_job_model]).to_json)
     end
@@ -106,7 +106,7 @@ describe Api::JobsController do
         result.notAcceptable("Not Acceptable", HealthStateType.general(HealthStateScope::GLOBAL))
       end
 
-      get :history, :pipeline_name => 'pipeline', :stage_name => 'stage', :job_name => 'job', :no_layout => true
+      get :history, params: { :pipeline_name => 'pipeline', :stage_name => 'stage', :job_name => 'job', :no_layout => true }
 
       expect(response.status).to eq(406)
       expect(response.body).to eq("Not Acceptable\n")

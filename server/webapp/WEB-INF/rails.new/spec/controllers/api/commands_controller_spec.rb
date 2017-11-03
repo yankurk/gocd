@@ -34,7 +34,7 @@ describe Api::CommandsController do
       it "should reload the cache" do
         expect(@command_repository_service).to receive(:reloadCache)
 
-        post :reload_cache, :no_layout => true
+        post :reload_cache, params: { :no_layout => true }
 
         expect(response.status).to eq(200)
         expect(response.code).to eq("200")

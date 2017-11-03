@@ -60,7 +60,7 @@ describe Api::PipelinesController do
       expect(@pipeline_history_service).to receive(:totalCount).and_return(10)
       expect(@pipeline_history_service).to receive(:loadMinimalData).with('up42', anything, loser, anything).and_return(create_pipeline_history_model)
 
-      get :history, :pipeline_name => 'up42', :offset => '5', :no_layout => true
+      get :history, params: { :pipeline_name => 'up42', :offset => '5', :no_layout => true }
 
       expect(response.body).to eq(PipelineHistoryAPIModel.new(Pagination.pageStartingAt(5, 10, 10), create_pipeline_history_model).to_json)
     end
@@ -75,7 +75,7 @@ describe Api::PipelinesController do
       expect(@pipeline_history_service).to receive(:totalCount).and_return(10)
       expect(@pipeline_history_service).to receive(:loadMinimalData).with('up42', anything, loser, @status)
 
-      get :history, :pipeline_name => 'up42', :no_layout => true
+      get :history, params: { :pipeline_name => 'up42', :no_layout => true }
 
       expect(response.status).to eq(406)
       expect(response.body).to eq("Not Acceptable\n")
@@ -123,7 +123,7 @@ describe Api::PipelinesController do
       expect(controller).to receive(:current_user).and_return(loser)
       expect(@pipeline_history_service).to receive(:findPipelineInstance).with('up42', 1, loser, anything).and_return(create_pipeline_model)
 
-      get :instance_by_counter, :pipeline_name => 'up42', :pipeline_counter => '1', :no_layout => true
+      get :instance_by_counter, params: { :pipeline_name => 'up42', :pipeline_counter => '1', :no_layout => true }
 
       expect(response.body).to eq(PipelineInstanceAPIModel.new(create_pipeline_model).to_json)
     end
@@ -135,7 +135,7 @@ describe Api::PipelinesController do
       loser = Username.new(CaseInsensitiveString.new("loser"))
       expect(controller).to receive(:current_user).and_return(loser)
       expect(@pipeline_history_service).to receive(:findPipelineInstance).with('up42', 1, loser, @status)
-      get :instance_by_counter, :pipeline_name => 'up42', :pipeline_counter => '1', :no_layout => true
+      get :instance_by_counter, params: { :pipeline_name => 'up42', :pipeline_counter => '1', :no_layout => true }
 
       expect(response.status).to eq(406)
       expect(response.body).to eq("Not Acceptable\n")
@@ -183,7 +183,7 @@ describe Api::PipelinesController do
       expect(controller).to receive(:current_user).and_return(loser)
       expect(@pipeline_history_service).to receive(:getPipelineStatus).with('up42', "loser", anything).and_return(create_pipeline_status_model)
 
-      get :status, :pipeline_name => 'up42', :no_layout => true
+      get :status, params: { :pipeline_name => 'up42', :no_layout => true }
 
       expect(response.body).to eq(PipelineStatusAPIModel.new(create_pipeline_status_model).to_json)
     end
@@ -196,7 +196,7 @@ describe Api::PipelinesController do
       expect(controller).to receive(:current_user).and_return(loser)
       expect(@pipeline_history_service).to receive(:getPipelineStatus).with('up42', "loser", @status)
 
-      get :status, :pipeline_name => 'up42', :no_layout => true
+      get :status, params: { :pipeline_name => 'up42', :no_layout => true }
 
       expect(response.status).to eq(406)
       expect(response.body).to eq("Not Acceptable\n")
@@ -387,7 +387,7 @@ describe Api::PipelinesController do
     it "should load pipeline by id" do
       pipeline = PipelineInstanceModel.createPipeline("pipeline", 1, "label", BuildCause.createWithEmptyModifications(), stage_history_for("blah-stage"))
       expect(@pipeline_history_service).to receive(:load).with(10, "user", anything).and_return(pipeline)
-      get :pipeline_instance, :id => '10', :name => "pipeline", :format => "xml", :no_layout => true
+      get :pipeline_instance, params: { :id => '10', :name => "pipeline", :format => "xml", :no_layout => true }
       context = XmlWriterContext.new("http://test.host/go", nil, nil, nil, nil)
       expect(assigns[:doc].asXML()).to eq(PipelineXmlViewModel.new(pipeline).toXml(context).asXML())
     end
@@ -397,7 +397,7 @@ describe Api::PipelinesController do
       expect(@status).to receive(:detailedMessage).and_return("Not Found")
       allow(@status).to receive(:httpCode).and_return(404)
       expect(@pipeline_history_service).to receive(:load).with(10, "user", anything).and_return(nil)
-      get :pipeline_instance, :id => '10', :name => "pipeline", :format => "xml", :no_layout => true
+      get :pipeline_instance, params: { :id => '10', :name => "pipeline", :format => "xml", :no_layout => true }
       expect(response.status).to eq(404)
     end
 
@@ -406,7 +406,7 @@ describe Api::PipelinesController do
       expect(@status).to receive(:detailedMessage).and_return("Unauthorized")
       allow(@status).to receive(:httpCode).and_return(401)
       expect(@pipeline_history_service).to receive(:load).with(10, "user", anything).and_return(nil)
-      get :pipeline_instance, :id => '10', :format => "xml", :name => "pipeline", :no_layout => true
+      get :pipeline_instance, params: { :id => '10', :format => "xml", :name => "pipeline", :no_layout => true }
       expect(response.status).to eq(401)
     end
 
@@ -448,7 +448,7 @@ describe Api::PipelinesController do
   describe "pipelines" do
     it "should assign pipeline_configs and latest instance of each pipeline configured" do
       expect(@pipeline_history_service).to receive(:latestInstancesForConfiguredPipelines).with("user").and_return(:pipeline_instance)
-      get :pipelines, :format => "xml", :no_layout => true
+      get :pipelines, params: { :format => "xml", :no_layout => true }
       expect(assigns[:pipelines]).to eq(:pipeline_instance)
     end
 
@@ -575,7 +575,7 @@ describe Api::PipelinesController do
       fake_template_presence 'api/pipelines/releaseLock.erb', 'dummy'
       expect(controller).to receive(:render_if_error).with("done", 406).and_return(true)
 
-      post :releaseLock, :pipeline_name => 'pipeline-name', :no_layout => true
+      post :releaseLock, params: { :pipeline_name => 'pipeline-name', :no_layout => true }
     end
 
     describe "route" do
@@ -625,7 +625,7 @@ describe Api::PipelinesController do
     it "should pause the pipeline" do
       expect(@pipeline_pause_service).to receive(:pause).with("foo.bar", "wait for next checkin", Username.new(CaseInsensitiveString.new("someuser"), "Some User"), an_instance_of(HttpLocalizedOperationResult))
       allow(@controller).to receive(:current_user).and_return(Username.new(CaseInsensitiveString.new("someuser"), "Some User"))
-      post :pause, {:pipeline_name => "foo.bar", :no_layout => true, :pauseCause => "wait for next checkin"}
+      post :pause, params: { :pipeline_name => "foo.bar", :no_layout => true, :pauseCause => "wait for next checkin" }
     end
 
     describe "route" do
@@ -675,7 +675,7 @@ describe Api::PipelinesController do
     it "should pause the pipeline" do
       expect(@pipeline_pause_service).to receive(:unpause).with("foo.bar", Username.new(CaseInsensitiveString.new("someuser"), "Some User"), an_instance_of(HttpLocalizedOperationResult))
       allow(@controller).to receive(:current_user).and_return(Username.new(CaseInsensitiveString.new("someuser"), "Some User"))
-      post :unpause, {:pipeline_name => "foo.bar", :no_layout => true}
+      post :unpause, params: { :pipeline_name => "foo.bar", :no_layout => true }
     end
 
     describe "route" do

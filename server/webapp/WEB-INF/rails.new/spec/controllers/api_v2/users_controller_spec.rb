@@ -88,7 +88,7 @@ describe ApiV2::UsersController do
       it 'should render the user' do
         login_as_admin
 
-        get_with_api_header :show, login_name: @john.name
+        get_with_api_header :show, params: { login_name: @john.name }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@john, ApiV2::UserRepresenter))
       end
@@ -98,7 +98,7 @@ describe ApiV2::UsersController do
 
         login_name = SecureRandom.hex
         allow(@user_service).to receive(:findUserByName).with(login_name).and_return(com.thoughtworks.go.domain.NullUser.new)
-        get_with_api_header :show, login_name: login_name
+        get_with_api_header :show, params: { login_name: login_name }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -168,7 +168,7 @@ describe ApiV2::UsersController do
           result.setMessage(LocalizedMessage.string("RESOURCE_DELETE_SUCCESSFUL", "user", username))
         end
 
-        delete_with_api_header :destroy, login_name: @john.name
+        delete_with_api_header :destroy, params: { login_name: @john.name }
         expect(response).to be_ok
         expect(response).to have_api_message_response(200, "The user 'jdoe' was deleted successfully.")
       end
@@ -178,7 +178,7 @@ describe ApiV2::UsersController do
 
         login_name = SecureRandom.hex
         allow(@user_service).to receive(:findUserByName).with(login_name).and_return(com.thoughtworks.go.domain.NullUser.new)
-        delete_with_api_header :destroy, login_name: login_name
+        delete_with_api_header :destroy, params: { login_name: login_name }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -248,7 +248,7 @@ describe ApiV2::UsersController do
           result.setMessage(LocalizedMessage.string("RESOURCE_DELETE_SUCCESSFUL", "users", users))
         end
 
-        delete_with_api_header :bulk_delete, users: [@john.name, @joanne.name]
+        delete_with_api_header :bulk_delete, params: { users: [@john.name, @joanne.name] }
 
         expect(response).to have_api_message_response(200, "The users '[\"jdoe\", \"jrowling\"]' was deleted successfully.")
       end
@@ -271,7 +271,7 @@ describe ApiV2::UsersController do
           bulkDeletionFailureResult
         end
 
-        delete_with_api_header :bulk_delete, users: [@john.name, @joanne.name]
+        delete_with_api_header :bulk_delete, params: { users: [@john.name, @joanne.name] }
 
         expect(response).to have_api_message_response(422, "Deletion failed because some users were either enabled or do not exist.")
       end
@@ -287,7 +287,7 @@ describe ApiV2::UsersController do
           BulkDeletionFailureResult.new()
         end
 
-        delete_with_api_header :bulk_delete, users: []
+        delete_with_api_header :bulk_delete, params: { users: [] }
 
         expect(response).to have_api_message_response(400, "No users selected.")
       end
@@ -344,7 +344,7 @@ describe ApiV2::UsersController do
         login_as_admin
         expect(@user_service).to receive(:save).with(@john, TriState.TRUE, TriState.FALSE, 'foo@example.com', 'foo, bar', an_instance_of(HttpLocalizedOperationResult)).and_return(@john)
 
-        patch_with_api_header :update, login_name: @john.name, enabled: true, email_me: false, email: 'foo@example.com', checkin_aliases: 'foo, bar'
+        patch_with_api_header :update, params: { login_name: @john.name, enabled: true, email_me: false, email: 'foo@example.com', checkin_aliases: 'foo, bar' }
         expect(response).to be_ok
         expect(actual_response).to eq(expected_response(@john, ApiV2::UserRepresenter))
       end
@@ -354,7 +354,7 @@ describe ApiV2::UsersController do
 
         login_name = SecureRandom.hex
         allow(@user_service).to receive(:findUserByName).with(login_name).and_return(com.thoughtworks.go.domain.NullUser.new)
-        patch_with_api_header :update, login_name: login_name
+        patch_with_api_header :update, params: { login_name: login_name }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
     end
@@ -424,7 +424,7 @@ describe ApiV2::UsersController do
 
         expect(@user_service).to receive(:save).with(@john, TriState.TRUE, TriState.FALSE, 'foo@example.com', 'foo, bar', an_instance_of(HttpLocalizedOperationResult)).and_return(@john)
 
-        post_with_api_header :create, login_name: @john.name, enabled: true, email_me: false, email: 'foo@example.com', checkin_aliases: 'foo, bar'
+        post_with_api_header :create, params: { login_name: @john.name, enabled: true, email_me: false, email: 'foo@example.com', checkin_aliases: 'foo, bar' }
         expect(response.status).to be(201)
         expect(actual_response).to eq(expected_response(@john, ApiV2::UserRepresenter))
       end
@@ -435,7 +435,7 @@ describe ApiV2::UsersController do
         login_name = SecureRandom.hex
         expect(@user_service).to receive(:withEnableUserMutex).and_yield
         allow(@user_service).to receive(:findUserByName).with(login_name).and_return(User.new(login_name))
-        post_with_api_header :create, login_name: login_name
+        post_with_api_header :create, params: { login_name: login_name }
         expect(response).to have_api_message_response(409, "The user `#{login_name}` already exists.")
       end
     end

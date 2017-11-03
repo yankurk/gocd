@@ -54,7 +54,7 @@ describe Admin::Plugins::PluginsController do
       expect(@plugin_response).to receive(:success).and_return("successfully uploaded!")
       file = Rack::Test::UploadedFile.new(__FILE__, "image/jpeg")
 
-      post :upload, :plugin => file
+      post :upload, params: { :plugin => file }
 
       expect(flash[:notice]).to eq("successfully uploaded!")
     end
@@ -66,7 +66,7 @@ describe Admin::Plugins::PluginsController do
       expect(@plugin_response).to receive(:errors).and_return({415 => "invalid file"})
       file = Rack::Test::UploadedFile.new(__FILE__, "image/jpeg")
 
-      post :upload, :plugin => file
+      post :upload, params: { :plugin => file }
 
       expect(flash[:error]).to eq("invalid file")
     end
@@ -74,7 +74,7 @@ describe Admin::Plugins::PluginsController do
     it "should show error message when no file is selected" do
       expect(@plugin_manager).not_to receive(:addPlugin)
 
-      post :upload, :plugin => nil
+      post :upload, params: { :plugin => nil }
 
       expect(flash[:error]).to eq("Please select a file to upload.")
     end
@@ -86,7 +86,7 @@ describe Admin::Plugins::PluginsController do
       expect(@plugin_response).to receive(:success).and_return("successfully uploaded!")
       file = Rack::Test::UploadedFile.new(__FILE__, "image/jpeg")
 
-      post :upload, :plugin => file
+      post :upload, params: { :plugin => file }
 
       expect(response).to redirect_to "/admin/plugins"
     end
@@ -94,7 +94,7 @@ describe Admin::Plugins::PluginsController do
     it "should refuse to upload when feature is turned off" do
       expect(@system_environment).to receive(:isPluginUploadEnabled).and_return(false)
 
-      post :upload, :plugin => nil
+      post :upload, params: { :plugin => nil }
 
       expect(response.status).to eq(403)
       expect(response.body).to eq("Feature is not enabled")
@@ -173,7 +173,7 @@ describe Admin::Plugins::PluginsController do
     end
 
     it "should render settings template with required data" do
-      get :edit_settings, :plugin_id => 'plugin.id'
+      get :edit_settings, params: { :plugin_id => 'plugin.id' }
 
       expect(assigns[:meta_data_store]).to eq(PluginSettingsMetadataStore.getInstance())
       expect(assigns[:plugin_settings]).to eq(@plugin_settings)
@@ -191,7 +191,7 @@ describe Admin::Plugins::PluginsController do
     it "should render settings template with required data on error" do
       expect(@plugin_settings).to receive(:hasErrors).and_return(true)
 
-      post :update_settings, :plugin_id => 'plugin.id'
+      post :update_settings, params: { :plugin_id => 'plugin.id' }
 
       expect(assigns[:meta_data_store]).to eq(PluginSettingsMetadataStore.getInstance())
       expect(assigns[:plugin_settings]).to eq(@plugin_settings)
@@ -203,7 +203,7 @@ describe Admin::Plugins::PluginsController do
       expect(@plugin_settings).to receive(:hasErrors).and_return(false)
       expect(@plugin_service).to receive(:savePluginSettingsFor).with(@plugin_settings)
 
-      post :update_settings, :plugin_id => 'plugin.id'
+      post :update_settings, params: { :plugin_id => 'plugin.id' }
 
       expect(response.body).to eq('Saved successfully')
       expect(URI.parse(response.location).path).to eq(plugins_listing_path)
