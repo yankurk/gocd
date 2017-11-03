@@ -45,28 +45,28 @@ describe ApiV1::Admin::PluginSettingsController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:get, :show, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:get, :show, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow group admin users, with security enabled' do
         enable_security
         login_as_group_admin
 
-        expect(controller).to disallow_action(:get, :show, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow template users, with security enabled' do
         enable_security
         login_as_template_admin
 
-        expect(controller).to disallow_action(:get, :show, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do
@@ -240,28 +240,28 @@ describe ApiV1::Admin::PluginSettingsController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:put, :update, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:put, :update, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow group admin users, with security enabled' do
         enable_security
         login_as_group_admin
 
-        expect(controller).to disallow_action(:put, :update, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow template users, with security enabled' do
         enable_security
         login_as_template_admin
 
-        expect(controller).to disallow_action(:put, :update, plugin_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { plugin_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do

@@ -32,14 +32,14 @@ describe Api::MaterialsController do
       expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
         result.unauthorized(LocalizedMessage.string('API_ACCESS_UNAUTHORIZED'), HealthStateType.unauthorised())
       end
-      post :notify, params: { @params }
+      post :notify, params: params
       expect(response.status).to eq(401)
       expect(response.body).to eq("Unauthorized to access this API.\n")
     end
 
     it "should return 200 when notify is successful" do
       expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)).and_return(nil)
-      post :notify, params: { @params }
+      post :notify, params: params
       expect(response.status).to eq(200)
     end
 
@@ -47,7 +47,7 @@ describe Api::MaterialsController do
       expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
         result.badRequest(LocalizedMessage.string('API_BAD_REQUEST'))
       end
-      post :notify, params: { @params }
+      post :notify, params: params
       expect(response.status).to eq(400)
       expect(response.body).to eq("The request could not be understood by Go Server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.\n")
     end

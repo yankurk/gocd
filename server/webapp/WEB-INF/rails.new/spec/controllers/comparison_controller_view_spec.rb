@@ -185,7 +185,7 @@ describe ComparisonController, "view" do
         result.notFound(LocalizedMessage.string("RESOURCE_NOT_FOUND", 'pipleine', ['some_pipeline']), HealthStateType.general(HealthStateScope.forPipeline('foo')))
       end
 
-      get :show, params: { :pipeline_name => "some_pipeline", :from_counter => "10", :to_counter => '17', :no_layout => true #Using No layout here so that we can assert on that message. }
+      get :show, params: { :pipeline_name => "some_pipeline", :from_counter => "10", :to_counter => '17', :no_layout => true }#Using No layout here so that we can assert on that message.
 
       expect(response.body).to eq("pipleine '[\"some_pipeline\"]' not found.\n")
     end

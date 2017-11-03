@@ -35,7 +35,7 @@ describe ApiV1::StagesController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:get, :show, pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1').with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1' }).with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
 
       it 'should allow normal users who have access to pipeline, with security enabled' do
@@ -161,7 +161,7 @@ describe ApiV1::StagesController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:get, :history, pipeline_name: 'pipeline', stage_name: 'stage').with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :history, params: { pipeline_name: 'pipeline', stage_name: 'stage' }).with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
 
       it 'should allow normal users who have access to pipeline, with security enabled' do

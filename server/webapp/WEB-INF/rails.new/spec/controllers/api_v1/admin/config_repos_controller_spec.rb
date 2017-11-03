@@ -70,12 +70,12 @@ describe ApiV1::Admin::ConfigReposController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:get, :show, id: @config_repo_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { id: @config_repo_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:get, :show, id: @config_repo_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { id: @config_repo_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do
@@ -203,12 +203,12 @@ describe ApiV1::Admin::ConfigReposController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:delete, :destroy, id: @config_repo_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { id: @config_repo_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:delete, :destroy, id: @config_repo_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { id: @config_repo_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do
@@ -370,12 +370,12 @@ describe ApiV1::Admin::ConfigReposController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:put, :update, id: @config_repo_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { id: @config_repo_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:put, :update, id: @config_repo_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { id: @config_repo_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do

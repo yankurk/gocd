@@ -114,14 +114,14 @@ describe ApiV1::Elastic::ProfilesController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:get, :show, profile_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { profile_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:get, :show, profile_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { profile_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do
@@ -298,14 +298,14 @@ describe ApiV1::Elastic::ProfilesController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:put, :update, profile_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { profile_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:put, :update, profile_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { profile_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do
@@ -411,14 +411,14 @@ describe ApiV1::Elastic::ProfilesController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:delete, :destroy, profile_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { profile_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:delete, :destroy, profile_id: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { profile_id: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do

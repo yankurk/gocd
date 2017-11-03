@@ -259,9 +259,9 @@ describe EnvironmentsController do
         result.badRequest(LocalizedMessage.string("ENV_UPDATE_FAILED", @environment_name))
       end
 
-      put :update, params: { :no_layout => true, }
+      put :update, params: { :no_layout => true,
           :environment => {'agents' => [{'uuid' => "uuid-1"}], 'name' => 'foo_env', 'pipelines' => [{'name' => 'bar'}], 'variables' => [{'name' => "var_name", 'value' => "var_value"}]},
-          :name => @environment_name, :cruise_config_md5 => md5
+          :name => @environment_name, :cruise_config_md5 => md5 }
 
       expect(response.status).to eq(400)
       expect(response.body).to match(/Failed to update environment 'foo-environment'/)
@@ -286,9 +286,9 @@ describe EnvironmentsController do
         result.unprocessableEntity(LocalizedMessage.string("ENV_UPDATE_FAILED", @environment_name))
       end
 
-      put :update, params: { :no_layout => true, }
+      put :update, params: { :no_layout => true,
           :environment => {'agents' => [{'uuid' => "uuid-1"}], 'name' => 'foo_env', 'pipelines' => [{'name' => 'bar'}], 'variables' => [{'name' => "var_name", 'value' => "var_value"}]},
-          :name => @environment_name, :cruise_config_md5 => md5
+          :name => @environment_name, :cruise_config_md5 => md5 }
 
       expect(response.status).to eq(422)
       expect(response.body).to match(/Failed to update environment 'foo-environment'/)
@@ -304,9 +304,9 @@ describe EnvironmentsController do
         result.setMessage(LocalizedMessage.string("UPDATE_ENVIRONMENT_SUCCESS",["foo_env"].to_java(java.lang.String)))
       end
 
-      put :update, params: { :no_layout => true, }
+      put :update, params: { :no_layout => true,
           :environment => {'agents' => [{'uuid' => "uuid-1"}], 'name' => 'foo_env', 'pipelines' => [{'name' => 'bar'}], 'variables' => [{'name' => "var_name", 'value' => "var_value"}]},
-          :name => @environment_name, :cruise_config_md5 => md5
+          :name => @environment_name, :cruise_config_md5 => md5 }
 
       expect(response).to be_success
       expect(response.location).to match(/^\/environments\/foo_env\/show\?.*?fm=/)
@@ -339,9 +339,9 @@ describe EnvironmentsController do
       end
 
 
-      put :update, params: { :no_layout => true, }
+      put :update, params: { :no_layout => true,
           :environment => {'agents' => [{'uuid' => "uuid-1"}], 'name' => 'foo_env', 'pipelines' => [{'name' => 'bar'}], 'variables' => [{'name' => "var_name", 'value' => "var_value"}]},
-          :name => "foo_env", :cruise_config_md5 => 'md5'
+          :name => "foo_env", :cruise_config_md5 => 'md5' }
 
       expect(response).to be_success
       expect(response.location).to match(/^\/environments\/foo_env\/show\?.*?fm=/)

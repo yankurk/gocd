@@ -35,7 +35,7 @@ describe ApiV2::Admin::PluginInfosController do
       it 'should disallow non-admin user, with security enabled' do
         enable_security
         login_as_user
-        expect(controller).to disallow_action(:get, :show, {:id => 'plugin_id'}).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { :id => 'plugin_id' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do

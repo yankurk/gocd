@@ -236,9 +236,20 @@ describe Admin::PipelinesController do
           @pipeline.addParam(ParamConfig.new("to-be-deleted", "original-deleted-value"))
           @pipeline.addParam(ParamConfig.new("to-be-modified", "original-value"))
 
-          put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'parameters', :config_md5 => "md5", :stage_parent=>"pipelines", :default_as_empty_list => ["pipeline>params"], }
-              :pipeline => {:params => [{:name => "to-be-modified", :valueForDisplay => "modified-value"},
-                                        {:name => "added", :valueForDisplay => "added-value"}]}
+          put :update, params: {
+            pipeline_name: "pipeline-name",
+            current_tab: 'parameters',
+            config_md5: "md5",
+            stage_parent: "pipelines",
+            default_as_empty_list: ["pipeline>params"],
+            pipeline: {
+              params: [
+                {name: "to-be-modified", valueForDisplay: "modified-value"},
+                {name: "added", valueForDisplay: "added-value"}
+              ]
+            }
+          }
+
           expect(assigns[:pause_info]).to eq(@pause_info)
           params = assigns[:pipeline].getParams()
           expect(params.size()).to eq(3)
@@ -268,8 +279,8 @@ describe Admin::PipelinesController do
           @pipeline.addParam(ParamConfig.new("to-be-deleted", "original-deleted-value"))
           @pipeline.addParam(ParamConfig.new("to-be-modified", "original-value"))
 
-          put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'parameters', :config_md5 => "md5", :stage_parent=>"pipelines", :default_as_empty_list => ["pipeline>params"], :pipeline => {:params => [{:name => "renamed", :valueForDisplay => "renamed-value", :original_name => "to-be-deleted"}, }
-                                                                                                                                                                                                                   {:name => "to-be-modified", :valueForDisplay => "modified-value"}]}
+          put :update, params: { :pipeline_name => "pipeline-name", :current_tab => 'parameters', :config_md5 => "md5", :stage_parent=>"pipelines", :default_as_empty_list => ["pipeline>params"], :pipeline => {:params => [{:name => "renamed", :valueForDisplay => "renamed-value", :original_name => "to-be-deleted"},
+                                                                                                                                                                                                                   {:name => "to-be-modified", :valueForDisplay => "modified-value"}]}}
           params = assigns[:pipeline].getParams()
           expect(params.size()).to eq(2)
 

@@ -65,7 +65,7 @@ describe ApiV5::Admin::PipelinesController do
         enable_security
         login_as_pipeline_group_Non_Admin_user
         allow(@security_service).to receive(:hasViewPermissionForPipeline).and_return(false)
-        expect(controller).to disallow_action(:get, :show, {:pipeline_name => "pipeline1"}).with(401, "You are not authorized to perform this action.")
+        expect(controller).to disallow_action(:get, :show, params: { :pipeline_name => "pipeline1" }).with(401, "You are not authorized to perform this action.")
       end
 
       it 'should allow admin users, with security enabled' do
@@ -86,7 +86,7 @@ describe ApiV5::Admin::PipelinesController do
       it 'should disallow non-admin user, with security enabled' do
         enable_security
         login_as_pipeline_group_Non_Admin_user
-        expect(controller).to disallow_action(:put, :update, {:pipeline_name => "pipeline1"}).with(401, "You are not authorized to perform this action.")
+        expect(controller).to disallow_action(:put, :update, params: { :pipeline_name => "pipeline1" }).with(401, "You are not authorized to perform this action.")
       end
 
       it 'should allow admin users, with security enabled' do
@@ -111,7 +111,7 @@ describe ApiV5::Admin::PipelinesController do
       it 'should disallow non-admin user, with security enabled' do
         enable_security
         login_as_pipeline_group_Non_Admin_user
-        expect(controller).to disallow_action(:post, :create, :pipeline => {:name => "pipeline1"}, :group => @group).with(401, "You are not authorized to perform this action.")
+        expect(controller).to disallow_action(:post, :create, params: { :pipeline => {:name => "pipeline1"}, :group => @group }).with(401, "You are not authorized to perform this action.")
       end
 
       it 'should allow admin users, with security enabled' do
@@ -133,13 +133,13 @@ describe ApiV5::Admin::PipelinesController do
         enable_security
         login_as_anonymous
         allow(@security_service).to receive(:isUserAdminOfGroup).and_return(false)
-        expect(controller).to disallow_action(:delete, :destroy, :pipeline_name => "pipeline1").with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { :pipeline_name => "pipeline1" }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         login_as_user
         allow(@security_service).to receive(:isUserAdminOfGroup).and_return(false)
-        expect(controller).to disallow_action(:delete, :destroy, :pipeline_name => "pipeline1").with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { :pipeline_name => "pipeline1" }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do

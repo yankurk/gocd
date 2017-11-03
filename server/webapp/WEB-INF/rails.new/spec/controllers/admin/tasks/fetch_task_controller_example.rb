@@ -45,8 +45,8 @@ shared_examples_for :fetch_task_controller do
 
     it "should load auto-suggest(off updated config) data when updating fetch task" do
       stub_save_for_success
-      put :update, params: { :current_tab=>"tasks", :pipeline_name => @pipeline_name, :stage_name => @stage_name, :job_name => @job_name, :config_md5 => "abcd1234", :type => fetch_task_with_exec_on_cancel_task.getTaskType(), :stage_parent => @parent_type, :task_index => '0', }
-          :task => @modify_payload
+      put :update, params: { :current_tab=>"tasks", :pipeline_name => @pipeline_name, :stage_name => @stage_name, :job_name => @job_name, :config_md5 => "abcd1234", :type => fetch_task_with_exec_on_cancel_task.getTaskType(), :stage_parent => @parent_type, :task_index => '0',
+          :task => @modify_payload }
 
       expect(assigns[:task]).to eq(fetch_task_with_exec_on_cancel_task("parent-pipeline", "parent-stage", "job.parent.1", "src-file", "dest-dir"))
       expect(assigns[:pipeline_json]).to eq(pipelines_json)

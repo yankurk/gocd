@@ -134,12 +134,12 @@ describe ApiV1::Admin::PackagesController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:get, :show, package_id: @package_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { package_id: @package_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:get, :show, package_id: @package_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { package_id: @package_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do
@@ -211,12 +211,12 @@ describe ApiV1::Admin::PackagesController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:delete, :destroy, package_id: @package_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { package_id: @package_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:delete, :destroy, package_id: @package_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { package_id: @package_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do
@@ -429,12 +429,12 @@ describe ApiV1::Admin::PackagesController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:put, :update, package_id: @package_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { package_id: @package_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:put, :update, package_id: @package_id).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { package_id: @package_id }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin users, with security enabled' do

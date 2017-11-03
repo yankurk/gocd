@@ -208,8 +208,8 @@ describe Admin::JobsController do
       it "should update job name and redirect to the new job" do
         stub_save_for_success
 
-        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1", }
-                    :current_tab => "settings",:config_md5 => "1234abcd", "job"=>{"name" => "renamed_job"}, :stage_parent => "pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1",
+                    :current_tab => "settings",:config_md5 => "1234abcd", "job"=>{"name" => "renamed_job"}, :stage_parent => "pipelines" }
 
         expect(response.location).to match(/admin\/pipelines\/pipeline-name\/stages\/stage-name\/job\/renamed_job\/settings?.*?fm=(.+)/)
         assert_update_command ::ConfigUpdate::JobNode, ::ConfigUpdate::NodeAsSubject, ::ConfigUpdate::RefsAsUpdatedRefs
@@ -221,8 +221,8 @@ describe Admin::JobsController do
         end
         expect(@pipeline_pause_service).to receive(:pipelinePauseInfo).with("pipeline-name").and_return(@pause_info)
 
-        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1", }
-            :current_tab => "settings", :config_md5 => "1234abcd", "job"=>{"name" => "doesnt_matter"}, :stage_parent => "pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1",
+            :current_tab => "settings", :config_md5 => "1234abcd", "job"=>{"name" => "doesnt_matter"}, :stage_parent => "pipelines" }
 
         expect(response.location).to be_nil
         assert_template "settings"
@@ -237,8 +237,8 @@ describe Admin::JobsController do
         expect(@pipeline_pause_service).to receive(:pipelinePauseInfo).with("pipeline-name").and_return(@pause_info)
         add_resource("job-2","anything")
 
-        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1", }
-                    :current_tab => "settings",:config_md5 => "1234abcd", "job"=>{"name" => "doesnt_matter"}, :stage_parent => "pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1",
+                    :current_tab => "settings",:config_md5 => "1234abcd", "job"=>{"name" => "doesnt_matter"}, :stage_parent => "pipelines" }
 
         expect(response.location).to be_nil
         expect(assigns[:autocomplete_resources]).to eq(["anything"].to_json)
@@ -251,8 +251,8 @@ describe Admin::JobsController do
         expect(@pipeline_pause_service).to receive(:pipelinePauseInfo).with("pipeline-name").and_return(@pause_info)
         add_resource("job-2","anything")
 
-        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1", }
-                    :current_tab => "settings",:config_md5 => "1234abcd", "job"=>{"name" => "doesnt_matter"}, :stage_parent => "pipelines"
+        put :update, params: { :pipeline_name => "pipeline-name", :stage_name => "stage-name", :job_name => "job-1",
+                    :current_tab => "settings",:config_md5 => "1234abcd", "job"=>{"name" => "doesnt_matter"}, :stage_parent => "pipelines" }
 
         expect(controller.instance_variable_get("@cruise_config").getMd5()).to eq("1234abcd")
         expect(@go_config_service).not_to receive(:loadForEdit)

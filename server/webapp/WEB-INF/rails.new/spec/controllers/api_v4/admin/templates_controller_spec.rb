@@ -123,14 +123,14 @@ describe ApiV4::Admin::TemplatesController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:get, :show, template_name: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { template_name: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:get, :show, template_name: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { template_name: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do
@@ -321,14 +321,14 @@ describe ApiV4::Admin::TemplatesController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:put, :update, template_name: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { template_name: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:put, :update, template_name: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:put, :update, params: { template_name: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do
@@ -463,14 +463,14 @@ describe ApiV4::Admin::TemplatesController do
         enable_security
         login_as_anonymous
 
-        expect(controller).to disallow_action(:delete, :destroy, template_name: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { template_name: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should disallow normal users, with security enabled' do
         enable_security
         login_as_user
 
-        expect(controller).to disallow_action(:delete, :destroy, template_name: 'foo').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { template_name: 'foo' }).with(401, 'You are not authorized to perform this action.')
       end
 
       it 'should allow admin, with security enabled' do

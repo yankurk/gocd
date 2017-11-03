@@ -107,7 +107,7 @@ describe ApiV4::AgentsController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:get, :show, uuid: @agent.getUuid()).with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
+        expect(controller).to disallow_action(:get, :show, params: { uuid: @agent.getUuid() }).with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
 
       it 'should allow normal users, with security enabled' do
@@ -181,12 +181,12 @@ describe ApiV4::AgentsController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:delete, :destroy, uuid: @agent.getUuid()).with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { uuid: @agent.getUuid() }).with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
 
       it 'should not allow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:delete, :destroy, uuid: @agent.getUuid()).with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:delete, :destroy, params: { uuid: @agent.getUuid() }).with(401, 'You are not authorized to perform this action.')
       end
     end
 
@@ -262,12 +262,12 @@ describe ApiV4::AgentsController do
       it 'should disallow anonymous users, with security enabled' do
         enable_security
         login_as_anonymous
-        expect(controller).to disallow_action(:patch, :update, uuid: @agent.getUuid(), hostname: 'some-hostname').with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
+        expect(controller).to disallow_action(:patch, :update, params: { uuid: @agent.getUuid(), hostname: 'some-hostname' }).with(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
 
       it 'should not allow normal users, with security enabled' do
         login_as_user
-        expect(controller).to disallow_action(:patch, :update, uuid: @agent.getUuid(), hostname: 'some-hostname').with(401, 'You are not authorized to perform this action.')
+        expect(controller).to disallow_action(:patch, :update, params: { uuid: @agent.getUuid(), hostname: 'some-hostname' }).with(401, 'You are not authorized to perform this action.')
       end
     end
 
