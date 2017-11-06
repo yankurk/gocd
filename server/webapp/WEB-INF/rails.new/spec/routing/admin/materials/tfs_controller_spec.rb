@@ -15,12 +15,12 @@
 ##########################GO-LICENSE-END##################################
 
 require 'rails_helper'
-require_relative 'material_controller_examples'
+require_relative 'material_controller_routes_examples'
 
 describe Admin::Materials::TfsController do
   before do
     @short_material_type = 'dependency'
   end
 
-  it_should_behave_like :material_controller
+  it_should_behave_like :material_controller_routes
 end
