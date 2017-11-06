@@ -227,37 +227,6 @@ describe ApiV4::Admin::PipelinesController do
         expect(response).to be_ok
         expect(response.body).to_not be_empty
       end
-
-      describe "route" do
-        describe "with_header" do
-          it 'should route to show action of pipelines controller for alphanumeric pipeline name' do
-            expect(:get => 'api/admin/pipelines/foo123').to route_to(action: 'show', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo123')
-          end
-
-          it 'should route to show action of pipelines controller for pipeline name with dots' do
-            expect(:get => 'api/admin/pipelines/foo.123').to route_to(action: 'show', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo.123')
-          end
-
-          it 'should route to show action of pipelines controller for pipeline name with hyphen' do
-            expect(:get => 'api/admin/pipelines/foo-123').to route_to(action: 'show', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo-123')
-          end
-
-          it 'should route to show action of pipelines controller for pipeline name with underscore' do
-            expect(:get => 'api/admin/pipelines/foo_123').to route_to(action: 'show', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo_123')
-          end
-
-          it 'should route to show action of pipelines controller for capitalized pipeline name' do
-            expect(:get => 'api/admin/pipelines/FOO').to route_to(action: 'show', controller: 'api_v4/admin/pipelines', pipeline_name: 'FOO')
-          end
-        end
-        describe "without_header" do
-
-          it 'should not route to show action of pipelines controller without header' do
-            expect(:get => 'api/admin/pipelines/foo').to_not route_to(action: 'show', controller: 'api_v4/admin/pipelines')
-            expect(:get => 'api/admin/pipelines/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/pipelines/foo')
-          end
-        end
-      end
     end
 
     describe "update" do
@@ -385,38 +354,6 @@ describe ApiV4::Admin::PipelinesController do
         put_with_api_header :update, params: { pipeline_name: @pipeline_name, :pipeline => pipeline_with_pluggable_material("pipeline1", "plugin", "scm-id") }
         expect(response).to be_ok
         expect(pipeline_being_saved.materialConfigs().first().getSCMConfig()).to eq(@scm)
-      end
-
-      describe "route" do
-        describe "with_header" do
-          it 'should route to update action of pipelines controller for alphanumeric pipeline name' do
-            expect(:put => 'api/admin/pipelines/foo123').to route_to(action: 'update', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo123')
-          end
-
-          it 'should route to update action of pipelines controller for pipeline name with dots' do
-            expect(:put => 'api/admin/pipelines/foo.123').to route_to(action: 'update', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo.123')
-          end
-
-          it 'should route to update action of pipelines controller for pipeline name with hyphen' do
-            expect(:put => 'api/admin/pipelines/foo-123').to route_to(action: 'update', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo-123')
-          end
-
-          it 'should route to update action of pipelines controller for pipeline name with underscore' do
-            expect(:put => 'api/admin/pipelines/foo_123').to route_to(action: 'update', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo_123')
-          end
-
-          it 'should route to update action of pipelines controller for capitalized pipeline name' do
-            expect(:put => 'api/admin/pipelines/FOO').to route_to(action: 'update', controller: 'api_v4/admin/pipelines', pipeline_name: 'FOO')
-          end
-        end
-        describe "without_header" do
-
-
-          it 'should not route to update action of pipelines controller without header' do
-            expect(:put => 'api/admin/pipelines/foo').to_not route_to(action: 'update', controller: 'api_v4/admin/pipelines')
-            expect(:put => 'api/admin/pipelines/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/pipelines/foo')
-          end
-        end
       end
     end
 
@@ -567,23 +504,6 @@ describe ApiV4::Admin::PipelinesController do
         expect(response).to be_ok
         expect(pipeline_being_saved.materialConfigs().first().getSCMConfig()).to eq(@scm)
       end
-
-      describe "route" do
-        describe "with_header" do
-
-          it 'should route to create action of pipelines controller' do
-            expect(:post => 'api/admin/pipelines/').to route_to(action: 'create', controller: 'api_v4/admin/pipelines')
-          end
-        end
-        describe "without_header" do
-
-
-          it 'should not route to create action of pipelines controller without header' do
-            expect(:post => 'api/admin/pipelines').to_not route_to(action: 'create', controller: 'api_v4/admin/pipelines')
-            expect(:post => 'api/admin/pipelines').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/pipelines')
-          end
-        end
-      end
     end
 
     describe "destroy" do
@@ -625,38 +545,6 @@ describe ApiV4::Admin::PipelinesController do
 
         expect(response.code).to eq("422")
         expect(actual_response).to eq({:message => "Can not operate on pipeline 'pipeline1' as it is defined remotely in 'https://github.com/config-repos/repo at revision1'."})
-      end
-
-      describe "route" do
-        describe "with_header" do
-
-          it 'should route to destroy action of pipelines controller for alphanumeric pipeline name' do
-            expect(:delete => 'api/admin/pipelines/foo123').to route_to(action: 'destroy', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo123')
-          end
-
-          it 'should route to destroy action of pipelines controller for pipeline name with dots' do
-            expect(:delete => 'api/admin/pipelines/foo.123').to route_to(action: 'destroy', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo.123')
-          end
-
-          it 'should route to destroy action of pipelines controller for pipeline name with hyphen' do
-            expect(:delete => 'api/admin/pipelines/foo-123').to route_to(action: 'destroy', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo-123')
-          end
-
-          it 'should route to destroy action of pipelines controller for pipeline name with underscore' do
-            expect(:delete => 'api/admin/pipelines/foo_123').to route_to(action: 'destroy', controller: 'api_v4/admin/pipelines', pipeline_name: 'foo_123')
-          end
-
-          it 'should route to destroy action of pipelines controller for capitalized pipeline name' do
-            expect(:delete => 'api/admin/pipelines/FOO').to route_to(action: 'destroy', controller: 'api_v4/admin/pipelines', pipeline_name: 'FOO')
-          end
-        end
-        describe "without_header" do
-
-          it 'should not route to destroy action of pipelines controller without header' do
-            expect(:delete => 'api/admin/pipelines/foo').to_not route_to(action: 'destroy', controller: 'api_v4/admin/pipelines')
-            expect(:delete => 'api/admin/pipelines/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/pipelines/foo')
-          end
-        end
       end
     end
 

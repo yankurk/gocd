@@ -72,21 +72,6 @@ describe ApiV4::AgentsController do
         expect(actual_response).to eq(expected_response_with_args(zero_agents, ApiV4::AgentsRepresenter, @security_service, @current_user))
       end
     end
-
-    describe "route" do
-      describe "with_header" do
-
-        it 'should route to index action of the agents controller' do
-          expect(:get => 'api/agents').to route_to(action: 'index', controller: 'api_v4/agents')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to index action of the agents controller without header' do
-          expect(:get => 'api/agents').to_not route_to(action: 'index', controller: 'api_v4/agents')
-          expect(:get => 'api/agents').to route_to(controller: 'application', action: 'unresolved', url: 'api/agents')
-        end
-      end
-    end
   end
 
   describe "show" do
@@ -133,29 +118,6 @@ describe ApiV4::AgentsController do
 
         get_with_api_header :show, params: { uuid: null_agent.getUuid() }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-
-        it 'should route to show action of the agents controller for uuid with hyphen' do
-          expect(:get => 'api/agents/uuid-123').to route_to(action: 'show', controller: 'api_v4/agents', uuid: 'uuid-123')
-        end
-
-        it 'should route to show action of the agents controller for uuid with underscore' do
-          expect(:get => 'api/agents/uuid_123').to route_to(action: 'show', controller: 'api_v4/agents', uuid: 'uuid_123')
-        end
-
-        it 'should route to show action of the agents controller for uuid with dots' do
-          expect(:get => 'api/agents/uuid.123').to route_to(action: 'show', controller: 'api_v4/agents', uuid: 'uuid.123')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to show action of the agents controller without header' do
-          expect(:get => 'api/agents/uuid').to_not route_to(action: 'show', controller: 'api_v4/agents')
-          expect(:get => 'api/agents/uuid').to route_to(controller: 'application', action: 'unresolved', url: 'api/agents/uuid')
-        end
       end
     end
   end
@@ -212,28 +174,6 @@ describe ApiV4::AgentsController do
         delete_with_api_header :destroy, params: { :uuid => agent.getUuid() }
         expect(response).to be_ok
         expect(response).to have_api_message_response(200, 'Deleted 1 agent(s).')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to destoy action of the agents controller for uuid with hyphen' do
-          expect(:delete => 'api/agents/uuid-123').to route_to(action: 'destroy', controller: 'api_v4/agents', uuid: 'uuid-123')
-        end
-
-        it 'should route to destroy action of the agents controller for uuid with underscore' do
-          expect(:delete => 'api/agents/uuid_123').to route_to(action: 'destroy', controller: 'api_v4/agents', uuid: 'uuid_123')
-        end
-
-        it 'should route to destroy action of the agents controller for uuid with dots' do
-          expect(:delete => 'api/agents/uuid.123').to route_to(action: 'destroy', controller: 'api_v4/agents', uuid: 'uuid.123')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to destroy action of the agents controller without header' do
-          expect(:delete => 'api/agents/uuid').to_not route_to(action: 'destroy', controller: 'api_v4/agents')
-          expect(:delete => 'api/agents/uuid').to route_to(controller: 'application', action: 'unresolved', url: 'api/agents/uuid')
-        end
       end
     end
   end
@@ -387,31 +327,8 @@ describe ApiV4::AgentsController do
         agent = AgentInstanceMother.idle()
         expect(@agent_service).to receive(:findAgent).with(agent.getUuid()).and_return(agent)
 
-        patch_with_api_header :update, params: { uuid: agent.getUuid(), hostname: 'some-hostname', agent_config_state: 'foo' }
+        patch_with_api_header :update, params: {uuid: agent.getUuid(), hostname: 'some-hostname', agent_config_state: 'foo'}
         expect(response).to have_api_message_response(400, 'Your request could not be processed. The value of `agent_config_state` can be one of `Enabled`, `Disabled` or null.')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-
-        it 'should route to update action of the agents controller for uuid with hyphen' do
-          expect(:patch => 'api/agents/uuid-123').to route_to(action: 'update', controller: 'api_v4/agents', uuid: 'uuid-123')
-        end
-
-        it 'should route to update action of the agents controller for uuid with underscore' do
-          expect(:patch => 'api/agents/uuid_123').to route_to(action: 'update', controller: 'api_v4/agents', uuid: 'uuid_123')
-        end
-
-        it 'should route to update action of the agents controller for uuid with dots' do
-          expect(:patch => 'api/agents/uuid.123').to route_to(action: 'update', controller: 'api_v4/agents', uuid: 'uuid.123')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to update action of the agents controller without header' do
-          expect(:patch => 'api/agents/uuid').to_not route_to(action: 'update', controller: 'api_v4/agents')
-          expect(:patch => 'api/agents/uuid').to route_to(controller: 'application', action: 'unresolved', url: 'api/agents/uuid')
-        end
       end
     end
   end
@@ -474,23 +391,8 @@ describe ApiV4::AgentsController do
         expect(response).to have_api_message_response(406, 'Not Acceptable')
       end
     end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to bulk_destroy action of the agents controller' do
-          expect(:delete => 'api/agents').to route_to(action: 'bulk_destroy', controller: 'api_v4/agents')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to bulk_destroy action of the agents controller without header' do
-          expect(:delete => 'api/agents').to_not route_to(action: 'bulk_destroy', controller: 'api_v4/agents')
-          expect(:delete => 'api/agents').to route_to(controller: 'application', action: 'unresolved', url: 'api/agents')
-        end
-      end
-    end
-
   end
-
+  
   describe "bulk_update" do
     describe "security" do
       it 'should allow anyone, with security disabled' do
@@ -538,20 +440,6 @@ describe ApiV4::AgentsController do
         patch_with_api_header :bulk_update, params: { :uuids => uuids }
         expect(response).to be_ok
         expect(response).to have_api_message_response(200, 'Updated agent(s) with uuid(s): [agent-1, agent-2].')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to bulk_update action of the agents controller' do
-          expect(:patch => 'api/agents').to route_to(action: 'bulk_update', controller: 'api_v4/agents')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to bulk_update action of the agents controller without header' do
-          expect(:patch => 'api/agents').to_not route_to(action: 'bulk_update', controller: 'api_v4/agents')
-          expect(:patch => 'api/agents').to route_to(controller: 'application', action: 'unresolved', url: 'api/agents')
-        end
       end
     end
   end
