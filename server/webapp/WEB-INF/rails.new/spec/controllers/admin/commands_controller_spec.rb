@@ -22,32 +22,6 @@ describe Admin::CommandsController do
     @command_repository_service = stub_service(:command_repository_service)
   end
 
-  describe "routes" do
-    it "should resolve commands" do
-      expect({:get => "/admin/commands"}).to route_to(:controller => "admin/commands", :action => "index")
-    end
-
-    it "should generate command" do
-      expect(admin_commands_path).to eq("/admin/commands")
-    end
-
-    it "should resolve command_definition" do
-      expect({:get => "/admin/commands/show?command_name=maven-clean"}).to route_to(:controller => "admin/commands", :action => "show", :command_name => 'maven-clean')
-    end
-
-    it "should generate command_definition" do
-      expect(admin_command_definition_path(:command_name => "foo")).to eq("/admin/commands/show?command_name=foo")
-    end
-
-    it "should resolve lookup autocomplete path" do
-      expect({:get => "/admin/commands/lookup?lookup_prefix=some-prefix"}).to route_to(:controller => "admin/commands", :action => "lookup", :lookup_prefix => "some-prefix", :format => "text")
-    end
-
-    it "should generate path for command lookup" do
-      expect(admin_command_lookup_path).to eq("/admin/commands/lookup")
-    end
-  end
-
   describe "actions" do
 
     describe "index" do
