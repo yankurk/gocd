@@ -397,16 +397,6 @@ describe StagesController do
   end
 
   describe "config_change" do
-
-    it "should route to action" do
-      expect(:get => "/config_change/between/md5_value_2/and/md5_value_1").to route_to({:controller => "stages", :action => "config_change", :later_md5 => "md5_value_2", :earlier_md5 => "md5_value_1"})
-      expect(controller.send(:config_change_path, :later_md5 => "md5_value_2", :earlier_md5 => "md5_value_1")).to eq("/config_change/between/md5_value_2/and/md5_value_1")
-    end
-
-    it "should generate the correct route" do
-      expect(controller.send(:config_change_path, :later_md5 => "md5_value_2", :earlier_md5 => "md5_value_1")).to eq("/config_change/between/md5_value_2/and/md5_value_1")
-    end
-
     it "should assign config changes for given md5" do
       result = HttpLocalizedOperationResult.new
       expect(@go_config_service).to receive(:configChangesFor).with("md5_value_2", "md5_value_1", result).and_return("changes_string")
