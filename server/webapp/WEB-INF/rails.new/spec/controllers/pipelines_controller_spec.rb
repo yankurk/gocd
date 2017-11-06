@@ -180,10 +180,6 @@ describe PipelinesController do
       expect(assigns[:pipeline]).to eq(@pim)
     end
 
-    it "should resolve POST to /pipelines/show_for_trigger as a call" do
-      expect({:post => "/pipelines/show_for_trigger"}).to route_to(:controller => 'pipelines', :action => 'show_for_trigger', :no_layout => true)
-    end
-
     it "should skip verify authenticity token" do
       expect(@pipeline_history_service).to receive(:latest).with("blah-pipeline-name", @user).and_return(@pim)
       expect(@go_config_service).to receive(:variablesFor).with("blah-pipeline-name").and_return(EnvironmentVariablesConfig.new)
@@ -249,7 +245,7 @@ describe PipelinesController do
 
       expect(cookiejar[:selected_pipelines]).to eq({:value=>1234, :expires=>1.year.from_now.beginning_of_day})
     end
-
+    
     it "should set cookies when no pipelines or groups selected" do
       expect(@go_config_service).to receive(:persistSelectedPipelines).with("456", @user_id, [], true).and_return(1234)
       allow(controller).to receive(:cookies).and_return(cookiejar={:selected_pipelines => "456"})

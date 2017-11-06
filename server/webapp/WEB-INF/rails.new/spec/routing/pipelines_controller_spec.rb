@@ -38,6 +38,13 @@ describe PipelinesController do
     end
   end
 
+  describe "action show_for_trigger" do
+    it "should resolve POST to /pipelines/show_for_trigger as a call" do
+      expect({:post => "/pipelines/show_for_trigger"}).to route_to(:controller => 'pipelines', :action => 'show_for_trigger', :no_layout => true)
+    end
+  end
+
+
   describe "action show" do
     it "should resolve using both GET and POST" do
       expect({:get => "/pipelines/show"}).to route_to(:controller => "pipelines", :action => "show")
