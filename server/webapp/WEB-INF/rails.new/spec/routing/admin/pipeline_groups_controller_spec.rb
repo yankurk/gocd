@@ -23,15 +23,8 @@ describe Admin::PipelineGroupsController do
     expect({:get => "/admin/pipelines"}).to route_to(:controller => "admin/pipeline_groups", :action => "index")
   end
 
-  describe "with header" do
-    before(:each) do
-      setup_header
-    end
-
-    it "should generate listing route" do
-
-      expect(pipeline_groups_url).to eq("http://test.host/admin/pipelines")
-    end
+  it "should generate listing route" do
+    expect(pipeline_groups_url(:host => 'test.host')).to eq("http://test.host/admin/pipelines")
   end
 
   it "should resolve route to move" do
@@ -39,7 +32,7 @@ describe Admin::PipelineGroupsController do
   end
 
   it "should generate move route" do
-    expect(move_pipeline_to_group_url(:pipeline_name => "pipeline.name")).to eq("http://test.host/admin/pipelines/move/pipeline.name")
+    expect(move_pipeline_to_group_url(:pipeline_name => "pipeline.name", :host => 'test.host')).to eq("http://test.host/admin/pipelines/move/pipeline.name")
   end
 
   it "should resolve route to delete of pipeline" do
@@ -76,15 +69,15 @@ describe Admin::PipelineGroupsController do
   end
 
   it "should generate delete pipeline route" do
-    expect(delete_pipeline_url(:pipeline_name => "pipeline.name")).to eq("http://test.host/admin/pipelines/pipeline.name")
+    expect(delete_pipeline_url(:pipeline_name => "pipeline.name", :host => 'test.host')).to eq("http://test.host/admin/pipelines/pipeline.name")
   end
 
   it "should generate new pipeline group route" do
-    expect(pipeline_group_new_url).to eq("http://test.host/admin/pipeline_group/new")
+    expect(pipeline_group_new_url(:host => 'test.host')).to eq("http://test.host/admin/pipeline_group/new")
   end
 
   it "should generate new pipeline group route" do
-    expect(pipeline_group_create_url).to eq("http://test.host/admin/pipeline_group")
+    expect(pipeline_group_create_url(:host => 'test.host')).to eq("http://test.host/admin/pipeline_group")
   end
 
   it "should generate route for destroy of group" do
