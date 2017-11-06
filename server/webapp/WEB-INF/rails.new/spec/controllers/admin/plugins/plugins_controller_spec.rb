@@ -24,28 +24,6 @@ describe Admin::Plugins::PluginsController do
     allow(controller).to receive(:plugin_service).and_return(@plugin_service = double('plugin service'))
   end
 
-  describe "routes" do
-    it "should resolve the route_for_index" do
-      expect({:get => "/admin/plugins"}).to route_to(:controller => "admin/plugins/plugins", :action => "index")
-      expect(plugins_listing_path).to eq("/admin/plugins")
-    end
-
-    it "should resolve_the_route_for_upload" do
-      expect({:post => "/admin/plugins"}).to route_to(:controller => "admin/plugins/plugins", :action => "upload")
-      expect(upload_plugin_path).to eq("/admin/plugins")
-    end
-
-    it "should resolve_the_route_for_get plugin settings" do
-      expect({:get => "/admin/plugins/settings/plugin.id"}).to route_to(:controller => "admin/plugins/plugins", :action => "edit_settings", :plugin_id => "plugin.id")
-      expect(edit_settings_path(:plugin_id => 'plugin.id')).to eq("/admin/plugins/settings/plugin.id")
-    end
-
-    it "should resolve_the_route_for_update plugin settings" do
-      expect({:post => "/admin/plugins/settings/plugin.id"}).to route_to(:controller => "admin/plugins/plugins", :action => "update_settings", :plugin_id => "plugin.id")
-      expect(update_settings_path(:plugin_id => 'plugin.id')).to eq("/admin/plugins/settings/plugin.id")
-    end
-  end
-
   describe "upload" do
     it "should show success message when upload is successful" do
       expect(@plugin_manager).to receive(:addPlugin).with(an_instance_of(java.io.File), 'plugins_controller_spec.rb')
