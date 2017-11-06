@@ -14,6 +14,7 @@ gem 'roar', '1.0.1'
 gem 'rack-throttle', '~> 0.4.2'
 gem 'representable', '2.1.7'
 gem 'versionist'
+gem 'dynamic_form'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
