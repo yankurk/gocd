@@ -19,33 +19,6 @@ shared_examples_for :material_controller do
   include ConfigSaveStubbing
   include MockRegistryModule
 
-  describe "routes should resolve and generate" do
-    it "new" do
-      expect({:get => "/admin/pipelines/pipeline.name/materials/#{@short_material_type}/new"}).to route_to(:controller => "admin/materials/#{@short_material_type}", :action => "new", :pipeline_name => "pipeline.name")
-      expect(send("admin_#{@short_material_type}_new_path", :pipeline_name => "foo.bar")).to eq("/admin/pipelines/foo.bar/materials/#{@short_material_type}/new")
-    end
-
-    it "create" do
-      expect({:post => "/admin/pipelines/pipeline.name/materials/#{@short_material_type}"}).to route_to(:controller => "admin/materials/#{@short_material_type}", :action => "create", :pipeline_name => "pipeline.name")
-      expect(send("admin_#{@short_material_type}_create_path", :pipeline_name => "foo.bar")).to eq("/admin/pipelines/foo.bar/materials/#{@short_material_type}")
-    end
-
-    it "update" do
-      expect({:put => "/admin/pipelines/pipeline.name/materials/#{@short_material_type}/finger_print"}).to route_to(:controller => "admin/materials/#{@short_material_type}", :action => "update", :pipeline_name => "pipeline.name", :finger_print => "finger_print")
-      expect(send("admin_#{@short_material_type}_update_path", :pipeline_name => "foo.bar", :finger_print => "abc")).to eq("/admin/pipelines/foo.bar/materials/#{@short_material_type}/abc")
-    end
-
-    it "edit" do
-      expect({:get => "/admin/pipelines/pipeline.name/materials/#{@short_material_type}/finger_print/edit"}).to route_to(:controller => "admin/materials/#{@short_material_type}", :action => "edit", :pipeline_name => "pipeline.name", :finger_print => "finger_print")
-      expect(send("admin_#{@short_material_type}_edit_path", :pipeline_name => "foo.bar", :finger_print => "finger_print")).to eq("/admin/pipelines/foo.bar/materials/#{@short_material_type}/finger_print/edit")
-    end
-
-    it "delete" do
-      expect({:delete => "/admin/pipelines/pipeline.name/materials/finger_print"}).to route_to(:controller => "admin/materials", :action => "destroy", :stage_parent => "pipelines", :pipeline_name => "pipeline.name", :finger_print => "finger_print")
-      expect(send("admin_material_delete_path", :pipeline_name => "foo.bar", :finger_print => "finger_print")).to eq("/admin/pipelines/foo.bar/materials/finger_print")
-    end
-  end
-
   describe "action" do
     before do
       setup_data
