@@ -31,6 +31,11 @@ RSpec.configure do |config|
     setup_base_urls
   end
 
+  config.before(:each) do
+    # call params.permit! if params is an instance of StrongParameter
+    respond_to?(:params) && params.respond_to?(:permit!) && params.permit!
+  end
+
   config.after(:each) do
     ServiceCacheStrategy.instance.clear_services
   end
