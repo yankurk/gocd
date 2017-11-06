@@ -17,44 +17,14 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::EncryptionController do
-
-  include ApiV1::ApiVersionHelper
-
-  describe "security" do
-    it 'should allow anyone, with security disabled' do
-      disable_security
-      expect(controller).to allow_action(:post, :encrypt_value)
-    end
-
-    it 'should disallow anonymous users, with security enabled' do
-      enable_security
-      login_as_anonymous
-      expect(controller).to disallow_action(:post, :encrypt_value).with(401, 'You are not authorized to perform this action.')
-    end
-
-    it 'should disallow normal users, with security enabled' do
-      login_as_user
-      expect(controller).to disallow_action(:post, :encrypt_value).with(401, 'You are not authorized to perform this action.')
-    end
-
-    it 'should allow admin users, with security enabled' do
-      login_as_admin
-      expect(controller).to allow_action(:post, :encrypt_value)
-    end
-
-    it 'should allow pipeline group admin users, with security enabled' do
-      login_as_group_admin
-      expect(controller).to allow_action(:post, :encrypt_value)
-    end
-
-    it 'should allow template admin users, with security enabled' do
-      login_as_template_admin
-      expect(controller).to allow_action(:post, :encrypt_value)
-    end
-  end
+  include ApiHeaderSetupForRouting
 
   describe "route" do
     describe "with_header" do
+      before(:each) do
+        setup_header
+      end
+      
       it 'should route to encrypt_value action of encryption controller' do
         expect(:post => 'api/admin/encrypt').to route_to(action: 'encrypt_value', controller: 'api_v1/admin/encryption')
       end
@@ -65,16 +35,6 @@ describe ApiV1::Admin::EncryptionController do
         expect(:post => 'api/admin/encrypt').to_not route_to(action: 'encrypt_value', controller: 'api_v1/admin/encryption')
         expect(:post => 'api/admin/encrypt').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/encrypt')
       end
-    end
-  end
-
-  describe "encryption" do
-    it 'should return the encrypted value of the plain text passed' do
-      login_as_admin
-      post_with_api_header :encrypt_value, params: { value: 'foo' }
-
-      expect(response).to be_ok
-      expected_response(GoCipher.new.encrypt('foo'), ApiV1::EncryptedValueRepresenter)
     end
   end
 end

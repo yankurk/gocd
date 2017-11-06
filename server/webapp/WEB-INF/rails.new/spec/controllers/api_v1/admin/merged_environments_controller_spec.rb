@@ -66,20 +66,6 @@ describe ApiV1::Admin::MergedEnvironmentsController do
         expect(controller).to disallow_action(:get, :index).with(401, 'You are not authorized to perform this action.')
       end
     end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to index action of environments controller' do
-          expect(:get => 'api/admin/environments/merged').to route_to(action: 'index', controller: 'api_v1/admin/merged_environments')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to index action of environments controller without header' do
-          expect(:get => 'api/admin/environments/merged').to_not route_to(action: 'index', controller: 'api_v1/admin/merged_environments')
-          expect(:get => 'api/admin/environments/merged').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments/merged')
-        end
-      end
-    end
   end
 
   describe "show" do
@@ -137,36 +123,6 @@ describe ApiV1::Admin::MergedEnvironmentsController do
       it 'should disallow pipeline group admin users, with security enabled' do
         login_as_group_admin
         expect(controller).to disallow_action(:get, :show, params: { environment_name: @environment_name }).with(401, 'You are not authorized to perform this action.')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to show action of environments controller for alphanumeric environment name' do
-          expect(:get => 'api/admin/environments/foo123/merged').to route_to(action: 'show', controller: 'api_v1/admin/merged_environments', environment_name: 'foo123')
-        end
-
-        it 'should route to show action of environments controller for environment name with dots' do
-          expect(:get => 'api/admin/environments/foo.123/merged').to route_to(action: 'show', controller: 'api_v1/admin/merged_environments', environment_name: 'foo.123')
-        end
-
-        it 'should route to show action of environments controller for environment name with hyphen' do
-          expect(:get => 'api/admin/environments/foo-123/merged').to route_to(action: 'show', controller: 'api_v1/admin/merged_environments', environment_name: 'foo-123')
-        end
-
-        it 'should route to show action of environments controller for environment name with underscore' do
-          expect(:get => 'api/admin/environments/foo_123/merged').to route_to(action: 'show', controller: 'api_v1/admin/merged_environments', environment_name: 'foo_123')
-        end
-
-        it 'should route to show action of environments controller for capitalized environment name' do
-          expect(:get => 'api/admin/environments/FOO/merged').to route_to(action: 'show', controller: 'api_v1/admin/merged_environments', environment_name: 'FOO')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to show action of environments controller without header' do
-          expect(:get => 'api/admin/environments/foo/merged').to_not route_to(action: 'show', controller: 'api_v1/admin/merged_environments')
-          expect(:get => 'api/admin/environments/foo/merged').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments/foo/merged')
-        end
       end
     end
   end

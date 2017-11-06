@@ -53,21 +53,6 @@ describe ApiV1::Admin::EncryptionController do
     end
   end
 
-  describe "route" do
-    describe "with_header" do
-      it 'should route to encrypt_value action of encryption controller' do
-        expect(:post => 'api/admin/encrypt').to route_to(action: 'encrypt_value', controller: 'api_v1/admin/encryption')
-      end
-
-    end
-    describe "without_header" do
-      it 'should not route to index action of packages controller without header' do
-        expect(:post => 'api/admin/encrypt').to_not route_to(action: 'encrypt_value', controller: 'api_v1/admin/encryption')
-        expect(:post => 'api/admin/encrypt').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/encrypt')
-      end
-    end
-  end
-
   describe "encryption" do
     it 'should return the encrypted value of the plain text passed' do
       login_as_admin

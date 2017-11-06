@@ -81,20 +81,6 @@ describe ApiV1::Admin::PackagesController do
         expect(controller).to allow_action(:get, :index)
       end
     end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to index action of packages controller' do
-          expect(:get => 'api/admin/packages').to route_to(action: 'index', controller: 'api_v1/admin/packages')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to index action of packages controller without header' do
-          expect(:get => 'api/admin/packages').to_not route_to(action: 'index', controller: 'api_v1/admin/packages')
-          expect(:get => 'api/admin/packages').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages')
-        end
-      end
-    end
   end
 
   describe "show" do
@@ -147,23 +133,6 @@ describe ApiV1::Admin::PackagesController do
       it 'should allow pipeline group admin users, with security enabled' do
         login_as_group_admin
         expect(controller).to allow_action(:get, :show)
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to show action of packages controller for specified package id' do
-          expect(:get => 'api/admin/packages/foo').to route_to(action: 'show', controller: 'api_v1/admin/packages', package_id: 'foo')
-        end
-        it 'should route to show action of packages controller for package_id with dots' do
-          expect(:get => 'api/admin/packages/foo.bar').to route_to(action: 'show', controller: 'api_v1/admin/packages', package_id: 'foo.bar')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to show action of packages controller without header' do
-          expect(:get => 'api/admin/packages/foo').to_not route_to(action: 'show', controller: 'api_v1/admin/packages')
-          expect(:get => 'api/admin/packages/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages/foo')
-        end
       end
     end
   end
@@ -221,24 +190,6 @@ describe ApiV1::Admin::PackagesController do
       it 'should allow pipeline group admin users, with security enabled' do
         login_as_group_admin
         expect(controller).to allow_action(:delete, :destroy)
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to destroy action of packages controller for specified package id' do
-          expect(:delete => 'api/admin/packages/foo').to route_to(action: 'destroy', controller: 'api_v1/admin/packages', package_id: 'foo')
-        end
-
-        it 'should route to delete action of packages controller for package_id with dots' do
-          expect(:delete => 'api/admin/packages/foo.bar').to route_to(action: 'destroy', controller: 'api_v1/admin/packages', package_id: 'foo.bar')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to destroy action of packages controller without header' do
-          expect(:delete => 'api/admin/packages/foo').to_not route_to(action: 'destroy', controller: 'api_v1/admin/packages')
-          expect(:delete => 'api/admin/packages/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages/foo')
-        end
       end
     end
   end
@@ -317,20 +268,6 @@ describe ApiV1::Admin::PackagesController do
       it 'should allow pipeline group admin users, with security enabled' do
         login_as_group_admin
         expect(controller).to allow_action(:post, :create)
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to create action of packages controller' do
-          expect(:post => 'api/admin/packages').to route_to(action: 'create', controller: 'api_v1/admin/packages')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to create action of packages controller without header' do
-          expect(:post => 'api/admin/packages').to_not route_to(action: 'create', controller: 'api_v1/admin/packages')
-          expect(:post => 'api/admin/packages').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages')
-        end
       end
     end
   end
@@ -433,23 +370,6 @@ describe ApiV1::Admin::PackagesController do
       it 'should allow pipeline group admin users, with security enabled' do
         login_as_group_admin
         expect(controller).to allow_action(:put, :update, params: { package_id: @package_id })
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to update action of package controller for specified package id' do
-          expect(:put => 'api/admin/packages/foo123').to route_to(action: 'update', controller: 'api_v1/admin/packages', package_id: 'foo123')
-        end
-        it 'should route to update action of packages controller for package_id with dots' do
-          expect(:put => 'api/admin/packages/foo.bar').to route_to(action: 'update', controller: 'api_v1/admin/packages', package_id: 'foo.bar')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to update action of packages controller without header' do
-          expect(:put => 'api/admin/packages/foo').to_not route_to(put: 'update', controller: 'api_v1/admin/packages')
-          expect(:put => 'api/admin/packages/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages/foo')
-        end
       end
     end
   end
