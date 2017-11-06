@@ -14,5 +14,5 @@
 # limitations under the License.
 ##########################GO-LICENSE-END##################################
 
-load File.join(Rails.root, 'lib', 'go_cache_store.rb')
+require_relative '../../lib/go_cache_store'
 ActionController::Base.cache_store = GoCacheStore.new
