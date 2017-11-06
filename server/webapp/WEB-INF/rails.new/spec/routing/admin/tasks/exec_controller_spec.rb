@@ -15,7 +15,7 @@
 ##########################GO-LICENSE-END##################################
 
 require 'rails_helper'
-require_relative 'task_controller_examples'
+require_relative 'task_controller_routes_examples'
 
 describe Admin::TasksController do
   include TaskMother
@@ -24,5 +24,5 @@ describe Admin::TasksController do
     @task_type = exec_task_with_ant_oncancel_task.getTaskType()
   end
 
-  it_should_behave_like :task_controller
+  it_should_behave_like :task_controller_routes
 end

@@ -14,7 +14,7 @@
 # limitations under the License.
 ##########################GO-LICENSE-END##################################
 
-shared_examples_for :task_controller do
+shared_examples_for :task_controller_routes do
   describe "routes" do
     describe "index" do
       it "should resolve templates as :stage_parent" do
