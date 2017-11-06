@@ -155,7 +155,7 @@ class ApplicationController < ActionController::Base
     unless message == nil || message.last == "\n"
       message = message + "\n"
     end
-    render text: message, status: status
+    render plain: message, status: status
   end
 
   def default_url_options(options = nil)

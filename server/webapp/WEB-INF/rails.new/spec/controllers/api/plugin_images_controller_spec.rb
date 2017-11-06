@@ -24,13 +24,13 @@ describe Api::PluginImagesController do
   end
 
   it 'should render an image with a hash and a long lived cache header' do
-    image = com.thoughtworks.go.plugin.domain.common.Image.new('image/foo', Base64.strict_encode64('some-image-data'), SecureRandom.hex(32))
+    image = com.thoughtworks.go.plugin.domain.common.Image.new('image/png', Base64.strict_encode64('some-image-data'), SecureRandom.hex(32))
     expect(@default_plugin_info_finder).to receive(:getImage).with('foo', image.getHash).and_return(image)
 
     get :show, params: { plugin_id: 'foo', hash: image.getHash }
     expect(response).to be_ok
-    expect(response.headers['Cache-Control']).to eq('max-age=31557600, private')
-    expect(response.headers['Content-Type']).to eq('image/foo')
+    expect(response.headers['Cache-Control']).to eq("max-age=#{1.year.to_i}, private")
+    expect(response.headers['Content-Type']).to eq('image/png')
     expect(response.body.bytes.to_a).to eq(image.getDataAsBytes.to_a)
   end
 

@@ -177,7 +177,7 @@ describe ApplicationController do
   describe "do for every request" do
     controller do
       def index
-        render text: "Hello"
+        render plain: "Hello"
       end
     end
 
@@ -218,11 +218,11 @@ describe ApplicationController do
       expect(@controller.current_user_id_for_oauth).to eq("anonymous")
     end
   end
-  
+
   context "with license agent validity stubbed" do
     controller do
       def test_action
-        render text: "Some test action"
+        render plain: "Some test action"
       end
     end
 

@@ -59,7 +59,7 @@ class EnvironmentsController < ApplicationController
 
     message = result.message(Spring.bean('localizer'))
     if result.isSuccessful()
-      render :text => message, :location => url_options_with_flash(message, {:action => :show, :name => @environment.name(), :class => 'success', :only_path => true})
+      render :plain => message, :location => url_options_with_flash(message, {:action => :show, :name => @environment.name(), :class => 'success', :only_path => true})
     else
       render_error_response message, 400, true
     end

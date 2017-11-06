@@ -68,18 +68,18 @@ class NonApiController < ApplicationController
   end
 
   def double_render_without_error
-    render :text => "first render"
-    render :text => "second render"
+    render :plain => "first render"
+    render :plain => "second render"
   end
 
   def encoded_param_user_action
     @decodable_param = params[:decodable_param]
-    render :text => ""
+    render :plain => ""
   end
 
   def non_encoded_param_user_action
     @decodable_param = params[:decodable_param]
-    render :text => ""
+    render :plain => ""
   end
 end
 
@@ -126,7 +126,7 @@ module Api
     end
 
     def auto_refresh
-      render :text => root_url
+      render :plain => root_url
     end
   end
 end
