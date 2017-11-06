@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV2::Admin::EnvironmentsController do
-  include ApiHeaderSetupTeardown
+
   include ApiV2::ApiVersionHelper
 
   describe "index" do
@@ -74,9 +74,6 @@ describe ApiV2::Admin::EnvironmentsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to index action of environments controller without header' do
           expect(:get => 'api/admin/environments').to_not route_to(action: 'index', controller: 'api_v2/admin/environments')
           expect(:get => 'api/admin/environments').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments')
@@ -164,9 +161,6 @@ describe ApiV2::Admin::EnvironmentsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of environments controller without header' do
           expect(:get => 'api/admin/environments/foo').to_not route_to(action: 'show', controller: 'api_v2/admin/environments')
           expect(:get => 'api/admin/environments/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments/foo')
@@ -284,9 +278,6 @@ describe ApiV2::Admin::EnvironmentsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to put action of environments controller without header' do
           expect(:put => 'api/admin/environments/foo').to_not route_to(action: 'put', controller: 'api_v2/admin/environments')
           expect(:put => 'api/admin/environments/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments/foo')
@@ -392,9 +383,6 @@ describe ApiV2::Admin::EnvironmentsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to put action of environments controller without header' do
           expect(:patch => 'api/admin/environments/foo').to_not route_to(action: 'put', controller: 'api_v2/admin/environments')
           expect(:patch => 'api/admin/environments/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments/foo')
@@ -483,9 +471,6 @@ describe ApiV2::Admin::EnvironmentsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to destroy action of environments controller without header' do
           expect(:delete => 'api/admin/environments/foo').to_not route_to(action: 'destroy', controller: 'api_v2/admin/environments')
           expect(:delete => 'api/admin/environments/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments/foo')
@@ -561,9 +546,6 @@ describe ApiV2::Admin::EnvironmentsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to create action of environments controller without header' do
           expect(:post => 'api/admin/environments').to_not route_to(action: 'create', controller: 'api_v2/admin/environments')
           expect(:post => 'api/admin/environments').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments')

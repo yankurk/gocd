@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::RepositoriesController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before :each do
@@ -77,9 +77,6 @@ describe ApiV1::Admin::RepositoriesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to index action of environments controller without header' do
           expect(:get => 'api/admin/repositories').to_not route_to(action: 'index', controller: 'api_v1/admin/repositories')
           expect(:get => 'api/admin/repositories').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/repositories')
@@ -153,9 +150,6 @@ describe ApiV1::Admin::RepositoriesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of package repositories controller without header' do
           expect(:get => 'api/admin/repositories/foo').to_not route_to(action: 'show', controller: 'api_v1/admin/repositories')
           expect(:get => 'api/admin/repositories/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/repositories/foo')
@@ -233,9 +227,6 @@ describe ApiV1::Admin::RepositoriesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to destroy action of package repositories controller without header' do
           expect(:delete => 'api_v1/admin/repositories/foo').to_not route_to(action: 'destroy', controller: 'api_v1/admin/repositories')
           expect(:delete => 'api_v1/admin/repositories/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api_v1/admin/repositories/foo')
@@ -314,9 +305,6 @@ describe ApiV1::Admin::RepositoriesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to create action of environments controller without header' do
           expect(:post => 'api/admin/repositories').to_not route_to(action: 'create', controller: 'api_v1/admin/repositories')
           expect(:post => 'api/admin/environments').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/environments')
@@ -426,9 +414,6 @@ describe ApiV1::Admin::RepositoriesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to put action of repositories controller without header' do
           expect(:put => 'api_v1/admin/repositories/foo').to_not route_to(action: 'update', controller: 'api_v1/admin/repositories')
           expect(:put => 'api_v1/admin/repositories/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api_v1/admin/repositories/foo')

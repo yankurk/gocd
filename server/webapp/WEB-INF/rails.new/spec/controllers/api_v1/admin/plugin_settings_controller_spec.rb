@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::PluginSettingsController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before :each do
@@ -112,9 +112,6 @@ describe ApiV1::Admin::PluginSettingsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of plugin_settings controller without header' do
           expect(:get => 'api/admin/plugin_settings/foo').to_not route_to(action: 'show', controller: 'api_v1/admin/plugin_settings')
           expect(:get => 'api/admin/plugin_settings/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/plugin_settings/foo')
@@ -213,9 +210,6 @@ describe ApiV1::Admin::PluginSettingsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of plugin_settings controller without header' do
           expect(:post => 'api/admin/plugin_settings').to_not route_to(action: 'create', controller: 'api_v1/admin/plugin_settings')
           expect(:post => 'api/admin/plugin_settings').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/plugin_settings')
@@ -338,9 +332,6 @@ describe ApiV1::Admin::PluginSettingsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of plugin_settings controller without header' do
           expect(:put => 'api/admin/plugin_settings/foo').to_not route_to(action: 'update', controller: 'api_v1/admin/plugin_settings')
           expect(:put => 'api/admin/plugin_settings/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/plugin_settings/foo')

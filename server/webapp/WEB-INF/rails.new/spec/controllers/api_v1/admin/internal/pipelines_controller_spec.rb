@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::Internal::PipelinesController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before(:each) do
@@ -80,9 +80,7 @@ describe ApiV1::Admin::Internal::PipelinesController do
           end
         end
         describe "without_header" do
-          before :each do
-            teardown_header
-          end
+
           it 'should not route to index action of internal pipelines controller without header' do
             expect(:get => 'api/admin/internal/pipelines').to_not route_to(action: 'index', controller: 'api_v1/admin/internal/pipelines')
             expect(:get => 'api/admin/internal/pipelines').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/internal/pipelines')

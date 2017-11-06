@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::Internal::MaterialTestController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   describe "test" do
@@ -166,9 +166,6 @@ describe ApiV1::Admin::Internal::MaterialTestController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to test action of material_test controller without header' do
           expect(:post => 'api/admin/internal/material_test').to_not route_to(action: 'test', controller: 'api_v1/admin/internal/material_test')
           expect(:post => 'api/admin/internal/material_test').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/internal/material_test')

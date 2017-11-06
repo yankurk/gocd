@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::BackupsController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before :each do
@@ -91,9 +91,6 @@ describe ApiV1::BackupsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to create action of backups controller without header' do
           expect(:post => 'api/backups').to_not route_to(action: 'backups', controller: 'api_v1/backups')
           expect(:post => 'api/backups').to route_to(controller: 'application', action: 'unresolved', url: 'api/backups')

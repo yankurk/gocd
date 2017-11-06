@@ -16,14 +16,9 @@
 
 
 module ApiSpecHelper
-  def current_api_accept_header
-    @controller.class.default_accepts_header
-  end
-
   [:get, :delete, :head].each do |http_verb|
     class_eval(<<-EOS, __FILE__, __LINE__ + 1)
       def #{http_verb}_with_api_header(path, args={})
-        setup_header
         #{http_verb} path, args.merge(as: :json)
       end
     EOS
@@ -33,7 +28,6 @@ module ApiSpecHelper
     class_eval(<<-EOS, __FILE__, __LINE__ + 1)
       def #{http_verb}_with_api_header(path, args={})
         allow(controller).to receive(:verify_content_type_on_post).and_return(@verify_content_type_on_post = double())
-        setup_header
         #{http_verb} path, args.merge(as: :json)
       end
     EOS

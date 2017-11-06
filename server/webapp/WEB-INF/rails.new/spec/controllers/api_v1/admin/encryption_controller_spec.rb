@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::EncryptionController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   describe "security" do
@@ -61,9 +61,6 @@ describe ApiV1::Admin::EncryptionController do
 
     end
     describe "without_header" do
-      before :each do
-        teardown_header
-      end
       it 'should not route to index action of packages controller without header' do
         expect(:post => 'api/admin/encrypt').to_not route_to(action: 'encrypt_value', controller: 'api_v1/admin/encryption')
         expect(:post => 'api/admin/encrypt').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/encrypt')

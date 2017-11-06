@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV3::Admin::PluginInfosController do
-  include ApiHeaderSetupTeardown
+
   include ApiV3::ApiVersionHelper
 
   before(:each) do
@@ -154,9 +154,6 @@ describe ApiV3::Admin::PluginInfosController do
       end
 
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to index action of plugin_infos controller without header' do
           expect(:get => 'api/admin/plugin_info').to_not route_to(action: 'index', controller: 'api_v3/admin/plugin_infos')
           expect(:get => 'api/admin/plugin_info').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/plugin_info')
@@ -237,9 +234,6 @@ describe ApiV3::Admin::PluginInfosController do
       end
 
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of plugin_infos controller without header' do
           expect(:get => 'api/admin/plugin_info/abc').to_not route_to(action: 'show', controller: 'api_v3/admin/plugin_infos')
           expect(:get => 'api/admin/plugin_info/abc').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/plugin_info/abc')

@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::PackagesController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before :each do
@@ -89,9 +89,6 @@ describe ApiV1::Admin::PackagesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to index action of packages controller without header' do
           expect(:get => 'api/admin/packages').to_not route_to(action: 'index', controller: 'api_v1/admin/packages')
           expect(:get => 'api/admin/packages').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages')
@@ -163,9 +160,6 @@ describe ApiV1::Admin::PackagesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of packages controller without header' do
           expect(:get => 'api/admin/packages/foo').to_not route_to(action: 'show', controller: 'api_v1/admin/packages')
           expect(:get => 'api/admin/packages/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages/foo')
@@ -241,9 +235,6 @@ describe ApiV1::Admin::PackagesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to destroy action of packages controller without header' do
           expect(:delete => 'api/admin/packages/foo').to_not route_to(action: 'destroy', controller: 'api_v1/admin/packages')
           expect(:delete => 'api/admin/packages/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages/foo')
@@ -336,9 +327,6 @@ describe ApiV1::Admin::PackagesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to create action of packages controller without header' do
           expect(:post => 'api/admin/packages').to_not route_to(action: 'create', controller: 'api_v1/admin/packages')
           expect(:post => 'api/admin/packages').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages')
@@ -458,9 +446,6 @@ describe ApiV1::Admin::PackagesController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to update action of packages controller without header' do
           expect(:put => 'api/admin/packages/foo').to_not route_to(put: 'update', controller: 'api_v1/admin/packages')
           expect(:put => 'api/admin/packages/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/packages/foo')

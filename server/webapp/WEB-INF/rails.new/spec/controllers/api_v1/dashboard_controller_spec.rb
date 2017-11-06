@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::DashboardController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before do
@@ -57,9 +57,6 @@ describe ApiV1::DashboardController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to dashboard action of dashboard controller without header' do
           expect(:get => 'api/dashboard').to_not route_to(action: 'dashboard', controller: 'api_v1/dashboard')
           expect(:get => 'api/dashboard').to route_to(controller: 'application', action: 'unresolved', url: 'api/dashboard')

@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::VersionInfosController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before :each do
@@ -163,9 +163,6 @@ describe ApiV1::VersionInfosController do
       end
     end
     describe "without_header" do
-      before :each do
-        teardown_header
-      end
       it 'should not route to stale action of version_infos controller without header' do
         expect(:get => 'api/version_infos/stale').to_not route_to(action: 'stale', controller: 'api_v1/version_infos')
         expect(:get => 'api/version_infos/stale').to route_to(controller: 'application', action: 'unresolved', url: 'api/version_infos/stale')

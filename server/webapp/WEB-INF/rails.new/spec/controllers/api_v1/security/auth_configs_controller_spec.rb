@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::Security::AuthConfigsController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before :each do
@@ -86,9 +86,6 @@ describe ApiV1::Admin::Security::AuthConfigsController do
 
       describe "without_header" do
 
-        before :each do
-          teardown_header
-        end
 
         it 'should not route to index action of controller without header' do
           expect(:get => 'api/admin/security/auth_configs').to_not route_to(action: 'index', controller: 'api_v1/admin/security/auth_configs')
@@ -188,9 +185,6 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of controller without header' do
           expect(:get => 'api/admin/security/auth_configs/foo').to_not route_to(action: 'show', controller: 'api_v1/admin/security/auth_configs')
           expect(:get => 'api/admin/security/auth_configs/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/security/auth_configs/foo')
@@ -270,9 +264,6 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to create action of controller without header' do
           expect(:post => 'api/admin/security/auth_configs').to_not route_to(action: 'create', controller: 'api_v1/admin/security/auth_configs')
           expect(:post => 'api/admin/security/auth_configs').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/security/auth_configs')
@@ -383,9 +374,6 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to update action of controller without header' do
           expect(:put => 'api/admin/security/auth_configs/foo').to_not route_to(action: 'update', controller: 'api_v1/admin/security/auth_configs')
           expect(:put => 'api/admin/security/auth_configs/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/security/auth_configs/foo')
@@ -491,9 +479,6 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       end
 
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to destroy action of controller without header' do
           expect(:delete => 'api/admin/security/auth_configs/foo').to_not route_to(action: 'destroy', controller: 'api_v1/admin/security/auth_configs')
           expect(:delete => 'api/admin/security/auth_configs/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/security/auth_configs/foo')
@@ -545,9 +530,6 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       end
 
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
 
         it 'should not route to verify action of controller without header' do
           expect(:post => 'api/admin/internal/security/auth_configs/verify_connection').to_not route_to(action: 'verify_connection', controller: 'api_v1/admin/security/auth_configs')

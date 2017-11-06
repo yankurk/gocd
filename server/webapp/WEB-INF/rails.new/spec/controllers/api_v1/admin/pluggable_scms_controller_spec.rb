@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::Admin::PluggableScmsController do
-  include ApiHeaderSetupTeardown
+
   include ApiV1::ApiVersionHelper
 
   before :each do
@@ -84,9 +84,6 @@ describe ApiV1::Admin::PluggableScmsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to index action of pluggable_scms controller without header' do
           expect(:get => 'api/admin/scms').to_not route_to(action: 'index', controller: 'api_v1/admin/pluggable_scms')
           expect(:get => 'api/admin/scms').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/scms')
@@ -163,9 +160,6 @@ describe ApiV1::Admin::PluggableScmsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to show action of pluggable_scms controller without header' do
           expect(:get => 'api/admin/scms/foo').to_not route_to(action: 'show', controller: 'api_v1/admin/pluggable_scms')
           expect(:get => 'api/admin/scms/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/scms/foo')
@@ -260,9 +254,6 @@ describe ApiV1::Admin::PluggableScmsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to create action of pluggable_scms controller without header' do
           expect(:post => 'api/admin/scms').to_not route_to(action: 'create', controller: 'api_v1/admin/pluggable_scms')
           expect(:post => 'api/admin/scms').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/scms')
@@ -398,9 +389,6 @@ describe ApiV1::Admin::PluggableScmsController do
         end
       end
       describe "without_header" do
-        before :each do
-          teardown_header
-        end
         it 'should not route to update action of pluggable_scms controller without header' do
           expect(:put => 'api/admin/scms/foo').to_not route_to(action: 'update', controller: 'api_v1/admin/pluggable_scms')
           expect(:put => 'api/admin/scms/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/scms/foo')

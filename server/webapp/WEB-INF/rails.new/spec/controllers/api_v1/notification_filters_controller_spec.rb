@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV1::NotificationFiltersController do
-  include ApiHeaderSetupTeardown
+
   include ApiV4::ApiVersionHelper
 
   before(:each) do

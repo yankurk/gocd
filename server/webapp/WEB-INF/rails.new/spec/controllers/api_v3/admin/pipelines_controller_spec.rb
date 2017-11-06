@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 describe ApiV3::Admin::PipelinesController do
-  include ApiHeaderSetupTeardown
+
   include ApiV3::ApiVersionHelper
 
   before(:each) do
@@ -251,9 +251,7 @@ describe ApiV3::Admin::PipelinesController do
           end
         end
         describe "without_header" do
-          before :each do
-            teardown_header
-          end
+
           it 'should not route to show action of pipelines controller without header' do
             expect(:get => 'api/admin/pipelines/foo').to_not route_to(action: 'show', controller: 'api_v3/admin/pipelines')
             expect(:get => 'api/admin/pipelines/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/pipelines/foo')
@@ -411,9 +409,7 @@ describe ApiV3::Admin::PipelinesController do
           end
         end
         describe "without_header" do
-          before :each do
-            teardown_header
-          end
+
 
           it 'should not route to update action of pipelines controller without header' do
             expect(:put => 'api/admin/pipelines/foo').to_not route_to(action: 'update', controller: 'api_v3/admin/pipelines')
@@ -578,9 +574,7 @@ describe ApiV3::Admin::PipelinesController do
           end
         end
         describe "without_header" do
-          before :each do
-            teardown_header
-          end
+
 
           it 'should not route to create action of pipelines controller without header' do
             expect(:post => 'api/admin/pipelines').to_not route_to(action: 'create', controller: 'api_v3/admin/pipelines')
@@ -655,9 +649,7 @@ describe ApiV3::Admin::PipelinesController do
           end
         end
         describe "without_header" do
-          before :each do
-            teardown_header
-          end
+
           it 'should not route to destroy action of pipelines controller without header' do
             expect(:delete => 'api/admin/pipelines/foo').to_not route_to(action: 'destroy', controller: 'api_v3/admin/pipelines')
             expect(:delete => 'api/admin/pipelines/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/pipelines/foo')
