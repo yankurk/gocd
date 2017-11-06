@@ -20,6 +20,9 @@ module GoUtil
 
   def in_params map
     map.each do |key, value|
+      if controller.respond_to?(:extra_params)  # for view specs
+        controller.extra_params = controller.extra_params.merge(key => value)
+      end
       controller.params[key] = value
       @request.path_parameters[key] = value
     end

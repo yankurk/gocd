@@ -331,7 +331,7 @@ module ApplicationHelper
     merge_block_options(options)
     options[:method] = "post"
 
-    tag_options = tag_options(options[:html], true)
+    tag_options = tag.tag_options(options[:html], true)
     %Q|<a href="#" #{tag_options} onclick="#{remote_function_new(options)}; return false;">#{options[:name]}</a>|
   end
 
@@ -369,7 +369,7 @@ module ApplicationHelper
     raise "Expected link name. Didn't find it." unless name
     [:method, :url].each { |key| raise "Expected key: #{key}. Didn't find it. Found: #{options.keys.inspect}" unless options.key?(key) }
 
-    %Q|<a href="#" #{tag_options(html_options) unless html_options.nil?} onclick="new Ajax.Request('#{options[:url]}', {asynchronous:true, evalScripts:true, method:'#{options[:method]}', onSuccess:function(request){#{options[:success]}}}); return false;">#{name}</a>|
+    %Q|<a href="#" #{tag.tag_options(html_options) unless html_options.nil?} onclick="new Ajax.Request('#{options[:url]}', {asynchronous:true, evalScripts:true, method:'#{options[:method]}', onSuccess:function(request){#{options[:success]}}}); return false;">#{name}</a>|
   end
 
   def end_form_tag
