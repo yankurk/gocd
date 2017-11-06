@@ -27,27 +27,6 @@ describe Admin::PipelineConfigsController do
     allow(controller).to receive(:user_service).and_return(@user_service)
 
   end
-  describe "route" do
-    it 'should route to edit for alphanumeric pipeline name' do
-      expect(:get => 'admin/pipelines/foo123/edit').to route_to(action: 'edit', controller: 'admin/pipeline_configs', pipeline_name: 'foo123')
-    end
-
-    it 'should route to edit for pipeline name with dots' do
-      expect(:get => 'admin/pipelines/foo.123/edit').to route_to(action: 'edit', controller: 'admin/pipeline_configs', pipeline_name: 'foo.123')
-    end
-
-    it 'should route to edit for pipeline name with hyphen' do
-      expect(:get => 'admin/pipelines/foo-123/edit').to route_to(action: 'edit', controller: 'admin/pipeline_configs', pipeline_name: 'foo-123')
-    end
-
-    it 'should route to edit for pipeline name with underscore' do
-      expect(:get => 'admin/pipelines/foo_123/edit').to route_to(action: 'edit', controller: 'admin/pipeline_configs', pipeline_name: 'foo_123')
-    end
-
-    it 'should route to edit for capitalized pipeline name' do
-      expect(:get => 'admin/pipelines/FOO/edit').to route_to(action: 'edit', controller: 'admin/pipeline_configs', pipeline_name: 'FOO')
-    end
-  end
 
   describe "security" do
     before :each do
