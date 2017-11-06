@@ -24,36 +24,6 @@ describe ComparisonController do
     allow(controller).to receive(:mingle_config_service).and_return(@mingle_service = double('MingleConfigService'))
   end
 
-  describe "routes" do
-    it "should generate & resolve list" do
-      expect(:get => '/compare/foo.bar/list/compare_with/10').to route_to(:controller => "comparison", :action => "list", :pipeline_name => 'foo.bar', :other_pipeline_counter => "10", :format=> "json")
-    end
-
-    it "should generate the route for show action" do
-      expect(:get => '/compare/foo.bar/10/with/9').to route_to(:controller => "comparison", :action => "show", :pipeline_name => 'foo.bar', :from_counter => "10", :to_counter => "9")
-    end
-
-    it "should resolve route to show action" do
-      expect(:get => '/compare/foo.bar/10/with/9').to route_to(:controller => "comparison", :pipeline_name=>"foo.bar", :action => "show", :from_counter => "10", :to_counter => "9")
-    end
-
-    it "should generate the route for page action" do
-      expect(:get => '/compare/foo.bar/page/1').to route_to(:controller => "comparison", :action => "page", :pipeline_name => 'foo.bar', :page => "1")
-    end
-
-    it "should resolve route to page action" do
-      expect(:get => '/compare/foo.bar/page/1').to route_to(:controller => "comparison", :action => "page", :pipeline_name=>"foo.bar", :page => "1")
-    end
-
-    it "should generate the route for browse pipeline timeline" do
-      expect(:get => '/compare/foo.bar/timeline/5').to route_to(:controller => "comparison", :action => "timeline", :pipeline_name => "foo.bar", :page => "5")
-    end
-
-    it "should resolve route to browse pipeline timeline" do
-      expect(:get => '/compare/foo.bar/timeline/5').to route_to(:controller => "comparison", :action => "timeline", :pipeline_name => "foo.bar", :page => "5")
-    end
-  end
-
   describe "comparison_controller" do
     before :each do
       allow(controller).to receive(:current_user).and_return(@loser = Username.new(CaseInsensitiveString.new("loser")))
