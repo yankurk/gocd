@@ -35,7 +35,7 @@ describe AgentDetailsController do
     it "should show agent details" do
       expect(@agent_service).to receive(:findAgentViewModel).with(@uuid).and_return(@agent)
 
-      get "show", :uuid => @uuid
+      get :show, params: { :uuid => @uuid }
 
       assert_template layout: :agent_detail
       assert_template "show"
@@ -48,7 +48,7 @@ describe AgentDetailsController do
       it "should show 404 when an agent is not found" do
         expect(@agent_service).to receive(:findAgentViewModel).with(@uuid).and_return(AgentViewModel.new(com.thoughtworks.go.domain.NullAgentInstance.new(@uuid)))
 
-        get "show", :uuid => @uuid
+        get :show, params: { :uuid => @uuid }
         expect(response.status).to eq(404)
         expect(response.body).to have_content(/Agent with uuid '#{@uuid}' not found\./)
       end
@@ -58,7 +58,7 @@ describe AgentDetailsController do
       expect(@agent_service).to receive(:findAgentViewModel).with(@uuid).and_return(@agent)
       expect(@job_instance_service).to receive(:completedJobsOnAgent).with(@uuid, AgentDetailsController::JobHistoryColumns.completed, SortOrder::DESC, 1, AgentDetailsController::PAGE_SIZE).and_return(expected = JobInstancesModel.new(nil, nil))
 
-      get "job_run_history", :uuid => @uuid
+      get :job_run_history, params: { :uuid => @uuid }
 
       assert_template "job_run_history"
       assert_template layout: :agent_detail
@@ -70,7 +70,7 @@ describe AgentDetailsController do
       expect(@agent_service).to receive(:findAgentViewModel).with(@uuid).and_return(@agent)
       expect(@job_instance_service).to receive(:completedJobsOnAgent).with(@uuid, AgentDetailsController::JobHistoryColumns.stage, SortOrder::ASC, 3, AgentDetailsController::PAGE_SIZE).and_return(expected = JobInstancesModel.new(nil, nil))
 
-      get "job_run_history", :uuid => @uuid, :page => 3, :column => 'stage', :order => 'ASC'
+      get :job_run_history, params: { :uuid => @uuid, :page => 3, :column => 'stage', :order => 'ASC' }
 
       assert_template "job_run_history"
       assert_template layout: :agent_detail
