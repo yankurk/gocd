@@ -72,23 +72,6 @@ describe Admin::ConfigurationController do
     end
   end
 
-  describe "routes" do
-    it "view" do
-      expect(config_view_path).to eq("/admin/config_xml")
-      expect({:get => "/admin/config_xml"}).to route_to(:controller => "admin/configuration", :action => "show")
-    end
-
-    it "edit" do
-      expect(config_edit_path).to eq("/admin/config_xml/edit")
-      expect({:get => "/admin/config_xml/edit"}).to route_to(:controller => "admin/configuration", :action => "edit")
-    end
-
-    it "update" do
-      expect(config_update_path).to eq("/admin/config_xml")
-      expect({:put => "/admin/config_xml"}).to route_to(:controller => "admin/configuration", :action => "update")
-    end
-  end
-
   describe "show" do
     it "should render view with config" do
       config = {"content" => "config-content", "md5" => "md5", "location" => "/foo/bar"}
