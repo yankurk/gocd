@@ -25,11 +25,6 @@ describe Api::ConfigurationController do
   end
 
   describe "config_revisions" do
-    it "should route to list_revisions" do
-      expect(:get => '/api/config/revisions').to route_to(:controller => "api/configuration", :action => "config_revisions", :offset => '0', :no_layout => true)
-      expect(:get => '/api/config/revisions/1').to route_to(:controller => "api/configuration", :action => "config_revisions", :offset => '1', :no_layout => true)
-    end
-
     it "should render history json" do
       loser = Username.new(CaseInsensitiveString.new("loser"))
       expect(controller).to receive(:current_user).and_return(loser)
@@ -54,10 +49,6 @@ describe Api::ConfigurationController do
   end
 
   describe "diff" do
-    it "should route to list_revisions" do
-      expect(:get => '/api/config/diff/a/b').to route_to(:controller => "api/configuration", :action => "config_diff", :from_revision => 'a', :to_revision => 'b', :no_layout => true)
-    end
-
     it "should render history json" do
       loser = Username.new(CaseInsensitiveString.new("loser"))
       expect(controller).to receive(:current_user).and_return(loser)
