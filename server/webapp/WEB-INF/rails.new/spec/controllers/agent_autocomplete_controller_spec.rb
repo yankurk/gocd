@@ -24,18 +24,6 @@ describe AgentAutocompleteController do
     allow(controller).to receive(:agent_service).and_return(@agent_service = double("agent_service"))
   end
 
-  describe "routes" do
-
-    it "should resolve the path" do
-      expect(:get => '/agents/filter_autocomplete/resource').to route_to(:controller => "agent_autocomplete", :action => 'resource')
-      expect(agent_filter_autocomplete_path(:action => "os")).to eq("/agents/filter_autocomplete/os")
-    end
-
-    it "should accept only the defined actions" do
-      expect(:get => "agents/filter_autocomplete/foo").to route_to(:controller => "application", :action => 'unresolved', :url => "agents/filter_autocomplete/foo")
-    end
-  end
-
   describe "actions" do
     before do
       allow(@go_config_service).to receive(:checkConfigFileValid).and_return(com.thoughtworks.go.config.validation.GoConfigValidity.valid())
