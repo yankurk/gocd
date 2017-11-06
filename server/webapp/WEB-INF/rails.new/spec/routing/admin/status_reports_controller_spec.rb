@@ -1,4 +1,4 @@
-##########################################################################
+##########################GO-LICENSE-START################################
 # Copyright 2017 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-##########################################################################
+##########################GO-LICENSE-END##################################
 
 require 'rails_helper'
 
-describe FailuresController do
-  it "should resolve the route to show action" do
-    expect({:get => "/failures/foo_pipeline/10/bar_stage/5/baz_job/quux_suite/bang_test"}).to route_to(:controller => "failures", :action => "show", :pipeline_name => "foo_pipeline", :pipeline_counter => "10", :stage_name => "bar_stage", :stage_counter => "5", :job_name => "baz_job", :suite_name => "quux_suite", :test_name => "bang_test", :no_layout => true)
+describe Admin::StatusReportsController do
+  it 'should route to show' do
+    expect({:get => '/admin/status_reports/pluginId'}).to route_to(:controller => 'admin/status_reports', :action => 'show', :plugin_id => 'pluginId')
+    expect(admin_status_report_path(:plugin_id => 'com.tw.myplugin')).to eq('/admin/status_reports/com.tw.myplugin')
   end
 end
