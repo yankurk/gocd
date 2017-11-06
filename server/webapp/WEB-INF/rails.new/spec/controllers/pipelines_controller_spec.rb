@@ -151,7 +151,7 @@ describe PipelinesController do
       expected.add("bar","bar_value")
       expect(@go_config_service).to receive(:variablesFor).with("blah-pipeline-name").and_return(expected)
 
-      get 'show', :pipeline_name => 'blah-pipeline-name'
+      get :show, params: { :pipeline_name => 'blah-pipeline-name' }
 
       expect(assigns[:pipeline]).to eq(@pim)
       expect(assigns[:variables]).to eq(expected)
@@ -163,7 +163,7 @@ describe PipelinesController do
 
       expect(controller).not_to receive(:verify_authenticity_token)
 
-      post 'show', pipeline_name: 'blah-pipeline-name'
+      post :show, params: { pipeline_name: 'blah-pipeline-name' }
     end
   end
 
@@ -175,7 +175,7 @@ describe PipelinesController do
       expected.add("bar","bar_value")
       expect(@go_config_service).to receive(:variablesFor).with("blah-pipeline-name").and_return(expected)
 
-      post 'show_for_trigger', pipeline_name: 'blah-pipeline-name'
+      post :show_for_trigger, params: { pipeline_name: 'blah-pipeline-name' }
 
       expect(assigns[:pipeline]).to eq(@pim)
     end
@@ -186,7 +186,7 @@ describe PipelinesController do
 
       expect(controller).not_to receive(:verify_authenticity_token)
 
-      post 'show_for_trigger', pipeline_name: 'blah-pipeline-name'
+      post :show_for_trigger, params: { pipeline_name: 'blah-pipeline-name' }
     end
   end
 
@@ -232,7 +232,7 @@ describe PipelinesController do
       expect(@go_config_service).to receive(:persistSelectedPipelines).with("456", @user_id, ["pipeline1", "pipeline2"], true).and_return(1234)
       allow(controller).to receive(:cookies).and_return(cookiejar={:selected_pipelines => "456"})
 
-      post "select_pipelines", "selector" => {:pipeline=>["pipeline1", "pipeline2"]}, show_new_pipelines: "true"
+      post :select_pipelines, params: { "selector" => {:pipeline=>["pipeline1", "pipeline2"]}, show_new_pipelines: "true" }
 
       expect(cookiejar[:selected_pipelines]).to eq({:value=>1234, :expires=>1.year.from_now.beginning_of_day})
     end
@@ -241,16 +241,16 @@ describe PipelinesController do
       expect(@go_config_service).to receive(:persistSelectedPipelines).with("456", @user_id, [], true).and_return(1234)
       allow(controller).to receive(:cookies).and_return(cookiejar={:selected_pipelines => "456"})
 
-      post "select_pipelines", "selector" => {}, show_new_pipelines: "true"
+      post :select_pipelines, params: { "selector" => {}, show_new_pipelines: "true" }
 
       expect(cookiejar[:selected_pipelines]).to eq({:value=>1234, :expires=>1.year.from_now.beginning_of_day})
     end
-    
+
     it "should set cookies when no pipelines or groups selected" do
       expect(@go_config_service).to receive(:persistSelectedPipelines).with("456", @user_id, [], true).and_return(1234)
       allow(controller).to receive(:cookies).and_return(cookiejar={:selected_pipelines => "456"})
 
-      post "select_pipelines", show_new_pipelines: "true"
+      post :select_pipelines, params: { show_new_pipelines: "true" }
 
       expect(cookiejar[:selected_pipelines]).to eq({:value=>1234, :expires=>1.year.from_now.beginning_of_day})
     end
@@ -259,14 +259,14 @@ describe PipelinesController do
       allow(controller).to receive(:cookies).and_return(cookiejar={:selected_pipelines => "456"})
       expect(@go_config_service).to receive(:persistSelectedPipelines).with("456", @user_id, ["pipeline1", "pipeline2"], true).and_return(1234)
 
-      post "select_pipelines", "selector" => { pipeline: ["pipeline1", "pipeline2"]}, show_new_pipelines: "true"
+      post :select_pipelines, params: { "selector" => { pipeline: ["pipeline1", "pipeline2"]}, show_new_pipelines: "true" }
     end
 
     it "should persist the value of 'show_new_pipelines' when it is false" do
       allow(controller).to receive(:cookies).and_return(cookiejar={:selected_pipelines => "456"})
       expect(@go_config_service).to receive(:persistSelectedPipelines).with("456", @user_id, ["pipeline1", "pipeline2"], false).and_return(1234)
 
-      post "select_pipelines", "selector" => { pipeline: ["pipeline1", "pipeline2"]}
+      post :select_pipelines, params: { "selector" => { pipeline: ["pipeline1", "pipeline2"]} }
     end
   end
 
@@ -279,7 +279,7 @@ describe PipelinesController do
       expect(@go_config_service).to receive(:persistSelectedPipelines).with("456", @user_id, ["pipeline1", "pipeline2"], true).and_return(1234)
       allow(controller).to receive(:cookies).and_return(cookiejar={:selected_pipelines => "456"})
 
-      post "select_pipelines", "selector" => {:pipeline=>["pipeline1", "pipeline2"]}, show_new_pipelines: "true"
+      post :select_pipelines, params: { "selector" => {:pipeline=>["pipeline1", "pipeline2"]}, show_new_pipelines: "true" }
 
       expect(cookiejar[:selected_pipelines]).to eq("456")
     end
@@ -288,7 +288,7 @@ describe PipelinesController do
       expect(@go_config_service).to receive(:persistSelectedPipelines).with(nil, @user_id, [], true).and_return(1234)
       allow(controller).to receive(:cookies).and_return(cookiejar = {})
 
-      post "select_pipelines", "selector" => {}, show_new_pipelines: "true"
+      post :select_pipelines, params: { "selector" => {}, show_new_pipelines: "true" }
 
       expect(cookiejar[:selected_pipelines]).to eq(nil)
     end
