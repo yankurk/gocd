@@ -18,12 +18,8 @@ require 'rails_helper'
 
 describe GoErrorsController do
   describe "inactive" do
-    it 'should show the error page, with a message' do
-      get :inactive
-
-      expect(assigns[:message]).to start_with("Sorry, that operation is not allowed at this time")
-      expect(assigns[:status]).to eq(503)
-      expect(response).to render_template("shared/error")
+    it "should resolve" do
+      expect(get: "/errors/inactive").to route_to(controller: "go_errors", action: "inactive")
     end
   end
 end
