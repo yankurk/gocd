@@ -20,4 +20,10 @@ module ApiHeaderSetupForRouting
       original_method.call(*args, &block).tap { |hash| hash['HTTP_ACCEPT'] = described_class::DEFAULT_ACCEPTS_HEADER }
     end
   end
+
+  def stub_confirm_header
+    expect(Rack::MockRequest).to receive(:env_for).and_wrap_original do |original_method, *args, &block|
+      original_method.call(*args, &block).tap { |hash| hash['HTTP_CONFIRM'] = "true" }
+    end
+  end
 end

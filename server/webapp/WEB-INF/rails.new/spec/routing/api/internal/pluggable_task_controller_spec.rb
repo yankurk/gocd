@@ -17,15 +17,12 @@
 require 'rails_helper'
 
 describe Api::Internal::PluggableTaskController do
-
-  before :each do
-    allow(controller).to receive(:task_view_service).and_return(@task_view_service = double('task_view_service'))
-  end
+  include ApiHeaderSetupForRouting
 
   describe "route" do
     describe "with_header" do
-      before :each do
-        allow_any_instance_of(HeaderConstraint).to receive(:matches?).and_return(true)
+      before(:each) do
+        stub_confirm_header
       end
 
       it 'should route to validate action of pluggable_task controller' do
@@ -53,11 +50,8 @@ describe Api::Internal::PluggableTaskController do
         end
       end
     end
+    
     describe "without_header" do
-      before :each do
-        allow_any_instance_of(HeaderConstraint).to receive(:matches?).and_return(false)
-      end
-
       it 'should not route to validate action' do
         expect(post: 'api/config/internal/pluggable_task/id').to_not route_to(controller: 'api/internal/pluggable_task', action: 'validate', plugin_id: 'id')
         expect(post: 'api/config/internal/pluggable_task/id').to route_to(controller: 'application', action: 'unresolved', url: 'api/config/internal/pluggable_task/id')
