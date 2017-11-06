@@ -112,7 +112,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
 
       it 'should disallow pipeline group admin users, with security enabled' do
         login_as_group_admin
-        expect(controller).to disallow_action(:get, :show, auth_config_id: 'foo')
+        expect(controller).to disallow_action(:get, :show, params: {auth_config_id: 'foo'})
       end
     end
 
@@ -244,7 +244,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
 
       it 'should disallow pipeline group admin users, with security enabled' do
         login_as_group_admin
-        expect(controller).to disallow_action(:put, :update, auth_config_id: 'foo')
+        expect(controller).to disallow_action(:put, :update, params: {auth_config_id: 'foo'})
       end
     end
     describe 'admin' do
@@ -397,7 +397,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         expect(controller).to disallow_action(:post, :verify_connection)
       end
     end
-    
+
     describe "as_admin" do
       before(:each) do
         enable_security

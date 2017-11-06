@@ -42,11 +42,10 @@ describe ApiV1::Admin::Security::AuthConfigsController do
   end
 
   describe "show" do
-    before(:each) do
-      setup_header
-    end
-
     describe "with_header" do
+      before(:each) do
+        setup_header
+      end
 
       it 'should route to show action of controller for alphanumeric identifier' do
         expect(:get => 'api/admin/security/auth_configs/foo123').to route_to(action: 'show', controller: 'api_v1/admin/security/auth_configs', auth_config_id: 'foo123')
