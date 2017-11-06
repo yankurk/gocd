@@ -61,7 +61,7 @@ class Admin::Plugins::PluginsController < AdminController
       render_settings_page(plugin_settings, 400)
     else
       plugin_service.savePluginSettingsFor(plugin_settings)
-      render(:text => 'Saved successfully', :location => url_options_with_flash(l.string('SAVED_SUCCESSFULLY'), {:action => :index, :class => 'success'}))
+      render(:plain => 'Saved successfully', :location => url_options_with_flash(l.string('SAVED_SUCCESSFULLY'), {:action => :index, :class => 'success'}))
     end
   end
 

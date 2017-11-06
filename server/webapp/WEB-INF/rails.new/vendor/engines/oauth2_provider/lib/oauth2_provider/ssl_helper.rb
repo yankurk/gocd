@@ -17,7 +17,7 @@ module Oauth2Provider
       else
         error = 'This page can only be accessed using HTTPS.'
         flash.now[:error] = error
-        render(:text => '', :layout => true, :status => :forbidden)
+        render(:plain => '', :layout => true, :status => :forbidden)
       end
       false
     end
