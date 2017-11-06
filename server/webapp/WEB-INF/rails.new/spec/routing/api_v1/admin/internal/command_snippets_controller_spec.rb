@@ -18,70 +18,21 @@ require 'rails_helper'
 
 describe ApiV1::Admin::Internal::CommandSnippetsController do
 
-  include ApiV1::ApiVersionHelper
-
-  before :each do
-    allow(controller).to receive(:command_repository_service).and_return(@command_repository_service = double('command_repository_service'))
-  end
+  include ApiHeaderSetupForRouting
 
   describe "index" do
-    describe "authorization" do
-      it 'should allow all with security disabled' do
-        disable_security
-
-        expect(controller).to allow_action(:get, :index)
+    describe "with_header" do
+      before(:each) do
+        setup_header
       end
-
-      it 'should disallow anonymous users, with security enabled' do
-        enable_security
-        login_as_anonymous
-
-        expect(controller).to disallow_action(:get, :index).with(401, 'You are not authorized to perform this action.')
-      end
-
-      it 'should disallow normal users, with security enabled' do
-        enable_security
-        login_as_user
-
-        expect(controller).to disallow_action(:get, :index).with(401, 'You are not authorized to perform this action.')
-      end
-
-      it 'should allow admin, with security enabled' do
-        enable_security
-        login_as_admin
-
-        expect(controller).to allow_action(:get, :index)
+      it 'should route to index action of the internal command_snippets controller' do
+        expect(:get => 'api/admin/internal/command_snippets').to route_to(action: 'index', controller: 'api_v1/admin/internal/command_snippets')
       end
     end
-
-    describe 'as admin' do
-      it 'should fetch all command snippets filtered by prefix' do
-        enable_security
-        login_as_admin
-        snippet = com.thoughtworks.go.helper.CommandSnippetMother.validSnippet("scp")
-        presenter   = ApiV1::CommandSnippetsRepresenter.new([snippet])
-        snippet_hash = presenter.to_hash(url_builder: controller, prefix: 'rake')
-
-        expect(@command_repository_service).to receive(:lookupCommand).with('rake').and_return([snippet])
-
-        get_with_api_header :index, params: { prefix: 'rake' }
-
-        expect(response).to be_ok
-        expect(actual_response).to eq(JSON.parse(snippet_hash.to_json).deep_symbolize_keys)
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to index action of the internal command_snippets controller' do
-          expect(:get => 'api/admin/internal/command_snippets').to route_to(action: 'index', controller: 'api_v1/admin/internal/command_snippets')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to index action of internal command_snippets controller without header' do
-          expect(:get => 'api/admin/internal/command_snippets').to_not route_to(action: 'index', controller: 'api_v1/admin/internal/command_snippets')
-          expect(:get => 'api/admin/internal/command_snippets').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/internal/command_snippets')
-        end
+    describe "without_header" do
+      it 'should not route to index action of internal command_snippets controller without header' do
+        expect(:get => 'api/admin/internal/command_snippets').to_not route_to(action: 'index', controller: 'api_v1/admin/internal/command_snippets')
+        expect(:get => 'api/admin/internal/command_snippets').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/internal/command_snippets')
       end
     end
   end

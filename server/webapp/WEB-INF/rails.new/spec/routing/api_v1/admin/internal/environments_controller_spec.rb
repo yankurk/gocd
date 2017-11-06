@@ -18,92 +18,23 @@ require 'rails_helper'
 
 describe ApiV1::Admin::Internal::EnvironmentsController do
 
-  include ApiV1::ApiVersionHelper
+  include ApiHeaderSetupForRouting
 
-  before(:each) do
-    @environment_config_service = double("environment_config_service")
-    allow(controller).to receive("environment_config_service").and_return(@environment_config_service)
-  end
-
-  describe "security" do
-    describe "index" do
-
-      it 'should allow anyone, with security disabled' do
-        disable_security
-
-        expect(controller).to allow_action(:get, :index)
+  describe "index" do
+    describe "with_header" do
+      before(:each) do
+        setup_header
       end
 
-      it 'should disallow non-admin user, with security enabled' do
-        enable_security
-        login_as_user
-
-        expect(controller).to disallow_action(:get, :index).with(401, 'You are not authorized to perform this action.')
-      end
-
-      it 'should allow admin users, with security enabled' do
-        login_as_admin
-
-        expect(controller).to allow_action(:get, :index)
+      it 'should route to index action of the internal environments controller' do
+        expect(:get => 'api/admin/internal/environments').to route_to(action: 'index', controller: 'api_v1/admin/internal/environments')
       end
     end
-  end
+    describe "without_header" do
 
-  describe "action" do
-    before :each do
-      enable_security
-    end
-
-    describe "index" do
-      it 'should fetch all the environments' do
-        login_as_admin
-        environments_list = %w(dev production)
-        expect(@environment_config_service).to receive(:environmentNames).and_return(environments_list)
-
-        get_with_api_header :index
-
-        expect(response).to be_ok
-        expect(JSON.parse(response.body)).to eq(environments_list)
-      end
-
-      it 'should not recompute the environments list when not modified and etag provided' do
-        login_as_admin
-        environments_list = %w(dev production).sort
-        expect(@environment_config_service).to receive(:environmentNames).and_return(environments_list)
-        controller.request.env['HTTP_IF_NONE_MATCH'] = Digest::MD5.hexdigest(environments_list.join('/'))
-
-        get_with_api_header :index
-
-        expect(response.code).to eq('304')
-        expect(response.body).to be_empty
-      end
-
-      it 'should recompute the environments list when it is modified and stale etag provided' do
-        login_as_admin
-        environments_list = %w(dev production)
-        expect(@environment_config_service).to receive(:environmentNames).and_return(environments_list)
-
-        controller.request.env['HTTP_IF_NONE_MATCH'] = 'stale-etag'
-
-        get_with_api_header :index
-
-        expect(response).to be_ok
-        expect(JSON.parse(response.body)).to eq(environments_list)
-      end
-
-      describe "route" do
-        describe "with_header" do
-          it 'should route to index action of the internal environments controller' do
-            expect(:get => 'api/admin/internal/environments').to route_to(action: 'index', controller: 'api_v1/admin/internal/environments')
-          end
-        end
-        describe "without_header" do
-
-          it 'should not route to index action of internal environments controller without header' do
-            expect(:get => 'api/admin/internal/environments').to_not route_to(action: 'index', controller: 'api_v1/admin/internal/environments')
-            expect(:get => 'api/admin/internal/environments').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/internal/environments')
-          end
-        end
+      it 'should not route to index action of internal environments controller without header' do
+        expect(:get => 'api/admin/internal/environments').to_not route_to(action: 'index', controller: 'api_v1/admin/internal/environments')
+        expect(:get => 'api/admin/internal/environments').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/internal/environments')
       end
     end
   end
