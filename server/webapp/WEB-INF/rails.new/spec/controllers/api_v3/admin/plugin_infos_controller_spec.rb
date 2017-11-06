@@ -145,21 +145,6 @@ describe ApiV3::Admin::PluginInfosController do
       json = JSON.parse(response.body).deep_symbolize_keys
       expect(json[:message]).to eq('Your request could not be processed. Invalid plugins type - `invalid_type` !')
     end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to the index action of plugin_infos controller' do
-          expect(:get => 'api/admin/plugin_info').to route_to(action: 'index', controller: 'api_v3/admin/plugin_infos')
-        end
-      end
-
-      describe "without_header" do
-        it 'should not route to index action of plugin_infos controller without header' do
-          expect(:get => 'api/admin/plugin_info').to_not route_to(action: 'index', controller: 'api_v3/admin/plugin_infos')
-          expect(:get => 'api/admin/plugin_info').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/plugin_info')
-        end
-      end
-    end
   end
 
   describe "show" do
@@ -207,38 +192,6 @@ describe ApiV3::Admin::PluginInfosController do
       expect(response.code).to eq('404')
       json = JSON.parse(response.body).deep_symbolize_keys
       expect(json[:message]).to eq('Either the resource you requested was not found, or you are not authorized to perform this action.')
-    end
-
-    describe "route" do
-      describe "with_header" do
-
-        it 'should route to the show action of plugin_infos controller for alphanumeric plugin id' do
-          expect(:get => 'api/admin/plugin_info/foo123bar').to route_to(action: 'show', controller: 'api_v3/admin/plugin_infos', id: 'foo123bar')
-        end
-
-        it 'should route to the show action of plugin_infos controller for plugin id with hyphen' do
-          expect(:get => 'api/admin/plugin_info/foo-123-bar').to route_to(action: 'show', controller: 'api_v3/admin/plugin_infos', id: 'foo-123-bar')
-        end
-
-        it 'should route to the show action of plugin_infos controller for plugin id with underscore' do
-          expect(:get => 'api/admin/plugin_info/foo_123_bar').to route_to(action: 'show', controller: 'api_v3/admin/plugin_infos', id: 'foo_123_bar')
-        end
-
-        it 'should route to the show action of plugin_infos controller for plugin id with dots' do
-          expect(:get => 'api/admin/plugin_info/foo.123.bar').to route_to(action: 'show', controller: 'api_v3/admin/plugin_infos', id: 'foo.123.bar')
-        end
-
-        it 'should route to the show action of plugin_infos controller for capitalized plugin id' do
-          expect(:get => 'api/admin/plugin_info/FOO').to route_to(action: 'show', controller: 'api_v3/admin/plugin_infos', id: 'FOO')
-        end
-      end
-
-      describe "without_header" do
-        it 'should not route to show action of plugin_infos controller without header' do
-          expect(:get => 'api/admin/plugin_info/abc').to_not route_to(action: 'show', controller: 'api_v3/admin/plugin_infos')
-          expect(:get => 'api/admin/plugin_info/abc').to route_to(controller: 'application', action: 'unresolved', url: 'api/admin/plugin_info/abc')
-        end
-      end
     end
   end
 end
