@@ -1,5 +1,5 @@
-##########################GO-LICENSE-START################################
-# Copyright 2014 ThoughtWorks, Inc.
+##########################################################################
+# Copyright 2017 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-##########################GO-LICENSE-END##################################
+##########################################################################
 
 require 'rails_helper'
 
@@ -66,18 +66,6 @@ describe PipelinesController do
 
       get :build_cause, params: { :pipeline_name => "pipeline_name", :pipeline_counter => "10", :layout => false }
     end
-
-    it "should route to build_cause action" do
-      expect({:get => "/pipelines/name_of_pipeline/15/build_cause"}).to route_to(:controller => "pipelines", :action => "build_cause", :pipeline_name => "name_of_pipeline", :pipeline_counter => "15", :no_layout => true)
-    end
-
-    it "should route to build_cause action with dots in pipline name" do
-      expect({:get => "/pipelines/blah.pipe-line/1/build_cause"}).to route_to(:controller => "pipelines", :action => "build_cause", :pipeline_name => "blah.pipe-line", :pipeline_counter => "1", :no_layout => true)
-    end
-
-    it "should have a named route" do
-      expect(controller.send(:build_cause_url, :pipeline_name => "foo", :pipeline_counter => 20)).to eq("http://test.host/pipelines/foo/20/build_cause")
-    end
   end
 
   describe "index" do
@@ -97,11 +85,6 @@ describe PipelinesController do
       expect(assigns[:pipeline_groups]).to eq(:pipeline_group_models)
       expect(assigns[:pipeline_selections]).to eq(selections)
       expect(assigns[:pipeline_configs]).to eq(viewable_groups)
-    end
-
-    it "should resolve" do
-      expect({:get => "/pipelines"}).to route_to(:controller => "pipelines", :action => "index", :format => "html")
-      expect({:get => "/pipelines.json"}).to route_to(:controller => "pipelines", :action => "index", :format => "json")
     end
 
     it "should redirect to 'add pipeline wizard' when there are no pipelines in config only if the user is an admin" do
@@ -160,10 +143,6 @@ describe PipelinesController do
   end
 
   describe "action show" do
-    it "should resolve using both GET and POST" do
-      expect({:get => "/pipelines/show"}).to route_to(:controller => "pipelines", :action => "show")
-      expect({:post => "/pipelines/show"}).to route_to(:controller => "pipelines", :action => "show")
-    end
 
     it "should load pipeline and variables for a given pipeline" do
       expect(@pipeline_history_service).to receive(:latest).with("blah-pipeline-name", @user).and_return(@pim)
@@ -213,10 +192,6 @@ describe PipelinesController do
 
       post 'show_for_trigger', pipeline_name: 'blah-pipeline-name'
     end
-  end
-
-  it "should resolve get to /pipelines/material_search as a call" do
-    expect({:get => "/pipelines/material_search"}).to route_to(:controller => "pipelines", :action => "material_search", :no_layout => true)
   end
 
   it "should show error message if the user is not authorized to view the pipeline" do
