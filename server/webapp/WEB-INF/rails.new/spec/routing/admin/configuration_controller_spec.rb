@@ -17,20 +17,18 @@
 require 'rails_helper'
 
 describe Admin::ConfigurationController do
-  describe "routes" do
-    it "view" do
-      expect(config_view_path).to eq("/admin/config_xml")
-      expect({:get => "/admin/config_xml"}).to route_to(:controller => "admin/configuration", :action => "show")
-    end
+  it "view" do
+    expect(config_view_path).to eq("/admin/config_xml")
+    expect({:get => "/admin/config_xml"}).to route_to(:controller => "admin/configuration", :action => "show")
+  end
 
-    it "edit" do
-      expect(config_edit_path).to eq("/admin/config_xml/edit")
-      expect({:get => "/admin/config_xml/edit"}).to route_to(:controller => "admin/configuration", :action => "edit")
-    end
+  it "edit" do
+    expect(config_edit_path).to eq("/admin/config_xml/edit")
+    expect({:get => "/admin/config_xml/edit"}).to route_to(:controller => "admin/configuration", :action => "edit")
+  end
 
-    it "update" do
-      expect(config_update_path).to eq("/admin/config_xml")
-      expect({:put => "/admin/config_xml"}).to route_to(:controller => "admin/configuration", :action => "update")
-    end
+  it "update" do
+    expect(config_update_path).to eq("/admin/config_xml")
+    expect({:put => "/admin/config_xml"}).to route_to(:controller => "admin/configuration", :action => "update")
   end
 end
