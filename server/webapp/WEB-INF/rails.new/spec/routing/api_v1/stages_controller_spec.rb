@@ -19,10 +19,6 @@ require 'rails_helper'
 describe ApiV1::StagesController do
   include ApiHeaderSetupForRouting
 
-  before :each do
-    allow(controller).to receive(:stage_service).and_return(@stage_service = double('stage_service'))
-  end
-
   describe "show" do
     describe "with_header" do
       before(:each) do
