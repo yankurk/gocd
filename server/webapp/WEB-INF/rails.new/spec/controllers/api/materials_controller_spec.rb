@@ -51,24 +51,11 @@ describe Api::MaterialsController do
       expect(response.status).to eq(400)
       expect(response.body).to eq("The request could not be understood by Go Server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.\n")
     end
-
-    it "should generate the route" do
-      expect(material_notify_path(:post_commit_hook_material_type => 'svn')).to eq("/api/material/notify/svn")
-    end
-
-    it "should resolve" do
-      expect_any_instance_of(HeaderConstraint).to receive(:matches?).with(any_args).and_return(true)
-      expect(:post => "/api/material/notify/svn").to route_to(:controller => "api/materials", :action => "notify", :no_layout=>true, :post_commit_hook_material_type => "svn")
-    end
   end
 
   describe "list_materials_config" do
     before :each do
       allow(controller).to receive(:material_config_service).and_return(@material_config_service = double('material_config_service'))
-    end
-
-    it "should resolve" do
-      expect(:get => "/api/config/materials").to route_to(:controller => "api/materials", :action => "list_configs", :no_layout=>true)
     end
 
     it "should render material list json" do
@@ -86,11 +73,6 @@ describe Api::MaterialsController do
     before :each do
       allow(controller).to receive(:material_config_service).and_return(@material_config_service = double('material_config_service'))
       allow(controller).to receive(:material_service).and_return(@material_service = double('material_service'))
-    end
-
-    it "should resolve" do
-      expect(:get => "/api/materials/fingerprint/modifications").to route_to(:controller => "api/materials", :action => "modifications", :fingerprint => "fingerprint", :offset => "0", :no_layout => true)
-      expect(:get => "/api/materials/fingerprint/modifications/1").to route_to(:controller => "api/materials", :action => "modifications", :fingerprint => "fingerprint", :offset => "1", :no_layout => true)
     end
 
     it "should render material modification list json" do
