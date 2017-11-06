@@ -30,7 +30,7 @@ describe ConfigView::TemplatesController do
     it 'should allow anyone, with security disabled' do
       disable_security
 
-      expect(controller).to allow_action(:get, :show, name: 'template')
+      expect(controller).to allow_action(:get, :show, params: { name: 'template' })
     end
 
     it 'should disallow anonymous users, with security enabled' do

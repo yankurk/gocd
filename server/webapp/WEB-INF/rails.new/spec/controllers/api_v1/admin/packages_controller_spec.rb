@@ -128,7 +128,7 @@ describe ApiV1::Admin::PackagesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, package_id: @package_id)
+        expect(controller).to allow_action(:get, :show, params: { package_id: @package_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -205,7 +205,7 @@ describe ApiV1::Admin::PackagesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:delete, :destroy, package_id: @package_id)
+        expect(controller).to allow_action(:delete, :destroy, params: { package_id: @package_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -423,7 +423,7 @@ describe ApiV1::Admin::PackagesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:put, :update, package_id: @package_id)
+        expect(controller).to allow_action(:put, :update, params: { package_id: @package_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -439,12 +439,12 @@ describe ApiV1::Admin::PackagesController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:put, :update, package_id: @package_id)
+        expect(controller).to allow_action(:put, :update, params: { package_id: @package_id })
       end
 
       it 'should allow pipeline group admin users, with security enabled' do
         login_as_group_admin
-        expect(controller).to allow_action(:put, :update, package_id: @package_id)
+        expect(controller).to allow_action(:put, :update, params: { package_id: @package_id })
       end
     end
 

@@ -38,7 +38,7 @@ describe Admin::StatusReportsController do
     it 'should be accessible only to admins' do
       login_as_admin
 
-      expect(controller).to allow_action(:get, :show, :plugin_id => 'com.tw.myplugin')
+      expect(controller).to allow_action(:get, :show, params: { :plugin_id => 'com.tw.myplugin' })
     end
 
     it 'should be inaccessible by non-admins' do
@@ -51,7 +51,7 @@ describe Admin::StatusReportsController do
       disable_security
       login_as_anonymous
 
-      expect(controller).to allow_action(:get, :show, :plugin_id => 'com.tw.myplugin')
+      expect(controller).to allow_action(:get, :show, params: { :plugin_id => 'com.tw.myplugin' })
     end
   end
 

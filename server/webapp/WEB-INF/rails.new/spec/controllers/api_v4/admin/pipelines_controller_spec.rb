@@ -105,7 +105,7 @@ describe ApiV4::Admin::PipelinesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:post, :create, :group => @group)
+        expect(controller).to allow_action(:post, :create, params: { :group => @group })
       end
 
       it 'should disallow non-admin user, with security enabled' do
@@ -116,7 +116,7 @@ describe ApiV4::Admin::PipelinesController do
 
       it 'should allow admin users, with security enabled' do
         login_as_pipeline_group_admin_user(@group)
-        expect(controller).to allow_action(:post, :create, :group => @group)
+        expect(controller).to allow_action(:post, :create, params: { :group => @group })
       end
     end
 

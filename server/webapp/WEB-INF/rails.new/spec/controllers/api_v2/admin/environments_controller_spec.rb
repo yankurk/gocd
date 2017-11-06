@@ -116,7 +116,7 @@ describe ApiV2::Admin::EnvironmentsController do
     describe "security" do
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, name: @environment_name)
+        expect(controller).to allow_action(:get, :show, params: { name: @environment_name })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -132,7 +132,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:get, :show, name: @environment_name)
+        expect(controller).to allow_action(:get, :show, params: { name: @environment_name })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do
@@ -236,7 +236,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:put, :put, name: @environment_name)
+        expect(controller).to allow_action(:put, :put, params: { name: @environment_name })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -252,7 +252,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:put, :put, name: @environment_name)
+        expect(controller).to allow_action(:put, :put, params: { name: @environment_name })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do
@@ -343,7 +343,7 @@ describe ApiV2::Admin::EnvironmentsController do
     describe "security" do
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:patch, :patch, name: @environment_name)
+        expect(controller).to allow_action(:patch, :patch, params: { name: @environment_name })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -359,7 +359,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:patch, :patch, name: @environment_name)
+        expect(controller).to allow_action(:patch, :patch, params: { name: @environment_name })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do
@@ -434,7 +434,7 @@ describe ApiV2::Admin::EnvironmentsController do
     describe "security" do
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:delete, :destroy, name: @environment_name)
+        expect(controller).to allow_action(:delete, :destroy, params: { name: @environment_name })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -450,7 +450,7 @@ describe ApiV2::Admin::EnvironmentsController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:delete, :destroy, name: @environment_name)
+        expect(controller).to allow_action(:delete, :destroy, params: { name: @environment_name })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do

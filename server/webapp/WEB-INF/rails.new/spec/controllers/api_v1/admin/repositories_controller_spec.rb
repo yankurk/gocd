@@ -117,7 +117,7 @@ describe ApiV1::Admin::RepositoriesController do
       end
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, repo_id: @repo_id)
+        expect(controller).to allow_action(:get, :show, params: { repo_id: @repo_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -198,7 +198,7 @@ describe ApiV1::Admin::RepositoriesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:delete, :destroy, repo_id: @repo_id)
+        expect(controller).to allow_action(:delete, :destroy, params: { repo_id: @repo_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -390,7 +390,7 @@ describe ApiV1::Admin::RepositoriesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:put, :update, repo_id: @repo_id)
+        expect(controller).to allow_action(:put, :update, params: { repo_id: @repo_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do

@@ -277,7 +277,7 @@ describe ApiV1::Admin::PluggableScmsController do
         disable_security
         allow(controller).to receive(:check_for_stale_request).and_return(nil)
         allow(@pluggable_scm_service).to receive(:findPluggableScmMaterial).with('foo').and_return(@scm)
-        expect(controller).to allow_action(:put, :update, material_name: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { material_name: 'foo' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -299,14 +299,14 @@ describe ApiV1::Admin::PluggableScmsController do
         login_as_admin
         allow(controller).to receive(:check_for_stale_request).and_return(nil)
         allow(@pluggable_scm_service).to receive(:findPluggableScmMaterial).with('foo').and_return(@scm)
-        expect(controller).to allow_action(:put, :update, material_name: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { material_name: 'foo' })
       end
 
       it 'should allow pipeline group admin users, with security enabled' do
         login_as_group_admin
         allow(controller).to receive(:check_for_stale_request).and_return(nil)
         allow(@pluggable_scm_service).to receive(:findPluggableScmMaterial).with('foo').and_return(@scm)
-        expect(controller).to allow_action(:put, :update, material_name: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { material_name: 'foo' })
       end
 
     end

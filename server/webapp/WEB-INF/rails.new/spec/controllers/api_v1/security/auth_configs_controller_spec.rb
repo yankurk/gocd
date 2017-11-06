@@ -107,7 +107,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       it 'should allow all with security disabled' do
         disable_security
 
-        expect(controller).to allow_action(:get, :show, auth_config_id: 'foo')
+        expect(controller).to allow_action(:get, :show, params: { auth_config_id: 'foo' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -128,7 +128,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
         enable_security
         login_as_admin
 
-        expect(controller).to allow_action(:get, :show, auth_config_id: 'foo')
+        expect(controller).to allow_action(:get, :show, params: { auth_config_id: 'foo' })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do
@@ -291,7 +291,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       end
       it 'should allow all with security disabled' do
         disable_security
-        expect(controller).to allow_action(:put, :update, auth_config_id: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { auth_config_id: 'foo' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -310,7 +310,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
 
       it 'should allow admin, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:put, :update, auth_config_id: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { auth_config_id: 'foo' })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do
@@ -401,7 +401,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       end
       it 'should allow all with security disabled' do
         disable_security
-        expect(controller).to allow_action(:delete, :destroy, auth_config_id: 'foo')
+        expect(controller).to allow_action(:delete, :destroy, params: { auth_config_id: 'foo' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -419,7 +419,7 @@ describe ApiV1::Admin::Security::AuthConfigsController do
       it 'should allow admin, with security enabled' do
         enable_security
         login_as_admin
-        expect(controller).to allow_action(:delete, :destroy, auth_config_id: 'foo')
+        expect(controller).to allow_action(:delete, :destroy, params: { auth_config_id: 'foo' })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do

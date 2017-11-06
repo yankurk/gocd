@@ -118,7 +118,7 @@ describe ApiV1::Admin::MergedEnvironmentsController do
     describe "security" do
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, environment_name: @environment_name)
+        expect(controller).to allow_action(:get, :show, params: { environment_name: @environment_name })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -134,7 +134,7 @@ describe ApiV1::Admin::MergedEnvironmentsController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:get, :show, environment_name: @environment_name)
+        expect(controller).to allow_action(:get, :show, params: { environment_name: @environment_name })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do

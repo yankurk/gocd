@@ -29,7 +29,7 @@ describe ApiV1::StagesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1')
+        expect(controller).to allow_action(:get, :show, params: { pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -41,7 +41,7 @@ describe ApiV1::StagesController do
       it 'should allow normal users who have access to pipeline, with security enabled' do
         login_as_user
         allow_current_user_to_access_pipeline('pipeline')
-        expect(controller).to allow_action(:get, :show, pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1')
+        expect(controller).to allow_action(:get, :show, params: { pipeline_name: 'pipeline', stage_name: 'stage', pipeline_counter: '1', stage_counter: '1' })
       end
 
       it 'should disallow normal users who do not have access to pipeline, with security enabled' do
@@ -155,7 +155,7 @@ describe ApiV1::StagesController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :history, pipeline_name: 'pipeline', stage_name: 'stage')
+        expect(controller).to allow_action(:get, :history, params: { pipeline_name: 'pipeline', stage_name: 'stage' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -167,7 +167,7 @@ describe ApiV1::StagesController do
       it 'should allow normal users who have access to pipeline, with security enabled' do
         login_as_user
         allow_current_user_to_access_pipeline('pipeline')
-        expect(controller).to allow_action(:get, :history, pipeline_name: 'pipeline', stage_name: 'stage')
+        expect(controller).to allow_action(:get, :history, params: { pipeline_name: 'pipeline', stage_name: 'stage' })
       end
 
       it 'should disallow normal users who do not have access to pipeline, with security enabled' do

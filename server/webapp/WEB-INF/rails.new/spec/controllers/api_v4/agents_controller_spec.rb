@@ -101,7 +101,7 @@ describe ApiV4::AgentsController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, uuid: @agent.getUuid())
+        expect(controller).to allow_action(:get, :show, params: { uuid: @agent.getUuid() })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -112,7 +112,7 @@ describe ApiV4::AgentsController do
 
       it 'should allow normal users, with security enabled' do
         login_as_user
-        expect(controller).to allow_action(:get, :show, uuid: @agent.getUuid())
+        expect(controller).to allow_action(:get, :show, params: { uuid: @agent.getUuid() })
       end
     end
 
@@ -175,7 +175,7 @@ describe ApiV4::AgentsController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:delete, :destroy, uuid: @agent.getUuid())
+        expect(controller).to allow_action(:delete, :destroy, params: { uuid: @agent.getUuid() })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -256,7 +256,7 @@ describe ApiV4::AgentsController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:patch, :update, uuid: @agent.getUuid(), hostname: 'some-hostname')
+        expect(controller).to allow_action(:patch, :update, params: { uuid: @agent.getUuid(), hostname: 'some-hostname' })
       end
 
       it 'should disallow anonymous users, with security enabled' do

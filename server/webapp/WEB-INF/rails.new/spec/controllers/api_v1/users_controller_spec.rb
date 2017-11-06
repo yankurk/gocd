@@ -106,7 +106,7 @@ describe ApiV1::UsersController do
     describe "security" do
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, login_name: @john.name)
+        expect(controller).to allow_action(:get, :show, params: { login_name: @john.name })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -186,7 +186,7 @@ describe ApiV1::UsersController do
     describe "security" do
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:delete, :destroy, login_name: @john.name)
+        expect(controller).to allow_action(:delete, :destroy, params: { login_name: @john.name })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -263,7 +263,7 @@ describe ApiV1::UsersController do
     describe "security" do
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:patch, :update, login_name: @john.name)
+        expect(controller).to allow_action(:patch, :update, params: { login_name: @john.name })
       end
 
       it 'should disallow anonymous users, with security enabled' do

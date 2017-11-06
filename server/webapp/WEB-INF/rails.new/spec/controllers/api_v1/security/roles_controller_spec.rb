@@ -129,7 +129,7 @@ describe ApiV1::Admin::Security::RolesController do
       it 'should allow all with security disabled' do
         disable_security
 
-        expect(controller).to allow_action(:get, :show, role_name: 'foo')
+        expect(controller).to allow_action(:get, :show, params: { role_name: 'foo' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -150,7 +150,7 @@ describe ApiV1::Admin::Security::RolesController do
         enable_security
         login_as_admin
 
-        expect(controller).to allow_action(:get, :show, role_name: 'foo')
+        expect(controller).to allow_action(:get, :show, params: { role_name: 'foo' })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do
@@ -338,7 +338,7 @@ describe ApiV1::Admin::Security::RolesController do
       end
       it 'should allow all with security disabled' do
         disable_security
-        expect(controller).to allow_action(:put, :update, role_name: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { role_name: 'foo' })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -355,7 +355,7 @@ describe ApiV1::Admin::Security::RolesController do
 
       it 'should allow admin, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:put, :update, role_name: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { role_name: 'foo' })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do
@@ -462,7 +462,7 @@ describe ApiV1::Admin::Security::RolesController do
 
       it 'should allow admin, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:delete, :destroy, role_name: 'foo')
+        expect(controller).to allow_action(:delete, :destroy, params: { role_name: 'foo' })
       end
 
       it 'should disallow pipeline group admin users, with security enabled' do

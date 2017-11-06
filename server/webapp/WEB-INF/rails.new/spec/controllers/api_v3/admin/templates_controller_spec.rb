@@ -143,14 +143,14 @@ describe ApiV3::Admin::TemplatesController do
       it 'show allow template admin, with security enabled' do
         login_as_template_admin
 
-        expect(controller).to allow_action(:get, :show, template_name: 'foo')
+        expect(controller).to allow_action(:get, :show, params: { template_name: 'foo' })
       end
 
       it 'should allow template view users, with security enabled' do
         enable_security
         allow(@security_service).to receive(:isAuthorizedToViewTemplate).with(anything, anything).and_return(true)
 
-        expect(controller).to allow_action(:get, :show, template_name: 'foo')
+        expect(controller).to allow_action(:get, :show, params: { template_name: 'foo' })
       end
     end
     describe 'admin' do
@@ -341,7 +341,7 @@ describe ApiV3::Admin::TemplatesController do
       it 'show allow template admin, with security enabled' do
         login_as_template_admin
 
-        expect(controller).to allow_action(:put, :update, template_name: 'foo')
+        expect(controller).to allow_action(:put, :update, params: { template_name: 'foo' })
       end
     end
     describe 'admin' do
@@ -483,7 +483,7 @@ describe ApiV3::Admin::TemplatesController do
       it 'should allow template admin, with security enabled' do
         login_as_template_admin
 
-        expect(controller).to allow_action(:delete, :destroy, template_name: 'foo')
+        expect(controller).to allow_action(:delete, :destroy, params: { template_name: 'foo' })
       end
     end
     describe 'admin' do

@@ -64,7 +64,7 @@ describe ApiV1::Admin::ConfigReposController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:get, :show, id: @config_repo_id)
+        expect(controller).to allow_action(:get, :show, params: { id: @config_repo_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -197,7 +197,7 @@ describe ApiV1::Admin::ConfigReposController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:delete, :destroy, id: @config_repo_id)
+        expect(controller).to allow_action(:delete, :destroy, params: { id: @config_repo_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -213,7 +213,7 @@ describe ApiV1::Admin::ConfigReposController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:delete, :destroy, id: @config_repo_id)
+        expect(controller).to allow_action(:delete, :destroy, params: { id: @config_repo_id })
       end
 
     end
@@ -255,7 +255,7 @@ describe ApiV1::Admin::ConfigReposController do
         expect(response.status).to be(200)
         expect(actual_response).to eq(expected_response(@config_repo, ApiV1::Config::ConfigRepoRepresenter))
       end
-      
+
       it 'should render the error occurred while creating a package' do
         expect(@config_repo_service).to receive(:createConfigRepo).with(an_instance_of(ConfigRepoConfig), an_instance_of(Username), an_instance_of(HttpLocalizedOperationResult)) do |pkg, user, result|
           result.unprocessableEntity(LocalizedMessage::string("SAVE_FAILED_WITH_REASON", "Validation failed"))
@@ -353,7 +353,7 @@ describe ApiV1::Admin::ConfigReposController do
         put_with_api_header :update, params: { id: 'non-existent-package-id' }
         expect(response).to have_api_message_response(404, 'Either the resource you requested was not found, or you are not authorized to perform this action.')
       end
-      
+
     end
 
     describe "security" do
@@ -364,7 +364,7 @@ describe ApiV1::Admin::ConfigReposController do
 
       it 'should allow anyone, with security disabled' do
         disable_security
-        expect(controller).to allow_action(:put, :update, id: @config_repo_id)
+        expect(controller).to allow_action(:put, :update, params: { id: @config_repo_id })
       end
 
       it 'should disallow anonymous users, with security enabled' do
@@ -380,7 +380,7 @@ describe ApiV1::Admin::ConfigReposController do
 
       it 'should allow admin users, with security enabled' do
         login_as_admin
-        expect(controller).to allow_action(:put, :update, id: @config_repo_id)
+        expect(controller).to allow_action(:put, :update, params: { id: @config_repo_id })
       end
 
     end

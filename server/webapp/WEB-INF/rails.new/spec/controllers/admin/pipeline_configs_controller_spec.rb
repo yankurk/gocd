@@ -80,10 +80,10 @@ describe Admin::PipelineConfigsController do
 
       it 'should allow pipeline group admin users, with security enabled' do
         allow(controller).to receive(:populate_config_validity).and_return(true)
-        
+
         login_as_group_admin
 
-        expect(controller).to allow_action(:get, :edit, pipeline_name: 'pipeline')
+        expect(controller).to allow_action(:get, :edit, params: { pipeline_name: 'pipeline' })
       end
     end
   end
