@@ -20,7 +20,7 @@ describe 'stages/stage.json.erb' do
   include StageModelMother
   include PipelineModelMother
   include GoUtil
-  
+
   before do
     allow(view).to receive(:is_user_an_admin?).and_return(true)
     allow(view).to receive(:config_change_path)
