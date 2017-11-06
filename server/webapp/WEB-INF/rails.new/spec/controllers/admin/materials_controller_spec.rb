@@ -26,16 +26,6 @@ describe Admin::MaterialsController do
     allow(controller).to receive(:populate_config_validity)
   end
 
-  describe "routes" do
-    it "should resolve index" do
-      expect({:get => "/admin/pipelines/pipeline.name/materials"}).to route_to(:controller => "admin/materials", :action => "index", :stage_parent => "pipelines", :pipeline_name => "pipeline.name")
-    end
-
-    it "should generate index" do
-      expect(admin_material_index_path(:pipeline_name => "foo.bar")).to eq("/admin/pipelines/foo.bar/materials")
-    end
-  end
-
   describe "index" do
     before :each do
       @pause_info = PipelinePauseInfo.paused("just for fun", "loser")
