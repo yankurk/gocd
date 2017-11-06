@@ -31,9 +31,6 @@
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
 
-# auto-generated tag files
-tags
-
 # temporary files from vim and emacs
 *~
 
