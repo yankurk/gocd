@@ -142,10 +142,6 @@ describe StagesController do
       end
     end
 
-    it "should resolve url with dots in pipline and stage name" do
-      expect(:get => "/pipelines/blah.pipe-line/1/_blah.stage/1").to route_to({:controller => "stages", :action => 'overview', :pipeline_name => "blah.pipe-line", :stage_name => "_blah.stage", :pipeline_counter => "1", :stage_counter => "1"})
-      expect(controller.send(:stage_detail_tab_path, :pipeline_counter => "1", :pipeline_name => "blah.pipe-line", :stage_counter => "1", :stage_name => "_blah.stage")).to eq("/pipelines/blah.pipe-line/1/_blah.stage/1")
-    end
 
     it "should render response code returned by the api result" do
       stage_identifier = StageIdentifier.new("pipeline", 2, "stage", "3")
@@ -170,29 +166,6 @@ describe StagesController do
       expect(response.status).to eq 404
     end
 
-    it "should resolve piplines/stage-locator to the stage action" do
-      expect(:get => "/pipelines/pipeline_name/10/stage_name/2").to route_to({:controller => "stages", :action => 'overview', :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => "10", :stage_counter => "2"})
-      expect(controller.send(:stage_detail_tab_path, :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => "10", :stage_counter => "2")).to eq("/pipelines/pipeline_name/10/stage_name/2")
-    end
-
-    it "should json url for stage" do
-      expect(:get => "/pipelines/pipeline_name/10/stage_name/2.json").to route_to({:controller => "stages", :action => "overview", :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => "10", :stage_counter => "2", :format => "json"})
-      expect(controller.send(:stage_detail_tab_path, :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => "10", :stage_counter => "2", :format => "json")).to eq("/pipelines/pipeline_name/10/stage_name/2.json")
-    end
-
-    it "should resolve 'rerun jobs' action" do
-      expect(:post => "/pipelines/pipeline_name/10/stage_name/2/rerun-jobs").to route_to({:controller => "stages", :action => "rerun_jobs", :pipeline_name => "pipeline_name", :pipeline_counter => "10", :stage_name => "stage_name", :stage_counter => "2"})
-      expect(controller.send(:rerun_jobs_path, {:pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => 10, :stage_counter => 2})).to eq("/pipelines/pipeline_name/10/stage_name/2/rerun-jobs")
-    end
-
-    it "should generate stage details url for a tab" do
-      expect(controller.send(:stage_detail_tab_path, :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => 10, :stage_counter => 2, :action => 'jobs')).to eq("/pipelines/pipeline_name/10/stage_name/2/jobs")
-      expect(controller.send(:stage_detail_tab_path, :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => 10, :stage_counter => 2, :action => 'jobs', :format => 'json')).to eq("/pipelines/pipeline_name/10/stage_name/2/jobs.json")
-      expect(controller.send(:stage_detail_tab_path, :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => 10, :stage_counter => 2, :action => 'overview')).to eq("/pipelines/pipeline_name/10/stage_name/2")
-      expect(controller.send(:stage_detail_tab_path, :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => 10, :stage_counter => 2, :action => 'overview', :format => 'json')).to eq("/pipelines/pipeline_name/10/stage_name/2.json")
-      expect(:get => "/pipelines/pipeline_name/10/stage_name/5/jobs").to route_to({:controller => "stages", :pipeline_name => "pipeline_name", :pipeline_counter => "10", :stage_name => "stage_name", :stage_counter => "5", :action => "jobs"})
-    end
-
     it "should render action api/stages/index for :format xml" do
       stub_current_config
       stage_identifier = StageIdentifier.new("pipeline", 2, "stage", "3")
@@ -204,11 +177,6 @@ describe StagesController do
       get :overview, params: { :pipeline_name => "pipeline", :pipeline_counter => "2", :stage_name => "stage", :stage_counter => "3", :format => 'xml' }
 
       expect(response).to redirect_to "/api/stages/#{@stage_summary_model.getId()}.xml"
-    end
-
-    it "should resolve piplines/stage-locator to the stage action" do
-      expect(:get => "/pipelines/pipeline_name/10/stage_name/2.xml").to route_to({:controller => "stages", :action => 'overview', :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => "10", :stage_counter => "2", :format => "xml"})
-      expect(controller.send(:stage_detail_tab_path, :pipeline_name => "pipeline_name", :stage_name => "stage_name", :pipeline_counter => "10", :stage_counter => "2", :format => "xml")).to eq("/pipelines/pipeline_name/10/stage_name/2.xml")
     end
 
     it "should load pipline instance " do
@@ -426,16 +394,6 @@ describe StagesController do
 
       assert_template "history"
     end
-
-    it "should route to action" do
-      expect(:get => "/history/stage/pipeline_name/10/stage_name/5?page=3").to route_to({:controller => "stages", :action => "history", :pipeline_name => "pipeline_name", :pipeline_counter => "10", :stage_name => "stage_name", :stage_counter => "5", :page => "3"})
-      expect(controller.send(:stage_history_path, :pipeline_name => "pipeline_name", :pipeline_counter => "10", :stage_name => "stage_name", :stage_counter => "5", :page => "3")).to eq("/history/stage/pipeline_name/10/stage_name/5?page=3")
-    end
-
-    it "should generate the correct route" do
-      expect(controller.send(:stage_history_path, {:pipeline_name => "pipeline_name", :pipeline_counter => 4, :stage_name => "stage_name", :stage_counter => 2, :page => "4"})).to eq("/history/stage/pipeline_name/4/stage_name/2?page=4")
-    end
-
   end
 
   describe "config_change" do
