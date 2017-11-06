@@ -26,50 +26,6 @@ describe Admin::PackageDefinitionsController do
     allow(controller).to receive(:package_definition_service).with(no_args).and_return(@package_definition_service= double('Package Definition Service'))
   end
 
-  describe "routes" do
-    it "should resolve route to the new package_definitions page" do
-      expect({:get => "/admin/package_definitions/repoid/new"}).to route_to(:controller => "admin/package_definitions", :action => "new", :repo_id => "repoid")
-      expect(package_definitions_new_path(:repo_id => "repoid")).to eq("/admin/package_definitions/repoid/new")
-    end
-
-    it "should resolve route to the new package_definitions page" do
-      expect({:get => "/admin/package_definitions/repoid/new_for_new_pipeline_wizard"}).to route_to(:controller => "admin/package_definitions", :action => "new_for_new_pipeline_wizard", :repo_id => "repoid")
-      expect(package_definitions_new_for_new_pipeline_wizard_path(:repo_id => "repoid")).to eq("/admin/package_definitions/repoid/new_for_new_pipeline_wizard")
-    end
-
-    it "should route to package_config action" do
-      expect({:get => "/admin/package_definitions/repoid/packageid"}).to route_to(:controller => "admin/package_definitions", :action => "show", :repo_id => "repoid", :package_id => "packageid")
-      expect(package_definitions_show_path(:repo_id => "repoid", :package_id => "packageid")).to eq("/admin/package_definitions/repoid/packageid")
-    end
-
-    it "should route to package_config action" do
-      expect({:get => "/admin/package_definitions/repoid/packageid/for_new_pipeline_wizard"}).to route_to(:controller => "admin/package_definitions", :action => "show_for_new_pipeline_wizard", :repo_id => "repoid", :package_id => "packageid")
-      expect(package_definitions_show_for_new_pipeline_wizard_path(:repo_id => "repoid", :package_id => "packageid")).to eq("/admin/package_definitions/repoid/packageid/for_new_pipeline_wizard")
-    end
-
-    it "should route to package_config action with repository listing" do
-      expect({:get => "/admin/package_definitions/repoid/packageid/with_repository_list"}).to route_to(:controller => "admin/package_definitions", :action => "show_with_repository_list", :repo_id => "repoid", :package_id => "packageid")
-      expect(package_definitions_show_with_repository_list_path(:repo_id => "repoid", :package_id => "packageid")).to eq("/admin/package_definitions/repoid/packageid/with_repository_list")
-    end
-
-    it "should route to pipeline used in" do
-      expect({:get => "/admin/package_definitions/repoid/packageid/pipelines_used_in"}).to route_to(:controller => "admin/package_definitions", :action => "pipelines_used_in", :repo_id => "repoid", :package_id => "packageid")
-      expect(pipelines_used_in_path(:repo_id => "repoid", :package_id => "packageid")).to eq("/admin/package_definitions/repoid/packageid/pipelines_used_in")
-    end
-
-    it "should route to delete package" do
-      expect({:delete => "/admin/package_definitions/repoid/packageid"}).to route_to(:controller => "admin/package_definitions", :action => "destroy", :repo_id => "repoid", :package_id => "packageid")
-      expect(package_definition_delete_path(:repo_id => "repoid", :package_id => "packageid")).to eq("/admin/package_definitions/repoid/packageid")
-    end
-
-    it "should resolve route to check connection for repo" do
-      expect_any_instance_of(HeaderConstraint).to receive(:matches?).with(any_args).and_return(true)
-      expect({:post => "admin/package_definitions/check_connection"}).to route_to(:controller => "admin/package_definitions", :action => "check_connection")
-      expect(package_definition_check_connection_path).to eq("/admin/package_definitions/check_connection")
-    end
-
-  end
-
   describe "action" do
     before(:each) do
       @cruise_config = BasicCruiseConfig.new()
