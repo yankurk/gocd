@@ -63,10 +63,6 @@ describe Admin::ServerController do
   end
 
   describe "index" do
-    it "should resolve route to server config" do
-      expect({:get => "/admin/config/server"}).to route_to(:controller => "admin/server", :action => "index")
-    end
-
     it "should assign server config details" do
       get :index
 
@@ -123,10 +119,6 @@ describe Admin::ServerController do
   end
 
   describe "update" do
-    it "should resolve route to server config" do
-      expect({:post => "/admin/config/server/update"}).to route_to(:controller => "admin/server", :action => "update")
-    end
-
     it "should render success message returned by service while updating server config" do
       allow(@server_config_service).to receive(:siteUrlFor) { |url, forceSsl| url }
       expect(@server_config_service).to receive(:updateServerConfig) do |mailhost, artifact_dir, purgeStart, purgeEnd, jobTimeout, should_allow_auto_login, siteUrl, secureSiteUrl, null, operation_result|
@@ -270,11 +262,6 @@ describe Admin::ServerController do
       @default_localized_result = DefaultLocalizedResult.new
     end
 
-    it "should resolve /admin/config/server/validate" do
-      expect_any_instance_of(HeaderConstraint).to receive(:matches?).with(any_args).and_return(true)
-      expect({:post => "/admin/config/server/validate"}).to route_to(:controller => "admin/server", :action => "validate")
-    end
-
     it "should validate email" do
       @default_localized_result.invalid("INVALID_EMAIL", ["@foo.com"].to_java(java.lang.String))
       expect(@server_config_service).to receive(:validateEmail).with("@foo.com").and_return(@default_localized_result)
@@ -324,11 +311,6 @@ describe Admin::ServerController do
   end
 
   describe "test_email" do
-
-    it "should resolve admin/config/server/test_email" do
-      expect({:post => "/admin/config/server/test_email"}).to route_to(:controller => "admin/server", :action => "test_email")
-    end
-
     it "should return error if sendTestEmail fails" do
       allow(controller).to receive(:server_config_service).and_return(@server_config_service = double(ServerConfigService))
       mail_host = MailHost.new("blrstdcrspair02", 9999, "pavan", "strong_password", true, true, "from@from.com", "admin@admin.com")
