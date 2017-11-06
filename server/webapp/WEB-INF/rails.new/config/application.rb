@@ -38,7 +38,7 @@ module Go
       Rails.root.join('app', 'presenters')
     ]
 
-    require_relative '../lib/ext/module_ext'
+    require_relative '../lib/ext'
 
     require_relative '../lib/log4j_logger'
     config.logger = Log4jLogger::Logger.new('com.thoughtworks.go.server.Rails')
