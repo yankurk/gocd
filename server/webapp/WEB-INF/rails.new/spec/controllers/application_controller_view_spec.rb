@@ -128,10 +128,6 @@ describe Api::TestController do
   end
 
   describe "unresolved" do
-    it "should resolve as action for any unmatched url" do
-      expect(:get => "/cruise/foo/bar/baz/quux/hell/yeah?random=junk").to route_to({:controller => 'application', :action => "unresolved", :url => "cruise/foo/bar/baz/quux/hell/yeah", :random => "junk"})
-    end
-
     it "should render a pretty payload with message" do
       allow(@controller).to receive(:url_for).and_return("foo/bar")
       get :unresolved

@@ -218,7 +218,7 @@ describe ApplicationController do
       expect(@controller.current_user_id_for_oauth).to eq("anonymous")
     end
   end
-
+  
   context "with license agent validity stubbed" do
     controller do
       def test_action
