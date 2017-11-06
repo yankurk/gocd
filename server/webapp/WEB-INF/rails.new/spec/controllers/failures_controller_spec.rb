@@ -26,10 +26,6 @@ describe FailuresController do
     @failure_details = FailureDetails.new("message", "stack_trace")
   end
 
-  it "should resolve the route to show action" do
-    expect({:get => "/failures/foo_pipeline/10/bar_stage/5/baz_job/quux_suite/bang_test"}).to route_to(:controller => "failures", :action => "show", :pipeline_name => "foo_pipeline", :pipeline_counter => "10", :stage_name => "bar_stage", :stage_counter => "5", :job_name => "baz_job", :suite_name => "quux_suite", :test_name => "bang_test", :no_layout => true)
-  end
-
   it "should load failure message and stack trace" do
     expect(@failure_service).to receive(:failureDetailsFor).with(@job_id, 'suite_name', 'test_name', @user, an_instance_of(HttpLocalizedOperationResult)).and_return(@failure_details)
     #suite_name and test_name are ParamEncode#enc'ed because they can potentially have special characters like dot(.) or slash(/) etc.
