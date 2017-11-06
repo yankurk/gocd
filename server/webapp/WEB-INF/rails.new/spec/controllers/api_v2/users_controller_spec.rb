@@ -56,20 +56,6 @@ describe ApiV2::UsersController do
         expect(controller).to disallow_action(:get, :index).with(401, 'You are not authorized to perform this action.')
       end
     end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to index action of users controller' do
-          expect(:get => 'api/users').to route_to(action: 'index', controller: 'api_v2/users')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to index action of users controller without header' do
-          expect(:get => 'api/users').to_not route_to(action: 'index', controller: 'api_v2/users')
-          expect(:get => 'api/users').to route_to(controller: 'application', action: 'unresolved', url: 'api/users')
-        end
-      end
-    end
   end
 
   describe "show" do
@@ -115,31 +101,6 @@ describe ApiV2::UsersController do
       it 'should disallow normal users, with security enabled' do
         login_as_user
         expect(controller).to disallow_action(:get, :show, params: { login_name: @john.name }).with(401, 'You are not authorized to perform this action.')
-      end
-    end
-    describe "route" do
-      describe "with_header" do
-        it 'should route to show action of users controller for alphanumeric login name' do
-          expect(:get => 'api/users/foo123').to route_to(action: 'show', controller: 'api_v2/users', login_name: 'foo123')
-        end
-
-        it 'should route to show action of users controller having dots in login name' do
-          expect(:get => 'api/users/foo.bar').to route_to(action: 'show', controller: 'api_v2/users', login_name: 'foo.bar')
-        end
-
-        it 'should route to show action of users controller for capitalized login name' do
-          expect(:get => 'api/users/Foo').to route_to(action: 'show', controller: 'api_v2/users', login_name: 'Foo')
-        end
-
-        it 'should not route to show action of users controller for invalid login name' do
-          expect(:get => 'api/users/foo#%$').not_to be_routable
-        end
-      end
-      describe "without_header" do
-        it 'should not route to show action of users controller without header' do
-          expect(:get => 'api/users/foo').to_not route_to(action: 'show', controller: 'api_v2/users')
-          expect(:get => 'api/users/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/users/foo')
-        end
       end
     end
   end
@@ -193,32 +154,6 @@ describe ApiV2::UsersController do
       it 'should disallow normal users, with security enabled' do
         login_as_user
         expect(controller).to disallow_action(:delete, :destroy, params: { login_name: @john.name }).with(401, 'You are not authorized to perform this action.')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to destroy action of users controller for alphanumeric login name' do
-          expect(:delete => 'api/users/foo123').to route_to(action: 'destroy', controller: 'api_v2/users', login_name: 'foo123')
-        end
-
-        it 'should route to destroy action of users controller having dots in login name' do
-          expect(:delete => 'api/users/foo.bar').to route_to(action: 'destroy', controller: 'api_v2/users', login_name: 'foo.bar')
-        end
-
-        it 'should route to destroy action of users controller for capitalized login name' do
-          expect(:delete => 'api/users/Foo').to route_to(action: 'destroy', controller: 'api_v2/users', login_name: 'Foo')
-        end
-
-        it 'should not route to show action of users controller for invalid login name' do
-          expect(:delete => 'api/users/foo#%$').not_to be_routable
-        end
-      end
-      describe "without_header" do
-        it 'should not route to show action of users controller without header' do
-          expect(:delete => 'api/users/foo').to_not route_to(action: 'destroy', controller: 'api_v2/users')
-          expect(:delete => 'api/users/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/users/foo')
-        end
       end
     end
   end
@@ -300,22 +235,6 @@ describe ApiV2::UsersController do
         expect(controller).to allow_action(:delete, 'bulk_delete')
       end
     end
-
-    describe 'routes' do
-      describe 'with header' do
-        it 'should route to the bulk_delete action for users controller' do
-          expect(:delete => '/api/users').to route_to(action: 'bulk_delete', controller: 'api_v2/users')
-        end
-      end
-
-      describe 'without header' do
-
-        it 'should not route to the bulk_delete action for users controller' do
-          expect(:delete => '/api/users').to_not route_to(action: 'bulk_delete', controller: 'api_v2/users')
-          expect(:delete => '/api/users').to route_to(controller: 'application', action: 'unresolved', url: 'api/users')
-        end
-      end
-    end
   end
 
   describe "update" do
@@ -362,32 +281,6 @@ describe ApiV2::UsersController do
       it 'should disallow normal users, with security enabled' do
         login_as_user
         expect(controller).to disallow_action(:patch, :update, params: { login_name: @john.name }).with(401, 'You are not authorized to perform this action.')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to update action of users controller for alphanumeric login name' do
-          expect(:patch => 'api/users/foo123').to route_to(action: 'update', controller: 'api_v2/users', login_name: 'foo123')
-        end
-
-        it 'should route to update action of users controller having dots in login name' do
-          expect(:patch => 'api/users/foo.bar').to route_to(action: 'update', controller: 'api_v2/users', login_name: 'foo.bar')
-        end
-
-        it 'should route to update action of users controller for capitalized login name' do
-          expect(:patch => 'api/users/Foo').to route_to(action: 'update', controller: 'api_v2/users', login_name: 'Foo')
-        end
-
-        it 'should not route to show action of users controller for invalid login name' do
-          expect(:patch => 'api/users/foo#%$').not_to be_routable
-        end
-      end
-      describe "without_header" do
-        it 'should not route to show action of users controller without header' do
-          expect(:patch => 'api/users/foo').to_not route_to(action: 'update', controller: 'api_v2/users')
-          expect(:patch => 'api/users/foo').to route_to(controller: 'application', action: 'unresolved', url: 'api/users/foo')
-        end
       end
     end
   end
@@ -440,20 +333,6 @@ describe ApiV2::UsersController do
       it 'should disallow normal users, with security enabled' do
         login_as_user
         expect(controller).to disallow_action(:post, :create).with(401, 'You are not authorized to perform this action.')
-      end
-    end
-
-    describe "route" do
-      describe "with_header" do
-        it 'should route to create action of users controller' do
-          expect(:post => 'api/users').to route_to(action: 'create', controller: 'api_v2/users')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to create action of users controller without header' do
-          expect(:post => 'api/users').to_not route_to(action: 'create', controller: 'api_v2/users')
-          expect(:post => 'api/users').to route_to(controller: 'application', action: 'unresolved', url: 'api/users')
-        end
       end
     end
   end
