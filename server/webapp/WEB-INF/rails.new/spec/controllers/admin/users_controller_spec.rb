@@ -51,21 +51,8 @@ describe Admin::UsersController do
     end
   end
 
-  describe "new" do
-
-    it "should match /admin/users/new to" do
-      expect(:get => "/admin/users/new").to route_to({:controller => "admin/users", :action => 'new', :no_layout=>true})
-      expect(controller.send(:users_new_path)).to eq("/admin/users/new")
-    end
-  end
-
   describe "operate" do
     render_views
-
-    it "should match /admin/users/operate to" do
-      expect(:post => "/admin/users/operate").to route_to({:controller => "admin/users", :action => 'operate'})
-      expect(controller.send(:user_operate_path)).to eq("/admin/users/operate")
-    end
 
     it "should enable users through UserService and redirect to user listing" do
       expect(@user_service).to receive(:enable).with(users = ["user-1"], an_instance_of(HttpLocalizedOperationResult))
@@ -122,11 +109,6 @@ describe Admin::UsersController do
       assert_redirected_with_flash("/admin/users", "New role assigned to 1 user(s) successfully.", 'success')
     end
 
-    it "should match /admin/users/roles to" do
-      expect(:post => "/admin/users/roles").to route_to({:controller => "admin/users", :action => 'roles', :no_layout=>true})
-      expect(controller.send(:user_roles_path)).to eq("/admin/users/roles")
-    end
-
     it "should disallow unknown operations" do
       post :operate, params: { :operation => "Something", :selected => [] }
       assert_redirected_with_flash("/admin/users", "Unknown operation", 'error')
@@ -158,11 +140,6 @@ describe Admin::UsersController do
       allow(HttpLocalizedOperationResult).to receive(:new).and_return(@result)
       allow(controller).to receive(:user_search_service).and_return(@user_search_service)
       allow(@result).to receive(:hasMessage).with(no_args).and_return(false)
-    end
-
-    it "should match /users/search to" do
-      expect(:post => "/admin/users/search").to route_to({:controller => "admin/users", :action => 'search', :no_layout=>true})
-      expect(controller.send(:users_search_path)).to eq("/admin/users/search")
     end
 
     it "should search for a user" do
@@ -218,11 +195,6 @@ describe Admin::UsersController do
   end
 
   describe "create" do
-    it "should match /users/create to" do
-      expect(:post => "/admin/users/create").to route_to({:controller => "admin/users", :action => 'create', :no_layout=>true})
-      expect(controller.send(:users_create_path)).to eq("/admin/users/create")
-    end
-
     it "should create a new user" do
       user_service = double('user_service')
       allow(controller).to receive(:user_service).and_return(user_service)
