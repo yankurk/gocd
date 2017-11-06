@@ -17,40 +17,22 @@
 require 'rails_helper'
 
 describe ApiV1::VersionController do
+  include ApiHeaderSetupForRouting
 
-  include ApiV1::ApiVersionHelper
-
-  describe "show" do
-    it 'HEAD should should render the current gocd server version for admins' do
-      actual_json = {go_version: '16.6.0', go_build_number: '235', git_sha: '69ef4921709a84831913d9fa7e750fbf840f213c'}
-      allow(ApiV1::VersionRepresenter).to receive(:version).and_return(OpenStruct.new(actual_json))
-
-      head_with_api_header :show
-      expect(response).to be_ok
-      expect(actual_response).to eq(expected_response(OpenStruct.new(actual_json), ApiV1::VersionRepresenter))
+  describe 'with header' do
+    before(:each) do
+      setup_header
     end
 
-    it 'GET should should render the current gocd server version for admins' do
-      actual_json = {go_version: '16.6.0', go_build_number: '235', git_sha: '69ef4921709a84831913d9fa7e750fbf840f213c'}
-      allow(ApiV1::VersionRepresenter).to receive(:version).and_return(OpenStruct.new(actual_json))
-
-      get_with_api_header :show
-      expect(response).to be_ok
-      expect(actual_response).to eq(expected_response(OpenStruct.new(actual_json), ApiV1::VersionRepresenter))
+    it 'should route to show action of version controller' do
+      expect(:get => 'api/version').to route_to(action: 'show', controller: 'api_v1/version')
     end
   end
 
-  describe "routing" do
-    describe 'with header' do
-      it 'should route to show action of version controller' do
-        expect(:get => 'api/version').to route_to(action: 'show', controller: 'api_v1/version')
-      end
-    end
-    describe 'without header' do
-      it 'should not route to show action of version controller' do
-        expect(:get => 'api/version').to_not route_to(action: 'show', controller: 'api_v1/version')
-        expect(:get => 'api/version').to route_to(controller: 'application', action: 'unresolved', url: 'api/version')
-      end
+  describe 'without header' do
+    it 'should not route to show action of version controller' do
+      expect(:get => 'api/version').to_not route_to(action: 'show', controller: 'api_v1/version')
+      expect(:get => 'api/version').to route_to(controller: 'application', action: 'unresolved', url: 'api/version')
     end
   end
 end

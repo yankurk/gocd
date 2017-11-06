@@ -17,39 +17,19 @@
 require 'rails_helper'
 
 describe ApiV1::HealthController do
+  include ApiHeaderSetupForRouting
 
   describe 'show' do
-    describe 'security' do
-      it 'should allow anyone with security disabled' do
-        disable_security
-
-        expect(controller).to allow_action(:get, :show)
-      end
-
-      it 'should allow anyone with security enabled' do
-        enable_security
-
-        expect(controller).to allow_action(:get, :show)
-      end
+    before(:each) do
+      setup_header
     end
 
-    describe 'route' do
-      it 'should route to show action of the health controller' do
-        expect(:get => 'api/v1/health').to route_to(action: 'show', controller: 'api_v1/health')
-      end
-
-      it 'should route to errors without custom header' do
-        expect(:get => 'api/v12/health').to route_to(controller: 'application', action: 'unresolved', url: 'api/v12/health')
-      end
+    it 'should route to show action of the health controller' do
+      expect(:get => 'api/v1/health').to route_to(action: 'show', controller: 'api_v1/health')
     end
 
-    describe 'response' do
-      it 'should render an ok response' do
-        get :show
-        expect(response).to be_ok
-        expect(actual_response).to eq({health: "OK"})
-      end
+    it 'should route to errors without custom header' do
+      expect(:get => 'api/v12/health').to route_to(controller: 'application', action: 'unresolved', url: 'api/v12/health')
     end
   end
-
 end

@@ -48,21 +48,6 @@ describe ApiV1::DashboardController do
       expect(response).to be_ok
       expect(actual_response).to eq(expected_response(@pipeline_group_models, ApiV1::Dashboard::PipelineGroupsRepresenter))
     end
-
-    describe "route" do
-      describe "with_header" do
-
-        it 'should route to dashboard action of the dashboard controller' do
-          expect(:get => 'api/dashboard').to route_to(action: 'dashboard', controller: 'api_v1/dashboard')
-        end
-      end
-      describe "without_header" do
-        it 'should not route to dashboard action of dashboard controller without header' do
-          expect(:get => 'api/dashboard').to_not route_to(action: 'dashboard', controller: 'api_v1/dashboard')
-          expect(:get => 'api/dashboard').to route_to(controller: 'application', action: 'unresolved', url: 'api/dashboard')
-        end
-      end
-    end
   end
 
 end
