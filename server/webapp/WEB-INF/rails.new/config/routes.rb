@@ -170,11 +170,12 @@ Go::Application.routes.draw do
       get ':pipeline_name/:pipeline_counter/build_cause' => 'pipelines#build_cause', constraints: PIPELINE_LOCATOR_CONSTRAINTS, as: :build_cause
     end
 
-    %w(index show build_cause select_pipelines).each do |controller_action_method|
+    match 'show', to: 'pipelines#show', via: %w(get post), as: :pipeline
+    match 'select_pipelines', to: 'pipelines#show', via: %w(get post), as: :pipeline_select_pipelines
+
+    %w(index build_cause).each do |controller_action_method|
       get "#{controller_action_method}" => "pipelines##{controller_action_method}"
     end
-
-    post ':action' => 'pipelines#:action', constraints: {:action => /select_pipelines|show/}, as: :pipeline
   end
 
   get "pipelines(.:format)" => 'pipelines#index', defaults: {:format => "html"}, as: :pipeline_dashboard
