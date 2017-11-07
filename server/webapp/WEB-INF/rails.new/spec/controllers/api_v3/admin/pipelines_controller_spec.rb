@@ -194,7 +194,7 @@ describe ApiV3::Admin::PipelinesController do
         expect(@pipeline_config_service).to receive(:getPipelineConfig).with(@pipeline_name).and_return(pipeline)
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(pipeline).and_return(pipeline_md5)
 
-        controller.request.env['HTTP_IF_NONE_MATCH'] = Digest::MD5.hexdigest(pipeline_md5)
+        controller.request.env['HTTP_IF_NONE_MATCH'] = %Q{"#{Digest::MD5.hexdigest(pipeline_md5)}"}
 
         get_with_api_header :show, params: { :pipeline_name => @pipeline_name }
 

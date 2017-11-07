@@ -36,7 +36,7 @@ module ApiV1
 
         def show
           role = load_entity_from_config
-          if stale?(strong_etag: etag_for(role))
+          if stale?(strong_etag: etag_for(role), template: false)
             render DEFAULT_FORMAT => ApiV1::Security::RoleConfigRepresenter.new(role).to_hash(url_builder: self)
           end
         end

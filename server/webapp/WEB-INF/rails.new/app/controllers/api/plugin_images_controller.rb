@@ -22,7 +22,7 @@ module Api
         response.content_type = image.getContentType
         response.charset = false
         expires_in 1.year, public: false
-        render plain: image.getDataAsBytes if stale?(strong_etag: image.getHash)
+        render plain: image.getDataAsBytes if stale?(strong_etag: image.getHash, template: false)
       else
         head(:not_found)
       end

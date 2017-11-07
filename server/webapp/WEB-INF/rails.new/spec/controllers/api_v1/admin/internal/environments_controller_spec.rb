@@ -70,7 +70,7 @@ describe ApiV1::Admin::Internal::EnvironmentsController do
         login_as_admin
         environments_list = %w(dev production).sort
         expect(@environment_config_service).to receive(:environmentNames).and_return(environments_list)
-        controller.request.env['HTTP_IF_NONE_MATCH'] = Digest::MD5.hexdigest(environments_list.join('/'))
+        controller.request.env['HTTP_IF_NONE_MATCH'] = %Q{"#{Digest::MD5.hexdigest(environments_list.join('/'))}"}
 
         get_with_api_header :index
 
