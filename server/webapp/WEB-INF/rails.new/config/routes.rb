@@ -393,7 +393,10 @@ Go::Application.routes.draw do
 
       # pipeline api's
       constraints pipeline_name: PIPELINE_NAME_FORMAT do
-        post 'pipelines/:pipeline_name/:action' => 'pipelines#%{action}', :no_layout => true, constraints: HeaderConstraint.new, as: :api_pipeline_action
+        %w(releaseLock schedule).each do |controller_action_method|
+          post "pipelines/:pipeline_name/#{controller_action_method}" => "pipelines##{controller_action_method}", :no_layout => true, constraints: HeaderConstraint.new, as: "api_pipeline_#{controller_action_method}"
+        end
+
         post 'pipelines/:pipeline_name/pause' => 'pipelines#pause', constraints: HeaderConstraint.new, as: :pause_pipeline
         post 'pipelines/:pipeline_name/unpause' => 'pipelines#unpause', constraints: HeaderConstraint.new, as: :unpause_pipeline
       end

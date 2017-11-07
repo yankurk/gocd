@@ -260,7 +260,7 @@ describe ApplicationHelper do
 
     it "should create a blocking link to a remote location" do
       actual = blocking_link_to_remote_new :name => "&nbsp;",
-                                           :url => api_pipeline_action_path(:pipeline_name => "SOME_NAME", :action => 'releaseLock'),
+                                           :url => api_pipeline_releaseLock_path(:pipeline_name => "SOME_NAME"),
                                            :update => {:failure => "message_pane", :success => 'function(){}'},
                                            :html => {},
                                            :headers => {Confirm: 'true'},
@@ -272,7 +272,7 @@ describe ApplicationHelper do
 
     it "should create a blocking link to a remote location with extra HTML provided" do
       actual = blocking_link_to_remote_new :name => "&nbsp;",
-                                           :url => api_pipeline_action_path(:pipeline_name => "SOME_NAME", :action => 'releaseLock'),
+                                           :url => api_pipeline_releaseLock_path(:pipeline_name => "SOME_NAME"),
                                            :headers => {Confirm: 'true'},
                                            :update => {:failure => "message_pane", :success => 'function(){}'},
                                            :html => {:class => "ABC", :title => "TITLE", :id => "SOME-ID" },

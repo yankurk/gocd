@@ -49,7 +49,7 @@ describe Api::PipelinesController do
   end
 
   it "should return only the path to a pipeline api" do
-    expect(api_pipeline_action_path(:pipeline_name => "pipeline", :action => "schedule")).to eq("/api/pipelines/pipeline/schedule")
+    expect(api_pipeline_schedule_path(:pipeline_name => "pipeline")).to eq("/api/pipelines/pipeline/schedule")
   end
 
   describe "history" do
