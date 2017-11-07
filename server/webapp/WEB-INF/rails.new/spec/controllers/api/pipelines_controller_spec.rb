@@ -148,7 +148,7 @@ describe Api::PipelinesController do
       expect(controller).to receive(:render_if_error).with(message, 404).and_return(true)
       fake_template_presence "api/pipelines/schedule.erb", "dummy"
 
-      post 'schedule', :pipeline_name => 'idonotexist', :no_layout => true
+      post :schedule, params: { :pipeline_name => 'idonotexist', :no_layout => true}
     end
 
     it "should return 404 when material does not exist" do
@@ -161,7 +161,7 @@ describe Api::PipelinesController do
       expect(controller).to receive(:render_if_error).with(message, 404).and_return(true)
       fake_template_presence "api/pipelines/schedule.erb", "dummy"
 
-      post 'schedule', :pipeline_name => 'pipeline', "materials" => {'material_does_not_exist' => "foo"}, :no_layout => true
+      post :schedule, params: { :pipeline_name => 'pipeline', "materials" => {'material_does_not_exist' => "foo"}, :no_layout => true}
     end
 
     it "should be able to specify a particular revision from a upstream pipeline" do
@@ -169,7 +169,7 @@ describe Api::PipelinesController do
       expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream',anything(), schedule_options({@fingerprint => "downstream/10/blah-stage/2"}, {}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return("accepted request to schedule pipeline badger")
-      post 'schedule', :pipeline_name => 'downstream', "materials" => {"downstream" => "downstream/10/blah-stage/2"}, :no_layout => true
+      post :schedule, params: { :pipeline_name => 'downstream', "materials" => {"downstream" => "downstream/10/blah-stage/2"}, :no_layout => true}
     end
 
     it "should return 202 when I trigger a pipeline successfully" do
@@ -177,7 +177,7 @@ describe Api::PipelinesController do
       expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('badger',anything(),schedule_options({}, {}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return(message)
-      post 'schedule', :pipeline_name => 'badger', :no_layout => true
+      post :schedule, params: { :pipeline_name => 'badger', :no_layout => true}
       expect(response.response_code).to eq(202)
       expect(response.body).to eq(message + "\n")
     end
@@ -186,7 +186,7 @@ describe Api::PipelinesController do
       expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream',anything(),schedule_options({@fingerprint => "downstream/10/blah-stage/2"}, {}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return("accepted request to schedule pipeline badger")
-      post 'schedule', :pipeline_name => 'downstream', "materials" => {"downstream" => ""}, "original_fingerprint" => {@fingerprint => "downstream/10/blah-stage/2"}, :no_layout => true
+      post :schedule, params: { :pipeline_name => 'downstream', "materials" => {"downstream" => ""}, "original_fingerprint" => {@fingerprint => "downstream/10/blah-stage/2"}, :no_layout => true}
     end
 
     it "should respect materials name material map over originalMaterials" do
@@ -202,25 +202,25 @@ describe Api::PipelinesController do
       expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream',anything(),schedule_options({@fingerprint => "downstream/10/blah-stage/5", svn_fingerprint => "20", svn2_fingerprint => "45"}, {}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return("accepted request to schedule pipeline badger")
-      post 'schedule', :pipeline_name => 'downstream', "materials" => {"downstream" => "downstream/10/blah-stage/5", "svn" => "20"}, "original_fingerprint" => {@fingerprint => "downstream/10/blah-stage/2", svn_fingerprint => "30", svn2_fingerprint => "45"}, :no_layout => true
+      post :schedule, params: { :pipeline_name => 'downstream', "materials" => {"downstream" => "downstream/10/blah-stage/5", "svn" => "20"}, "original_fingerprint" => {@fingerprint => "downstream/10/blah-stage/2", svn_fingerprint => "30", svn2_fingerprint => "45"}, :no_layout => true}
     end
 
     it "should support using pipeline unique fingerprint to select material" do
       downstream = "0942094a"
       svn = "875c3261"
       svn_2 = "98143abd"
-      expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream',anything(),schedule_options({downstream => "downstream/10/blah-stage/5", svn => "20", svn_2 => "45"}, {}), @status)
+      expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with(eq('downstream'),anything(),schedule_options({downstream => "downstream/10/blah-stage/5", svn => "20", svn_2 => "45"}, {}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return("accepted request to schedule pipeline badger")
-      post 'schedule', :pipeline_name => 'downstream', "material_fingerprint" => {downstream => "downstream/10/blah-stage/5", svn => "20"}, "original_fingerprint" => {downstream => "downstream/10/blah-stage/2", svn => "30", svn_2 => "45"}, :no_layout => true
+      post :schedule, params: { :pipeline_name => 'downstream', "material_fingerprint" => {downstream => "downstream/10/blah-stage/5", svn => "20"}, "original_fingerprint" => {downstream => "downstream/10/blah-stage/2", svn => "30", svn_2 => "45"}, :no_layout => true}
     end
 
     it "should support using schedule time environment variable values while scheduling a pipeline" do
       downstream = "0942094a"
-      expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream',anything(),schedule_options({downstream => "downstream/10/blah-stage/5"}, {'foo' => 'foo_value', 'bar' => 'bar_value'}), @status)
+      expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream', anything(),schedule_options({downstream => "downstream/10/blah-stage/5"}, {'foo' => 'foo_value', 'bar' => 'bar_value'}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return("accepted request to schedule pipeline badger")
-      post 'schedule', :pipeline_name => 'downstream', "material_fingerprint" => {downstream => "downstream/10/blah-stage/5"}, 'variables' => {'foo' => 'foo_value', 'bar' => 'bar_value'}, :no_layout => true
+      post :schedule, params: { :pipeline_name => 'downstream', "material_fingerprint" => {downstream => "downstream/10/blah-stage/5"}, 'variables' => {'foo' => 'foo_value', 'bar' => 'bar_value'}, :no_layout => true}
     end
 
     it "should support using schedule time environment variable values while scheduling a pipeline" do
@@ -228,15 +228,17 @@ describe Api::PipelinesController do
       expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream', anything(), schedule_options({downstream => "downstream/10/blah-stage/5"}, {'foo' => 'foo_value', 'bar' => 'bar_value'}, {'secure_name' => 'secure_value'}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return("accepted request to schedule pipeline badger")
-      post 'schedule', :pipeline_name => 'downstream', "material_fingerprint" => {downstream => "downstream/10/blah-stage/5"}, 'variables' => {'foo' => 'foo_value', 'bar' => 'bar_value'}, 'secure_variables' => {'secure_name' => 'secure_value'}, :no_layout => true
+      warn "spec"
+      warn({'foo' => 'foo_value', 'bar' => 'bar_value'}.symbolize_keys.to_param)
+      post :schedule, params: { :pipeline_name => 'downstream', "material_fingerprint" => {downstream => "downstream/10/blah-stage/5"}, 'variables' => {'foo' => 'foo_value', 'bar' => 'bar_value'}, 'secure_variables' => {'secure_name' => 'secure_value'}, :no_layout => true}
     end
 
     it "should support empty material_fingerprints" do
       svn = "875c3261"
-      expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream',anything(),schedule_options({svn => "30"}, {}), @status)
+      expect(@pipeline_service).to receive(:manualProduceBuildCauseAndSave).with('downstream', anything(),schedule_options({svn => "30"}, {}), @status)
       allow(@status).to receive(:httpCode).and_return(202)
       allow(@status).to receive(:detailedMessage).and_return("accepted request to schedule pipeline badger")
-      post 'schedule', :pipeline_name => 'downstream', "material_fingerprint" => {svn => ""}, "original_fingerprint" => {svn => "30"}, :no_layout => true
+      post :schedule, params: { :pipeline_name => 'downstream', "material_fingerprint" => {svn => ""}, "original_fingerprint" => {svn => "30"}, :no_layout => true}
     end
   end
 
@@ -244,7 +246,7 @@ describe Api::PipelinesController do
     it "should load pipeline by id" do
       pipeline = PipelineInstanceModel.createPipeline("pipeline", 1, "label", BuildCause.createWithEmptyModifications(), stage_history_for("blah-stage"))
       expect(@pipeline_history_service).to receive(:load).with(10, "user", anything).and_return(pipeline)
-      get :pipeline_instance, params: { :id => '10', :name => "pipeline", :format => "xml", :no_layout => true }
+      get :pipeline_instance, params: { :id => '10', :name => "pipeline", :no_layout => true}, format: :xml
       context = XmlWriterContext.new("http://test.host/go", nil, nil, nil, nil)
       expect(assigns[:doc].asXML()).to eq(PipelineXmlViewModel.new(pipeline).toXml(context).asXML())
     end
@@ -254,7 +256,7 @@ describe Api::PipelinesController do
       expect(@status).to receive(:detailedMessage).and_return("Not Found")
       allow(@status).to receive(:httpCode).and_return(404)
       expect(@pipeline_history_service).to receive(:load).with(10, "user", anything).and_return(nil)
-      get :pipeline_instance, params: { :id => '10', :name => "pipeline", :format => "xml", :no_layout => true }
+      get :pipeline_instance, params: { :id => '10', :name => "pipeline", :no_layout => true }, format: :xml
       expect(response.status).to eq(404)
     end
 
@@ -263,7 +265,7 @@ describe Api::PipelinesController do
       expect(@status).to receive(:detailedMessage).and_return("Unauthorized")
       allow(@status).to receive(:httpCode).and_return(401)
       expect(@pipeline_history_service).to receive(:load).with(10, "user", anything).and_return(nil)
-      get :pipeline_instance, params: { :id => '10', :format => "xml", :name => "pipeline", :no_layout => true }
+      get :pipeline_instance, params: { :id => '10', :name => "pipeline", :no_layout => true  }, format: :xml
       expect(response.status).to eq(401)
     end
   end
@@ -271,7 +273,7 @@ describe Api::PipelinesController do
   describe "pipelines" do
     it "should assign pipeline_configs and latest instance of each pipeline configured" do
       expect(@pipeline_history_service).to receive(:latestInstancesForConfiguredPipelines).with("user").and_return(:pipeline_instance)
-      get :pipelines, params: { :format => "xml", :no_layout => true }
+      get :pipelines, format: :xml, params: { :no_layout => true }
       expect(assigns[:pipelines]).to eq(:pipeline_instance)
     end
   end
@@ -293,44 +295,44 @@ describe Api::PipelinesController do
     it "should set the stage feed from the java side" do
       expect(Feed).to receive(:new).with(@user, an_instance_of(PipelineStagesFeedService::PipelineStageFeedResolver), an_instance_of(HttpLocalizedOperationResult), have_key(:controller)).and_return(:stage_feed)
       expect(@go_config_service).to receive(:hasPipelineNamed).with(CaseInsensitiveString.new('pipeline')).and_return(true)
-      get 'stage_feed', :format => "xml", :no_layout => true, :name => 'pipeline'
+      get :stage_feed, params: { :name => 'pipeline', :no_layout => true }, format: :xml
       expect(assigns[:feed]).to eq(:stage_feed)
     end
 
     it "should set content type as application/atom+xml" do
       expect(Feed).to receive(:new).with(@user, an_instance_of(PipelineStagesFeedService::PipelineStageFeedResolver), an_instance_of(HttpLocalizedOperationResult), have_key(:controller)).and_return(:stage_feed)
       expect(@go_config_service).to receive(:hasPipelineNamed).with(CaseInsensitiveString.new('pipeline')).and_return(true)
-      get 'stage_feed', :format => "xml", :no_layout => true, :name => 'pipeline'
+      get :stage_feed, params: { :name => 'pipeline', :no_layout => true }, format: :xml
       expect(response.content_type).to eq("application/atom+xml")
     end
 
     it "should honor after if present" do
       expect(Feed).to receive(:new).with(@user, an_instance_of(PipelineStagesFeedService::PipelineStageFeedResolver), an_instance_of(HttpLocalizedOperationResult), have_key(:after)).and_return(:stage_feed)
       expect(@go_config_service).to receive(:hasPipelineNamed).with(CaseInsensitiveString.new('pipeline')).and_return(true)
-      get 'stage_feed', :after => 10, :format => "xml", :no_layout => true, :name => 'pipeline'
+      get :stage_feed, params: { :after => 10, :name => 'pipeline', :no_layout => true }, format: :xml
       expect(assigns[:feed]).to eq(:stage_feed)
     end
 
     it "should honor before if present" do
       expect(Feed).to receive(:new).with(@user, an_instance_of(PipelineStagesFeedService::PipelineStageFeedResolver), an_instance_of(HttpLocalizedOperationResult), have_key(:before)).and_return(:stage_feed)
       expect(@go_config_service).to receive(:hasPipelineNamed).with(CaseInsensitiveString.new('pipeline')).and_return(true)
-      get 'stage_feed', :before => 10, :format => "xml", :no_layout => true, :name => 'pipeline'
+      get :stage_feed, params: {:before => 10, :name => 'pipeline', :no_layout => true }, format: :xml
       expect(assigns[:feed]).to eq(:stage_feed)
     end
 
     it "should assign title"do
       expect(Feed).to receive(:new).with(@user, an_instance_of(PipelineStagesFeedService::PipelineStageFeedResolver), an_instance_of(HttpLocalizedOperationResult), have_key(:controller)).and_return(:stage_feed)
       expect(@go_config_service).to receive(:hasPipelineNamed).with(CaseInsensitiveString.new('pipeline')).and_return(true)
-      get 'stage_feed', :format => "xml", :no_layout => true, :name => 'pipeline'
+      get :stage_feed, params: {:name => 'pipeline', :no_layout => true}, format: :xml
       expect(assigns[:title]).to eq("pipeline")
     end
 
     it "should return 404 if the pipeline does not exist" do
       expect(controller).to receive(:render_error_response).with("Pipeline not found", 404, true)
       expect(@go_config_service).to receive(:hasPipelineNamed).with(CaseInsensitiveString.new('does_not_exist')).and_return(false)
-      get 'stage_feed', :format => "xml", :no_layout => true, :name => 'does_not_exist'
+      get :stage_feed, params: { :name => 'does_not_exist', :no_layout => true}, format: :xml
     end
-    
+
     it "should render the error if there is any" do
       http_localized_operation_result = double(HttpLocalizedOperationResult)
       allow(HttpLocalizedOperationResult).to receive(:new).and_return(http_localized_operation_result)
@@ -340,7 +342,7 @@ describe Api::PipelinesController do
       expect(Feed).to receive(:new).with(@user, an_instance_of(PipelineStagesFeedService::PipelineStageFeedResolver), http_localized_operation_result, have_key(:controller)).and_return(:stage_feed)
       expect(controller).to receive(:render_localized_operation_result).with(http_localized_operation_result)
       expect(@go_config_service).to receive(:hasPipelineNamed).with(CaseInsensitiveString.new('does_not_exist')).and_return(true)
-      get 'stage_feed', :format => "xml", :no_layout => true, :name => 'does_not_exist'
+      get :stage_feed, params: { :name => 'does_not_exist', :no_layout => true }, format: :xml
     end
   end
 
@@ -350,10 +352,9 @@ describe Api::PipelinesController do
       expect(@status).to receive(:httpCode).and_return(406)
       expect(@pipeline_unlock_api_service).to receive(:unlock).with('pipeline-name', @user, @status)
 
-      fake_template_presence 'api/pipelines/releaseLock.erb', 'dummy'
-      expect(controller).to receive(:render_if_error).with("done", 406).and_return(true)
-
       post :releaseLock, params: { :pipeline_name => 'pipeline-name', :no_layout => true }
+      expect(response.status).to eq(406)
+      expect(response.body).to eq("done\n")
     end
   end
 
@@ -361,7 +362,7 @@ describe Api::PipelinesController do
     it "should pause the pipeline" do
       expect(@pipeline_pause_service).to receive(:pause).with("foo.bar", "wait for next checkin", Username.new(CaseInsensitiveString.new("someuser"), "Some User"), an_instance_of(HttpLocalizedOperationResult))
       allow(@controller).to receive(:current_user).and_return(Username.new(CaseInsensitiveString.new("someuser"), "Some User"))
-      post :pause, params: { :pipeline_name => "foo.bar", :no_layout => true, :pauseCause => "wait for next checkin" }
+      post :pause, params: { :pipeline_name => "foo.bar", :pauseCause => "wait for next checkin", :no_layout => true }
     end
   end
 
@@ -374,7 +375,7 @@ describe Api::PipelinesController do
   end
 
   def schedule_options(specified_revisions, variables, secure_variables = {})
-    ScheduleOptions.new(HashMap.new(specified_revisions), LinkedHashMap.new(variables), HashMap.new(secure_variables))
+    ScheduleOptions.new(specified_revisions.dup, variables.dup, secure_variables.dup)
   end
 
 end
