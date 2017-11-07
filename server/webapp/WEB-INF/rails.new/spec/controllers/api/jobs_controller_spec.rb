@@ -29,7 +29,7 @@ describe Api::JobsController do
   end
 
   it "should return a 404 HTTP response when id is not a number" do
-    get 'index', :id => "does-not-exist", :format => "xml", :no_layout => true
+    get :index, params: {:id => "does-not-exist", :no_layout => true}, format: :xml
     expect(response.status).to eq(404)
   end
 
@@ -37,7 +37,7 @@ describe Api::JobsController do
     job_instance_service = double()
     expect(job_instance_service).to receive(:buildById).with(99).and_throw(Exception.new("foo"))
     allow(controller).to receive(:job_instance_service).and_return(job_instance_service)
-    get 'index', :id => "99", :format => "xml", :no_layout => true
+    get :index, params: {:id => "99", :no_layout => true}, format: :xml
     expect(response.status).to eq(404)
   end
 
@@ -49,7 +49,7 @@ describe Api::JobsController do
     expect(@job_instance_service).to receive(:buildById).with(1).and_return(job)
     fake_template_presence 'api/jobs/index', 'some data'
 
-    get 'index', :id => "1", :format => "xml", :no_layout => true
+    get :index, params: {:id => "1", :no_layout => true}, format: :xml
 
     expect(assigns[:doc]).to eq(:dom)
   end
@@ -70,7 +70,7 @@ describe Api::JobsController do
     allow(@job_instance_service).to receive(:waitingJobPlans).and_return(waitingJobPlans)
     fake_template_presence 'api/jobs/scheduled', 'some data'
 
-    get :scheduled, params: { :format => "xml", :no_layout => true }
+    get :scheduled, params: { :no_layout => true }, format: :xml
 
     context = XmlWriterContext.new("http://test.host/go", nil, nil, nil, nil)
     expect(assigns[:doc]).to eq(:dom)
