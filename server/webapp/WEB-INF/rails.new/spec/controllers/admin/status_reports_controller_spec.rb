@@ -36,7 +36,7 @@ describe Admin::StatusReportsController do
     it 'should be inaccessible by non-admins' do
       login_as_group_admin
 
-      expect(controller).to disallow_action(:get, :show, :plugin_id => 'com.tw.myplugin')
+      expect(controller).to disallow_action(:get, :show, params: { :plugin_id => 'com.tw.myplugin' })
     end
 
     it 'should be accessible by all if security is disabled' do
