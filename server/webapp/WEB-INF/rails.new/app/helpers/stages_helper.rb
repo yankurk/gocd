@@ -56,7 +56,7 @@ module StagesHelper
   end
 
   def stage_bar_options sim
-    tag.tag_options(:class => "stage_bar #{sim.getState()}", :title => "%s (%s)" % [sim.getName(), l.messageFor(sim.getState())])
+    raw tag.tag_options(:class => "stage_bar #{sim.getState()}", :title => "%s (%s)" % [sim.getName(), l.messageFor(sim.getState())])
   end
 
   def stage_history_pagination_handler page, tab
