@@ -159,7 +159,9 @@ Go::Application.routes.draw do
   post "admin/materials/pluggable_scm/check_connection/:plugin_id" => "admin/materials/pluggable_scm#check_connection", constraints: {plugin_id: ALLOW_DOTS}, as: :admin_pluggable_scm_check_connection
   get "admin/materials/pluggable_scm/:scm_id/pipelines_used_in" => "admin/materials/pluggable_scm#pipelines_used_in", as: :scm_pipelines_used_in
 
-  get 'agents/filter_autocomplete/:action' => 'agent_autocomplete#%{action}', constraints: {action: /resource|os|ip|name|status|environment/}, as: :agent_filter_autocomplete
+  %w(resource os ip name status environment).each do |controller_action_method|
+    get "agents/filter_autocomplete/#{controller_action_method}" => "agent_autocomplete##{controller_action_method}", as: "agent_filter_autocomplete_#{controller_action_method}"
+  end
 
   scope 'pipelines' do
     defaults :no_layout => true do

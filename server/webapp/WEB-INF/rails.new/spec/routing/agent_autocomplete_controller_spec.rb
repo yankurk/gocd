@@ -20,7 +20,7 @@ describe AgentAutocompleteController do
   describe "routes" do
     it "should resolve the path" do
       expect(:get => '/agents/filter_autocomplete/resource').to route_to(:controller => "agent_autocomplete", :action => 'resource')
-      expect(agent_filter_autocomplete_path(:action => "os")).to eq("/agents/filter_autocomplete/os")
+      expect(agent_filter_autocomplete_os_path(:action => "os")).to eq("/agents/filter_autocomplete/os")
     end
 
     it "should accept only the defined actions" do
