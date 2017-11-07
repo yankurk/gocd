@@ -130,8 +130,12 @@ class ApplicationController < ActionController::Base
 
   def render_if_error message, status
     return if (status < 400)
-    render_error_response message, status, (params[:no_layout] == true)
+    render_error_response message, status, no_layout?
     return true
+  end
+
+  def no_layout?
+    params[:no_layout] == true || params[:no_layout] == 'true'
   end
 
   def render_error_response message, status, is_text
