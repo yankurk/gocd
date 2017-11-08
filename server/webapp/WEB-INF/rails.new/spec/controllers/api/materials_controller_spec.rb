@@ -29,25 +29,29 @@ describe Api::MaterialsController do
     end
 
     it "should return 401 when user is not an admin" do
-      expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
+      expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActiveSupport::HashWithIndifferentAccess), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
         result.unauthorized(LocalizedMessage.string('API_ACCESS_UNAUTHORIZED'), HealthStateType.unauthorised())
       end
-      post :notify, params: params
+      post :notify, params: @params
       expect(response.status).to eq(401)
       expect(response.body).to eq("Unauthorized to access this API.\n")
     end
 
-    it "should return 200 when notify is successful" do
-      expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)).and_return(nil)
-      post :notify, params: params
-      expect(response.status).to eq(200)
+    it "should return 202 when notify is successful" do
+      expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActiveSupport::HashWithIndifferentAccess), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
+        result.accepted(LocalizedMessage.string("MATERIAL_SCHEDULE_NOTIFICATION_ACCEPTED"));
+      end
+      post :notify, params: @params
+      expect(response.status).to eq(202)
+      expect(response.content_type).to eq('text/plain')
+      expect(response.body).to eq("The material is now scheduled for an update. Please check relevant pipeline(s) for status.\n")
     end
 
     it "should return 400 with params is empty" do
-      expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActionController::Parameters), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
+      expect(@material_update_service).to receive(:notifyMaterialsForUpdate).with(@user, an_instance_of(ActiveSupport::HashWithIndifferentAccess), an_instance_of(HttpLocalizedOperationResult)) do |user, params, result|
         result.badRequest(LocalizedMessage.string('API_BAD_REQUEST'))
       end
-      post :notify, params: params
+      post :notify, params: @params
       expect(response.status).to eq(400)
       expect(response.body).to eq("The request could not be understood by Go Server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.\n")
     end
