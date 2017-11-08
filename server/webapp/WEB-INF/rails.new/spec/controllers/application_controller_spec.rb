@@ -367,7 +367,7 @@ describe ApplicationController do
       end
 
       it "should cache the url based on options" do
-        controller.params.clear
+        controller.params = {}
         expect(controller.url_for('foo' => 'foo', 'bar' => 'bar')).to eq("1 -  - bar=bar|foo=foo|only_path=true - http:// - test.host")
         expect(controller.url_for('bar' => 'bar', 'foo' => 'foo')).to eq("1 -  - bar=bar|foo=foo|only_path=true - http:// - test.host")
       end
