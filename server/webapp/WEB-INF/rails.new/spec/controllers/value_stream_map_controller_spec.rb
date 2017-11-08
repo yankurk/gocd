@@ -41,9 +41,6 @@ describe ValueStreamMapController do
     @vsm_material_path_partial = proc do |material_fingerprint, revision|
       vsm_show_material_path(material_fingerprint, revision)
     end
-    @stage_detail_path_partial = proc do |pipeline_name, pipeline_counter, stage_name, stage_counter|
-      stage_detail_tab_path(pipeline_name: pipeline_name, pipeline_counter: pipeline_counter, stage_name: stage_name, stage_counter: stage_counter)
-    end
     @pipeline_edit_path_normal_edit = proc { |pipeline_name | pipeline_edit_path(:pipeline_name => pipeline_name, :current_tab => 'general') }
     @pipeline_edit_path_quick_edit = proc { |pipeline_name | edit_admin_pipeline_config_path(:pipeline_name => pipeline_name) }
   end
