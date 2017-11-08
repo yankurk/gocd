@@ -25,13 +25,13 @@ describe Api::StagesController do
     end
 
     it "should return a 404 HTTP response when id is not a number" do
-      get 'index', :id => "does-not-exist", :format => "xml", :no_layout => true
+      get 'index', params: { :id => "does-not-exist", :no_layout => true }, :format => "xml"
       expect(response.status).to eq(404)
     end
 
     it "should return a 404 HTTP response when stage cannot be loaded" do
       expect(@stage_service).to receive(:stageById).with(99).and_throw(Exception.new("foo"))
-      get 'index', :id => "99", :format => "xml", :no_layout => true
+      get 'index', params: { :id => "99", :no_layout => true }, :format => "xml"
       expect(response.status).to eq(404)
     end
 
@@ -39,7 +39,7 @@ describe Api::StagesController do
       updated_date = java.util.Date.new
       stage = StageMother.create_passed_stage("pipeline_name", 100, "blah-stage", 12, "dev", updated_date)
       expect(@stage_service).to receive(:stageById).with(99).and_return(stage)
-      get 'index', :id => "99", :format => "xml", :no_layout => true
+      get 'index', params: { :id => "99", :no_layout => true }, :format => "xml"
 
       context = XmlWriterContext.new("http://test.host/go", nil, nil, nil, nil)
       expect(assigns[:doc].asXML()).to eq(StageXmlViewModel.new(stage).toXml(context).asXML())
