@@ -124,7 +124,7 @@ describe Api::TestController do
   it "should render responses when given operation-result without any message" do
     get :localized_operation_result_without_message, params: { :no_layout=>true }
     expect(response.status).to eq(200)
-    expect(response.body).to eq(" ")
+    expect(response.body).to be_blank
   end
 
   describe "unresolved" do
