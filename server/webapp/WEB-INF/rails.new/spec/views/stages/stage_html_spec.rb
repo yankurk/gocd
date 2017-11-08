@@ -172,12 +172,12 @@ describe 'stages/stage.html.erb' do
           render :template => "stages/stage.html.erb", :layout => "layouts/pipelines.html.erb"
 
           Capybara.string(response.body).find(".other_runs").tap do |other_runs|
-            other_runs.find("li a[href='/pipelines/pipeline_name/10/stage_name/1/overview']").tap do |f|
+            other_runs.find("li a[href='/pipelines/pipeline_name/10/dev/1/overview']").tap do |f|
               expect(f).to have_selector "span", :text => "Run: 1 of 3"
               expect(f).to have_selector ".color_code.Passed"
               expect(f).to have_selector ".message", :text => "Passed"
             end
-            other_runs.find("li a[href='/pipelines/pipeline_name/10/stage_name/3/overview']").tap do |f|
+            other_runs.find("li a[href='/pipelines/pipeline_name/10/dev/3/overview']").tap do |f|
               expect(f).to have_selector "span", :text => "Run: 3 of 3"
               expect(f).to have_selector ".color_code.Failed"
               expect(f).to have_selector ".message", :text => "Failed"
