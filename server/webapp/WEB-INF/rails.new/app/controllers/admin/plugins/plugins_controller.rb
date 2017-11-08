@@ -29,7 +29,7 @@ class Admin::Plugins::PluginsController < AdminController
   end
 
   def upload
-    render :status => 403, :text => "Feature is not enabled" and return unless system_environment.isPluginUploadEnabled()
+    render :status => 403, :plain => "Feature is not enabled" and return unless system_environment.isPluginUploadEnabled()
     if params[:plugin].nil?
       respond_to do |format|
         format.html { flash[:error] = "Please select a file to upload." and redirect_to action: "index" }
