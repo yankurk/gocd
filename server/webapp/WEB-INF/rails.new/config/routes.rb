@@ -171,7 +171,7 @@ Go::Application.routes.draw do
     end
 
     match 'show', to: 'pipelines#show', via: %w(get post), as: :pipeline
-    match 'select_pipelines', to: 'pipelines#show', via: %w(get post), as: :pipeline_select_pipelines
+    match 'select_pipelines', to: 'pipelines#select_pipelines', via: %w(get post), as: :pipeline_select_pipelines
 
     %w(index build_cause).each do |controller_action_method|
       get "#{controller_action_method}" => "pipelines##{controller_action_method}"
