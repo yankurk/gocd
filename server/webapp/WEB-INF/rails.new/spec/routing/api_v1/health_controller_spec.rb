@@ -29,7 +29,7 @@ describe ApiV1::HealthController do
     end
 
     it 'should route to errors without custom header' do
-      expect(:get => 'api/v12/health').to route_to(controller: 'application', action: 'unresolved', url: 'api/v12/health')
+      expect(:get => 'api/v12/health').to route_to(controller: 'api_v1/errors', action: 'not_found', url: 'v12/health')
     end
   end
 end
