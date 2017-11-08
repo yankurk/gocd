@@ -24,7 +24,7 @@
   Mime::Type.register mime_type, symbol
 
   ActionController::Renderers.add symbol do |json, options|
-    json = JSON.pretty_generate(json, options) << "\n" unless json.kind_of?(String)
+    json = JSON.pretty_generate(json.as_json, options) << "\n" unless json.kind_of?(String)
     json = "#{options[:callback]}(#{json})" unless options[:callback].blank?
     render body: json, content_type: mime_type, layout: false
   end
