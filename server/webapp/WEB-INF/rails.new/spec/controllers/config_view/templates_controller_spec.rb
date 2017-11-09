@@ -30,14 +30,14 @@ describe ConfigView::TemplatesController do
       enable_security
       login_as_anonymous
 
-      expect(controller).to disallow_action(:get, :show, name: 'template')
+      expect(controller).to disallow_action(:get, :show, params: { name: 'template' })
     end
 
     it 'should disallow normal users, with security enabled' do
       enable_security
       login_as_user
 
-      expect(controller).to disallow_action(:get, :show, name: 'template')
+      expect(controller).to disallow_action(:get, :show, params: { name: 'template' })
     end
 
     it 'should allow admin, with security enabled' do
