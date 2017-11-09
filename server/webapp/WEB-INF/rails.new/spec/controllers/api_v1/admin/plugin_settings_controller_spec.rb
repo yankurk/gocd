@@ -161,7 +161,7 @@ describe ApiV1::Admin::PluginSettingsController do
 
       it 'should deserialize plugin settings from given object' do
         allow(@entity_hashing_service).to receive(:md5ForEntity).and_return("some-md5")
-        hash = {plugin_id: 'plugin.id.2',configuration: [{"key" => 'url', "value" => 'git@github.com:foo/bar.git'}, {"key" => 'password', "value" => "some-value"}]}
+        hash = {plugin_id: 'plugin.id.2',configuration: [{:key => 'url', :value => 'git@github.com:foo/bar.git'}, {:key => 'password', :value => "some-value"}]}
         expect(@plugin_service).to receive(:createPluginSettings).with(anything, anything, an_instance_of(PluginSettings))
 
         post_with_api_header :create, params: { plugin_setting: hash }
@@ -282,7 +282,7 @@ describe ApiV1::Admin::PluginSettingsController do
         allow(controller).to receive(:default_plugin_info_finder).and_return(@default_plugin_info_finder)
         expect(@default_plugin_info_finder).to receive(:pluginInfoFor).with('plugin.id.1').exactly(2).times.and_return(com.thoughtworks.go.plugin.domain.configrepo.ConfigRepoPluginInfo.new(nil, com.thoughtworks.go.plugin.domain.common.PluggableInstanceSettings.new([com.thoughtworks.go.plugin.domain.common.PluginConfiguration.new('url', nil), com.thoughtworks.go.plugin.domain.common.PluginConfiguration.new('password', nil)])))
         controller.request.env['HTTP_IF_MATCH'] = "\"#{Digest::MD5.hexdigest("md5")}\""
-        hash = {plugin_id: 'plugin.id.1',configuration: [{"key" => 'url', "value" => 'git@github.com:foo/bar.git'}, {"key" => 'password', "value" => "some-value"}]}
+        hash = {plugin_id: 'plugin.id.1',configuration: [{:key => 'url', :value => 'git@github.com:foo/bar.git'}, {:key => 'password', :value => "some-value"}]}
 
         expect(@entity_hashing_service).to receive(:md5ForEntity).with(an_instance_of(PluginSettings)).exactly(3).times.and_return('md5')
         expect(@plugin_service).to receive(:getPluginSettings).with('plugin.id.1').and_return(@plugin_settings)
