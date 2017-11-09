@@ -236,12 +236,12 @@ describe 'stages/stage.html.erb' do
         render
 
         Capybara.string(response.body).find(".sub_tabs_container").tap do |f|
-          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/pipeline?action=jobs&pipeline_counter=1&pipeline_name=cruise&stage_counter=3&stage_name=dev']", :text => "Pipeline Dependencies"
-          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/materials?action=jobs&pipeline_counter=1&pipeline_name=cruise&stage_counter=3&stage_name=dev']", :text => "Materials"
-          expect(f).to have_selector ".current a[href='/pipelines/pipeline_name/10/stage_name/3/jobs?action=jobs&pipeline_counter=1&pipeline_name=cruise&stage_counter=3&stage_name=dev']", :text => "Jobs"
-          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/tests?action=jobs&pipeline_counter=1&pipeline_name=cruise&stage_counter=3&stage_name=dev']", :text => "Tests"
-          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/overview?action=jobs&pipeline_counter=1&pipeline_name=cruise&stage_counter=3&stage_name=dev']", :text => "Overview"
-          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/stage_config?action=jobs&pipeline_counter=1&pipeline_name=cruise&stage_counter=3&stage_name=dev']", :text => "Config"
+          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/pipeline']", :text => "Pipeline Dependencies"
+          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/materials']", :text => "Materials"
+          expect(f).to have_selector ".current a[href='/pipelines/pipeline_name/10/stage_name/3/jobs']", :text => "Jobs"
+          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/tests']", :text => "Tests"
+          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/overview']", :text => "Overview"
+          expect(f).to have_selector "a[href='/pipelines/pipeline_name/10/stage_name/3/stage_config']", :text => "Config"
         end
 
         Capybara.string(response.body).find("script[type='text/javascript']", :visible => false).tap do |script_tag|
