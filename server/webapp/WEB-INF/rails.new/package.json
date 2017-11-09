@@ -50,6 +50,7 @@
     "stats-webpack-plugin": "^0.6.0",
     "synchronize": "^2.0.0",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.4"
+    "webpack-dev-server": "^2.9.4",
+    "webpack-merge": "^4.1.1"
   }
 }
