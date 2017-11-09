@@ -289,16 +289,11 @@ describe ApplicationController do
 
       # Fake that part of a Rails model object that is needed by url_for.
       class TestObject
+        extend ActiveModel::Naming
+
         def id
         end
 
-        def self.model_name
-          self
-        end
-
-        def self.singular_route_key
-          "test_object"
-        end
       end
 
       it "should return only the path to a given resource and not the whole url" do
