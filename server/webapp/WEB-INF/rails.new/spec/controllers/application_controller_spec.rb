@@ -294,6 +294,14 @@ describe ApplicationController do
         def id
         end
 
+        def to_model
+          self
+        end
+
+        def persisted?
+          self
+        end
+
       end
 
       it "should return only the path to a given resource and not the whole url" do
