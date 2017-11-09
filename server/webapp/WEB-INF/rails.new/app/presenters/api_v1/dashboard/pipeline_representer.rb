@@ -32,7 +32,7 @@ module ApiV1
       end
 
       link :trigger do |opts|
-        opts[:url_builder].api_pipeline_releaseLock_url(pipeline.getName())
+        opts[:url_builder].api_pipeline_schedule_url(pipeline.getName())
       end
 
       link :trigger_with_options do |opts|

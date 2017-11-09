@@ -17,6 +17,7 @@
 module PipelinesHelper
   include RailsLocalizer
   include JavaImports
+  include StagesHelper
   include ERB::Util
 
   def stage_bar_url stage, action
