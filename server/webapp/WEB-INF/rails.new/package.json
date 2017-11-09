@@ -10,6 +10,7 @@
     "karma": "karma start"
   },
   "dependencies": {
+    "@rails/webpacker": "^3.0.2",
     "angular": "1.0.8",
     "bourbon": "^4.3.4",
     "dragula": "^3.7.2",
@@ -49,6 +50,6 @@
     "stats-webpack-plugin": "^0.6.0",
     "synchronize": "^2.0.0",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.4.5"
+    "webpack-dev-server": "^2.9.4"
   }
 }
