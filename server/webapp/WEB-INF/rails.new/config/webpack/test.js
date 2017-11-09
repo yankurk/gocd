@@ -3,4 +3,4 @@ const environment  = require('./environment');
 const customConfig = require('./customizations');
 const devAndTest = require('./dev-and-test');
 
-module.exports = merge(environment.toWebpackConfig(), customConfig, devAndTest);
+module.exports = merge(devAndTest, environment.toWebpackConfig(), customConfig);

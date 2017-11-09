@@ -28,6 +28,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'listen'
+  gem 'jasmine-rails'
 
   gem 'rspec_junit_formatter'
   gem 'rails-controller-testing'

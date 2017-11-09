@@ -1,3 +1,7 @@
+/* global __dirname */
+
+'use strict';
+
 const {environment} = require('@rails/webpacker');
 const StatsPlugin   = require('stats-webpack-plugin');
 const webpack       = require('webpack');
@@ -8,6 +12,20 @@ const path          = require('path');
 const webpackerYml  = require('@rails/webpacker/package/config');
 const assetHost     = require('@rails/webpacker/package/asset_host');
 const assetsDir     = path.join(__dirname, '..', '..', webpackerYml.source_path);
+
+const mithrilVersionFromNpm          = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'node_modules/mithril/package.json'), 'utf8')).version;
+const mithrilPatchFileContentAsLines = fs.readFileSync(path.join(__dirname, '..', '..', 'spec/webpack/patches/mithril.js'), 'utf8').split("\n");
+
+let isMithrilVersionLine = function (line) {
+  return _.includes(line, 'm.version = ');
+};
+
+const mithrilVersionFromPatch = _.find(mithrilPatchFileContentAsLines, isMithrilVersionLine)
+  .split("=")[1].trim().replace(/"/g, "");
+
+if (mithrilVersionFromNpm !== mithrilVersionFromPatch) {
+  throw new Error("Please ensure that the patched mithril version is the same as the one installed via nodejs");
+}
 
 const babelLoader = environment.loaders.get('babel');
 babelLoader.test  = /\.(js|jsx|msx)?(\.erb)?$/;
