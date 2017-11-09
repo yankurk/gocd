@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "license": "Apache-2.0",
   "scripts": {
-    "webpack-watch": "webpack --config config/webpack.config.js --watch",
-    "webpack-dev": "webpack --config config/webpack.config.js",
-    "webpack-prod": "webpack --config config/webpack.config.js --env.production=true",
-    "jasmine-ci": "karma start --single-run",
-    "karma": "karma start"
+    "webpack-watch": "NODE_ENV=development webpack --config config/webpack/webpack.js --watch",
+    "webpack-dev": "NODE_ENV=development webpack --config config/webpack/webpack.js",
+    "webpack-prod": "NODE_ENV=production webpack --config config/webpack/webpack.js",
+    "jasmine-ci": "NODE_ENV=test karma start --single-run",
+    "karma": "NODE_ENV=test karma start"
   },
   "dependencies": {
     "@rails/webpacker": "^3.0.2",

@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-const webpackerYml = require('@rails/webpacker/package/config');
+var path = require('path');
 
 module.exports = {
-  cache: true,
-  bail: true,
+  entry:   {
+    specRoot: path.join(__dirname, '..', '..', 'spec', 'webpack', 'specRoot.js')
+  },
   resolve: {
-    alias: {
-      'string-plus': 'helpers/string-plus',
-      'string':      'underscore.string',
-      'jQuery':      'jquery',
-    }
-  },
-  output: {
-    // we have to override this for the `/go` prefix
-    publicPath: `/go/${webpackerYml.public_output_path}/`,
-    filename:   process.env.NODE_ENV == 'production' ? '[name]-[chunkhash].js' : '[name].js',
-    pathinfo: true
-  },
-  devServer: {
-    publicPath: `/go/${webpackerYml.public_output_path}/`
+    modules: [path.join(__dirname, '..', 'spec', 'webpack', 'patches')]
   }
 };
