@@ -31,8 +31,7 @@ class GoCacheStore < ActiveSupport::Cache::Store
 
   def write(name, value, options = nil)
     if name.start_with?(VIEW_PREFIX) && value.is_a?(String)
-      super(name, value.to_java(:string), options)
-      return
+      return super(name, value.to_java(:string), options)
     end
     super(name, value, options)
   end
