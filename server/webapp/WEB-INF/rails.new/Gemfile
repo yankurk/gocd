@@ -29,11 +29,12 @@ group :development, :test do
   gem 'capybara'
   gem 'listen'
 
+  # === begin jasmine+friends
   gem 'jasmine'
   gem 'jasmine-core'
-  # gem 'jasmine-junitreporter', '0.0.1'
   gem 'jasmine-rails'
   gem 'selenium-webdriver'
+  # === end jasmine+friends
 
   gem 'rspec_junit_formatter'
   gem 'rails-controller-testing'
