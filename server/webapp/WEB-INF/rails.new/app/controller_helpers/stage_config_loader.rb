@@ -1,5 +1,5 @@
 ##########################GO-LICENSE-START################################
-# Copyright 2014 ThoughtWorks, Inc.
+# Copyright 2017 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,31 +14,26 @@
 # limitations under the License.
 ##########################GO-LICENSE-END##################################
 
-Go::Application.config.after_initialize do
-  Rails.logger.fatal "Oauth Controller invoked"
+module StageConfigLoader
+  include JavaImports
 
-  Oauth2Provider::ClientsController.class_eval do
-    layout 'admin'
-    prepend_before_action :set_tab_name, :set_view_title
+  def self.included base
+    base.send(:include, ::PipelineConfigLoader)
+    base.send(:extend, ClassMethods)
+  end
 
-    private
-
-    def set_tab_name
-      @tab_name = "oauth-clients"
-    end
-
-    def set_view_title
-      @view_title = "Administration"
+  module ClassMethods
+    def load_stage_except_for *actions
+      load_pipeline_except_for *actions
+      before_action :load_stage, :except => actions
     end
   end
 
-  Oauth2Provider::UserTokensController.class_eval do
-    layout 'my-cruise'
+  private
 
-    prepend_before_action :set_tab_name
-
-    def set_tab_name
-      @current_tab_name = "preferences"
-    end
+  def load_stage
+    stage_name = CaseInsensitiveString.new(params[:stage_name])
+    stage = @pipeline.find { |stage_config| stage_name == stage_config.name() }
+    assert_load :stage, stage, l.stageNotFoundInPipeline(stage_name, @pipeline.name())
   end
 end

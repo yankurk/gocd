@@ -26,6 +26,7 @@ Bundler.require(*Rails.groups)
 
 module Go
   class Application < Rails::Application
+    require_relative '../lib/all_libs'
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
 
@@ -34,17 +35,13 @@ module Go
     # -- all .rb files in that directory are automatically loaded.
 
     config.autoload_paths += Dir[
-      Rails.root.join('lib'),
+      Rails.root.join('app', 'controller_helpers'),
       Rails.root.join('app', 'presenters')
     ]
 
-    require_relative '../lib/ext'
-
-    require_relative '../lib/log4j_logger'
     config.logger = Log4jLogger::Logger.new('com.thoughtworks.go.server.Rails')
 
     #Set up rate limiting
-    require "encryption_api_rate_limiter"
     config.middleware.use EncryptionApiRateLimiter, {max_per_minute: com.thoughtworks.go.util.SystemEnvironment.new.getMaxEncryptionAPIRequestsPerMinute()}
 
     # Add catch-all route, after all Rails routes and Engine routes are initialized.

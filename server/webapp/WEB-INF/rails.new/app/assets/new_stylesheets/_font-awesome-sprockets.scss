@@ -15,3 +15,26 @@
  */
 
 $fa-font-path: 'font-awesome/fonts';
+
+@import 'bourbon/app/assets/stylesheets/bourbon';
+
+// this file is a copy of font-awesome.scss, with changes to `path.scss` substituted in this file
+@import "font-awesome/scss/variables";
+@import "font-awesome/scss/mixins";
+
+@include font-face($font-family: 'FontAwesome',
+                   $file-path: "#{$fa-font-path}/fontawesome-webfont",
+                   $file-formats: eot woff woff2 ttf,
+                   $asset-pipeline: true
+);
+
+@import "font-awesome/scss/core";
+@import "font-awesome/scss/larger";
+@import "font-awesome/scss/fixed-width";
+@import "font-awesome/scss/list";
+@import "font-awesome/scss/bordered-pulled";
+@import "font-awesome/scss/animated";
+@import "font-awesome/scss/rotated-flipped";
+@import "font-awesome/scss/stacked";
+@import "font-awesome/scss/icons";
+@import "font-awesome/scss/screen-reader";

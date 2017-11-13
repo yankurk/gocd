@@ -21,4 +21,4 @@ ENV['LOAD_OAUTH_SILENTLY'] = "yes"
 require_relative 'application'
 
 # Initialize the Rails application.
-Go::Application.initialize!
+Rails.application.initialize!
