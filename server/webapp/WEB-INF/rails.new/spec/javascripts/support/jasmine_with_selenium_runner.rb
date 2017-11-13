@@ -33,7 +33,7 @@ class JasmineWithSeleniumRunner
     RakeFileUtils.rm_rf tmp_dir
     RakeFileUtils.mkdir_p tmp_dir
 
-    if Config::CONFIG['host_os'] =~ /windows|cygwin|bccwin|cygwin|djgpp|mingw|mswin|wince/i
+    if RbConfig::CONFIG['host_os'] =~ /windows|cygwin|bccwin|cygwin|djgpp|mingw|mswin|wince/i
       tmp_dir = tmp_dir.gsub(::File::SEPARATOR, ::File::ALT_SEPARATOR || '\\')
     end
 
