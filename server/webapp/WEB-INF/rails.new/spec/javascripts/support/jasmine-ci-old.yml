@@ -29,7 +29,9 @@ src_files:
 #   - stylesheets/*.css
 #
 stylesheets:
-  - assets/application.css
+  - "assets/application.css"
+  - "patterns/application.css"
+  - "new-theme.css"
 
 # helpers
 #
