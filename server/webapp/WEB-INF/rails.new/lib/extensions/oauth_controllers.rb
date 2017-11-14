@@ -15,7 +15,6 @@
 ##########################GO-LICENSE-END##################################
 
 Go::Application.config.after_initialize do
-  Rails.logger.fatal "Oauth Controller invoked"
 
   Oauth2Provider::ClientsController.class_eval do
     layout 'admin'
